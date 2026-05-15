@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 import os
+from pathlib import Path
 import random as _random
 import sys
 
@@ -24,6 +25,8 @@ DEFAULT_PROFILE = "hard"
 PROFILE_NAMES = [STATIC_PROFILE, *sorted(PRESET_LAYOUT_PROFILES)]
 VIEWER_MAX_BUILDINGS = max(profile.max_buildings for profile in PRESET_LAYOUT_PROFILES.values())
 VIEWER_ARMY_COMPOSITION = {"barbarian": 40, "wall_breaker": 10}
+TRUTHY_ENV = {"1", "true", "yes", "on"}
+FALSY_ENV = {"0", "false", "no", "off"}
 
 app = Flask(__name__, static_folder=VIEWER_DIR, static_url_path="")
 
@@ -48,6 +51,29 @@ class SessionState:
 
 
 session = SessionState()
+
+
+def _env_flag(name: str, default: bool) -> bool:
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    normalized = raw.strip().lower()
+    if normalized in TRUTHY_ENV:
+        return True
+    if normalized in FALSY_ENV:
+        return False
+    return default
+
+
+def _reload_extra_files() -> list[str]:
+    root = Path(VIEWER_DIR).parent
+    watched: list[Path] = [
+        Path(VIEWER_DIR) / "index.html",
+        Path(VIEWER_DIR) / "server.py",
+        root / "pyproject.toml",
+    ]
+    watched.extend((root / "coc_env").glob("*.py"))
+    return [str(path) for path in watched if path.exists()]
 
 
 def _action_label(action: int) -> str:
@@ -404,8 +430,16 @@ def state():
 
 def main() -> None:
     port = int(os.environ.get("PORT", "5173"))
+    hot_reload = _env_flag("VIEWER_RELOAD", True)
     print(f"Open http://127.0.0.1:{port}/ in your browser")
-    app.run(host="127.0.0.1", port=port, debug=False)
+    print(f"Hot reload: {'on' if hot_reload else 'off'}")
+    app.run(
+        host="127.0.0.1",
+        port=port,
+        debug=False,
+        use_reloader=hot_reload,
+        extra_files=_reload_extra_files() if hot_reload else None,
+    )
 
 
 if __name__ == "__main__":

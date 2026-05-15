@@ -214,6 +214,9 @@ Two viewers exist:
   `http://127.0.0.1:5173/`. The UI can step ticks, run the bundled random
   agent, or accept manual deploys. The `/state` JSON endpoint is a
   reasonable scripting surface if you'd rather not go through Gymnasium.
+  The viewer server hot-reloads by default when Python files, `viewer/server.py`,
+  `viewer/index.html`, or `pyproject.toml` change. Use
+  `VIEWER_RELOAD=0 coc-viewer` when you want a single non-reloading process.
 - Pygame: `python scripts/hand_play.py` runs a hand-coded deploy schedule
   against the default layout. This is what I use when I am changing
   simulator internals.
@@ -269,4 +272,5 @@ Python 3.11+, numpy 2.x, gymnasium 1.x.
 | All profiles, 30 s total | `.venv/bin/python -m scripts.random_baseline --profile all --seconds 30` |
 | Throughput              | `.venv/bin/python -m scripts.bench_env --profile hard --iterations 20000` |
 | Browser viewer          | `.venv/bin/coc-viewer` then `http://127.0.0.1:5173/` |
+| Browser viewer, no reload | `VIEWER_RELOAD=0 .venv/bin/coc-viewer` |
 | Pygame demo             | `.venv/bin/python scripts/hand_play.py` |
