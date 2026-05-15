@@ -1957,7 +1957,7 @@ async function tickOne() {
   state = await api("POST", "/advance", { ticks: 1, agent_mode: "off", include_paths: pathsEnabled() });
   afterUpdate();
 }
-async function deploy(action) {
+async function deployTroop(action) {
   state = await api("POST", "/deploy", { action, include_paths: pathsEnabled() });
   afterUpdate();
 }
@@ -2261,12 +2261,12 @@ function drawBoard() {
   applyDebugTransform();
   const guides = document.getElementById("grid-guides");
   const ranges = document.getElementById("grid-ranges");
-  const deploy = document.getElementById("grid-deploy");
+  const deployLayer = document.getElementById("grid-deploy");
   const paths = document.getElementById("grid-paths");
   const buildings = document.getElementById("grid-buildings");
   const combat = document.getElementById("grid-combat");
   const troops = document.getElementById("grid-troops");
-  if (!guides || !ranges || !deploy || !paths || !buildings || !combat || !troops) return;
+  if (!guides || !ranges || !deployLayer || !paths || !buildings || !combat || !troops) return;
   drawPathPredictions(paths);
   combat.innerHTML = "";
 
@@ -2353,7 +2353,7 @@ function drawBoard() {
   const troopKind = selectedTroopKind;
   const deployKey = `${DEBUG.inset}|${troopKind}|${armyLeft ? 1 : 0}|${state.is_done ? 1 : 0}|${(state.action_mask || []).join("")}`;
   if (deployKey !== boardDeployKey) {
-    deploy.replaceChildren();
+    deployLayer.replaceChildren();
     for (let i = 0; i < deployCells.length; i++) {
       const [cx, cy] = deployCells[i];
       const action = deployActionForCell(i);
@@ -2363,12 +2363,12 @@ function drawBoard() {
         class: "perim" + (enabled ? "" : " disabled"),
       });
       if (enabled) {
-        r.addEventListener("click", () => deploy(action));
+        r.addEventListener("click", () => deployTroop(action));
         const t = el("title", {});
         t.textContent = `deploy ${troopKind.replaceAll("_", " ")} @ (${cx}, ${cy})`;
         r.appendChild(t);
       }
-      deploy.appendChild(r);
+      deployLayer.appendChild(r);
     }
     boardDeployKey = deployKey;
   }
