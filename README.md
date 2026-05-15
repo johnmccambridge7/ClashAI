@@ -110,7 +110,7 @@ at `present=0`. The keys are:
 
 The env was built around the assumption that the agent would be a
 discrete-action, action-masked PPO. The action space is large
-(`44 * 44 * 2 + 1 = 3873`) and most of it is illegal at any given moment,
+(`44 * 44 + 1 = 1937`) and most of it is illegal at any given moment,
 which is the case action masking exists for.
 
 ### Step 1: baseline
@@ -125,6 +125,16 @@ It prints maps per minute, mean damage and stars, terminated vs. truncated
 counts, and threshold success rates (>=25 percent, >=50 percent, and so
 on). If a learned policy doesn't beat this by a wide margin, the run is
 broken.
+
+For rollout-throughput checks, run the same random policy across multiple
+processes:
+
+```
+.venv/bin/python -B -m scripts.random_baseline_parallel --profile hard --seconds 60 --workers 8
+```
+
+This reports aggregate maps/min, decisions/sec, sim ticks/sec, and per-worker
+episode counts. Use it to choose the worker count for hosted training.
 
 ### Step 2: maskable PPO
 
@@ -232,9 +242,10 @@ coc/
     index.html        Sprite-based browser UI
     img/              Sprite assets
   scripts/
-    random_baseline.py  Random-policy evaluation harness
-    bench_env.py        Throughput benchmark for masks/tick/step
-    hand_play.py        Scripted-deploy pygame demo
+    random_baseline.py           Random-policy evaluation harness
+    random_baseline_parallel.py  Multi-process random-policy throughput harness
+    bench_env.py                 Throughput benchmark for masks/tick/step
+    hand_play.py                 Scripted-deploy pygame demo
   tests/                Pytest suite
 ```
 
@@ -254,7 +265,8 @@ Python 3.11+, numpy 2.x, gymnasium 1.x.
 | ----------------------- | ------- |
 | Tests                   | `.venv/bin/python -m pytest -q` |
 | Random baseline, 1 min  | `.venv/bin/python -m scripts.random_baseline --profile hard --seconds 60` |
-| All profiles, 30 s each | `.venv/bin/python -m scripts.random_baseline --profile all --seconds 30` |
+| Parallel random baseline | `.venv/bin/python -B -m scripts.random_baseline_parallel --profile hard --seconds 60 --workers 8` |
+| All profiles, 30 s total | `.venv/bin/python -m scripts.random_baseline --profile all --seconds 30` |
 | Throughput              | `.venv/bin/python -m scripts.bench_env --profile hard --iterations 20000` |
 | Browser viewer          | `.venv/bin/coc-viewer` then `http://127.0.0.1:5173/` |
 | Pygame demo             | `.venv/bin/python scripts/hand_play.py` |

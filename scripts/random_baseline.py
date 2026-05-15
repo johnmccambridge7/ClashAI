@@ -90,7 +90,7 @@ def run(n_episodes: int = 200, seed: int = 42, profile: str = "hard") -> np.ndar
     return np.array(damage)
 
 
-def _summarize(results: list[EpisodeResult], elapsed: float) -> str:
+def summarize(results: list[EpisodeResult], elapsed: float) -> str:
     if not results:
         return f"N=0 elapsed={elapsed:.2f}s"
     damage = np.array([r.damage_pct for r in results], dtype=np.float64)
@@ -101,8 +101,11 @@ def _summarize(results: list[EpisodeResult], elapsed: float) -> str:
     terminated = sum(r.terminated for r in results)
     truncated = sum(r.truncated for r in results)
     maps_per_min = len(results) / max(elapsed, 1e-9) * 60.0
+    decisions_per_sec = steps.sum() / max(elapsed, 1e-9)
+    ticks_per_sec = ticks.sum() / max(elapsed, 1e-9)
     lines = [
-        f"N={len(results)} elapsed={elapsed:.2f}s maps/min={maps_per_min:.1f}",
+        f"N={len(results)} elapsed={elapsed:.2f}s maps/min={maps_per_min:.1f} "
+        f"decisions/sec={decisions_per_sec:.1f} sim_ticks/sec={ticks_per_sec:.1f}",
         f"damage mean={damage.mean():.3f} median={np.median(damage):.3f} "
         f"min={damage.min():.3f} max={damage.max():.3f} std={damage.std():.3f}",
         f"score  mean={scores.mean():.3f} median={np.median(scores):.3f} "
@@ -129,7 +132,7 @@ def main() -> None:
 
     results, elapsed = run_time_budget(seconds=args.seconds, seed=args.seed, profile=args.profile)
     print(f"profile={args.profile} seed={args.seed}")
-    print(_summarize(results, elapsed))
+    print(summarize(results, elapsed))
 
 
 if __name__ == "__main__":

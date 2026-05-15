@@ -150,7 +150,10 @@ def _include_paths_requested(body: dict[str, object] | None = None) -> bool:
     return raw is True or raw == 1 or (isinstance(raw, str) and raw.lower() in {"1", "true", "yes"})
 
 
-def _state(include_paths: bool = False) -> dict[str, object]:
+def _state(
+    include_paths: bool = False,
+    event_stream: list[dict[str, object]] | None = None,
+) -> dict[str, object]:
     sim = env.sim
     assert sim is not None
     return {
@@ -221,20 +224,21 @@ def _state(include_paths: bool = False) -> dict[str, object]:
         "n_actions": N_DEPLOY_ACTIONS + 1,
         "action_mask": env.action_masks().tolist(),
         "engagements": sim.current_engagements(),
+        "event_stream": event_stream or [],
         "path_predictions": _path_predictions() if include_paths else [],
     }
 
 
-def _advance_one_tick() -> float:
+def _advance_one_tick() -> tuple[float, list[dict[str, object]]]:
     sim = env.sim
     assert sim is not None
     if sim.is_done:
-        return 0.0
+        return 0.0, []
     sim.tick()
     session.ticks_since_decision += 1
     r = sim.score - session.prev_score - TIME_COST_PER_TICK
     session.prev_score = sim.score
-    return float(r)
+    return float(r), [dict(e) for e in sim.visual_events]
 
 
 def _random_policy_action() -> int | None:
@@ -254,10 +258,11 @@ def _apply_random_policy_action() -> bool:
     return applied
 
 
-def _advance_ticks(count: int, agent_mode: str = "off") -> float:
+def _advance_ticks(count: int, agent_mode: str = "off") -> tuple[float, list[dict[str, object]]]:
     sim = env.sim
     assert sim is not None
     step_reward = 0.0
+    event_stream: list[dict[str, object]] = []
     for _ in range(max(0, count)):
         if sim.is_done:
             break
@@ -267,8 +272,10 @@ def _advance_ticks(count: int, agent_mode: str = "off") -> float:
             and session.ticks_since_decision >= DECISION_INTERVAL
         ):
             _apply_random_policy_action()
-        step_reward += _advance_one_tick()
-    return step_reward
+        reward, events = _advance_one_tick()
+        step_reward += reward
+        event_stream.extend(events)
+    return step_reward, event_stream
 
 
 def _apply_action(action: int, source: str) -> bool:
@@ -318,10 +325,10 @@ def reset():
 
 @app.post("/tick")
 def tick():
-    r = _advance_ticks(1)
+    r, events = _advance_ticks(1)
     session.last_reward = r
     session.total_reward += r
-    return jsonify(_state(_include_paths_requested()))
+    return jsonify(_state(_include_paths_requested(), events))
 
 
 @app.post("/deploy")
@@ -357,19 +364,19 @@ def step():
     if not mask[action]:
         return jsonify({"error": f"action {action} is masked"}), 400
     _apply_action(action, "manual")
-    step_reward = _advance_ticks(DECISION_INTERVAL)
+    step_reward, events = _advance_ticks(DECISION_INTERVAL)
     session.last_reward = step_reward
     session.total_reward += step_reward
-    return jsonify(_state(_include_paths_requested()))
+    return jsonify(_state(_include_paths_requested(), events))
 
 
 @app.post("/step_random")
 def step_random():
     _apply_random_policy_action()
-    step_reward = _advance_ticks(DECISION_INTERVAL)
+    step_reward, events = _advance_ticks(DECISION_INTERVAL)
     session.last_reward = step_reward
     session.total_reward += step_reward
-    return jsonify(_state(_include_paths_requested()))
+    return jsonify(_state(_include_paths_requested(), events))
 
 
 @app.post("/advance")
@@ -384,10 +391,10 @@ def advance():
     agent_mode = str(body.get("agent_mode", "off"))
     if agent_mode not in {"off", "random"}:
         return jsonify({"error": f"agent_mode {agent_mode!r} is not available"}), 400
-    step_reward = _advance_ticks(ticks, agent_mode)
+    step_reward, events = _advance_ticks(ticks, agent_mode)
     session.last_reward = step_reward
     session.total_reward += step_reward
-    return jsonify(_state(_include_paths_requested(body)))
+    return jsonify(_state(_include_paths_requested(body), events))
 
 
 @app.get("/state")

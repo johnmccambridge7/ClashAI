@@ -463,12 +463,6 @@
     background: rgba(118, 217, 154, 0.12);
   }
 
-  .hint {
-    flex: 1;
-    color: var(--ink-mute);
-    font-size: 10.5px;
-    letter-spacing: 0.04em;
-  }
   .legend {
     display: flex; gap: 14px;
     color: var(--ink-mute);
@@ -567,10 +561,6 @@
   .hp-fg {
     fill: #55e3c4;
     filter: drop-shadow(0 0 2px rgba(85, 227, 196, 0.45));
-  }
-  .troop {
-    fill: var(--hot);
-    transition: cx 220ms ease-out, cy 220ms ease-out;
   }
   .range-circle {
     fill: var(--threat);
@@ -865,7 +855,7 @@
     <span class="sep">/</span>
     <span class="meta">seed <em id="seedReadout">—</em></span>
     <span class="sep">/</span>
-    <span class="meta">port 5173</span>
+    <span class="meta">local server</span>
     <span class="grow"></span>
     <span class="status" id="status" data-state="live">
       <span class="dot"></span>
@@ -1039,40 +1029,62 @@ const BUILDING_COLORS = {
   wall:     "var(--ink-mute)",
 };
 
-const SPRITE_V = 18;
+const ASSET_VERSION = Object.freeze({
+  surface: 1,
+  townhall: 18,
+  townhall_rubble: 18,
+  cannon_rubble: 18,
+  resources_rubble: 18,
+  storage_full: 18,
+  storage_dmg: 18,
+  cannon: 18,
+  cannon_frames: 18,
+  wizard_tower: 18,
+  wizard_tower_broken: 18,
+  mortar_frames: 18,
+  bomb: 18,
+  wall: 18,
+  barbarian_run_a: 18,
+  barbarian_hit: 18,
+  barbarian_dead: 18,
+  barbarian_tombstone: 18,
+  wall_breaker: 18,
+  star: 18,
+});
+function assetUrl(name, versionKey = name) {
+  return `/img/${name}.png?v=${ASSET_VERSION[versionKey] ?? 1}`;
+}
 const SPRITES = {
-  townhall:        `/img/townhall.png?v=${SPRITE_V}`,
-  townhall_rubble: `/img/townhall_rubble.png?v=${SPRITE_V}`,
-  cannon_rubble:   `/img/cannon_rubble.png?v=${SPRITE_V}`,
-  resources_rubble: `/img/resources_rubble.png?v=${SPRITE_V}`,
-  storage_full:    `/img/storage_full.png?v=${SPRITE_V}`,
-  storage_dmg:     `/img/storage_dmg.png?v=${SPRITE_V}`,
-  cannon:          `/img/cannon.png?v=${SPRITE_V}`,
-  wizard_tower:    `/img/wizard_tower.png?v=${SPRITE_V}`,
-  wizard_tower_broken: `/img/wizard_tower_broken.png?v=${SPRITE_V}`,
-  bomb:            `/img/bomb.png?v=${SPRITE_V}`,
-  wall:            `/img/wall.png?v=${SPRITE_V}`,
-  barbarian_run_a: `/img/barbarian_run_a.png?v=${SPRITE_V}`,
-  barbarian_hit:   `/img/barbarian_hit.png?v=${SPRITE_V}`,
-  barbarian_dead:  `/img/barbarian_dead.png?v=${SPRITE_V}`,
-  barbarian_tombstone: `/img/barbarian_tombstone.png?v=${SPRITE_V}`,
-  wall_breaker:    `/img/wall_breaker.png?v=${SPRITE_V}`,
-  star:            `/img/star.png?v=${SPRITE_V}`,
+  townhall:        assetUrl("townhall"),
+  townhall_rubble: assetUrl("townhall_rubble"),
+  cannon_rubble:   assetUrl("cannon_rubble"),
+  resources_rubble: assetUrl("resources_rubble"),
+  storage_full:    assetUrl("storage_full"),
+  storage_dmg:     assetUrl("storage_dmg"),
+  cannon:          assetUrl("cannon"),
+  wizard_tower:    assetUrl("wizard_tower"),
+  wizard_tower_broken: assetUrl("wizard_tower_broken"),
+  bomb:            assetUrl("bomb"),
+  wall:            assetUrl("wall"),
+  barbarian_run_a: assetUrl("barbarian_run_a"),
+  barbarian_hit:   assetUrl("barbarian_hit"),
+  barbarian_dead:  assetUrl("barbarian_dead"),
+  barbarian_tombstone: assetUrl("barbarian_tombstone"),
+  wall_breaker:    assetUrl("wall_breaker"),
+  star:            assetUrl("star"),
 };
 const CANNON_FRAMES = Array.from({ length: 36 }, (_, i) =>
-  `/img/cannon_${String(i).padStart(2, "0")}.png?v=${SPRITE_V}`
+  assetUrl(`cannon_${String(i).padStart(2, "0")}`, "cannon_frames")
 );
 const MORTAR_FRAMES = Array.from({ length: 36 }, (_, i) =>
-  `/img/mortar_${String(i).padStart(2, "0")}.png?v=${SPRITE_V}`
+  assetUrl(`mortar_${String(i).padStart(2, "0")}`, "mortar_frames")
 );
 for (const url of CANNON_FRAMES) { const i = new Image(); i.src = url; }
 for (const url of MORTAR_FRAMES) { const i = new Image(); i.src = url; }
 let cannonAim = new Map();      // building id -> last-known frame index 0..35
 let mortarAim = new Map();      // building id -> last-known frame index 0..35
-let lastFireTick = new Map();   // attacker_id -> tick of last shot
-let lastWallBreakerExplosionTick = new Map(); // troop id -> tick of last blast fx
+let pendingProjectileImpacts = new Set();
 let fxGradientSeq = 0;
-const DEFAULT_FIRE_EVERY = 3;   // fallback if a defense omits cooldown metadata
 const CANNONBALL_MUZZLE_OFFSET = 1.8; // grid cells from cannon center before projectile appears
 
 // 36-frame rotation: derive frame index from angle to current target. Shared
@@ -1247,16 +1259,44 @@ function spawnMortarShell(fx, fy, tx, ty, durationMs, radiusCells = 1.5) {
     core.remove();
     glowGradient?.remove();
     coreGradient?.remove();
-    const impact = el("circle", {
-      cx: end.x,
-      cy: end.y,
-      r: Math.max(4, gridUnits(radiusCells) * 0.28),
-      class: "mortar-impact",
-    });
-    layer.appendChild(impact);
-    setTimeout(() => impact.remove(), 420);
+    spawnMortarImpact(tx, ty, radiusCells);
   }
   requestAnimationFrame(frame);
+}
+
+function spawnMortarImpact(tx, ty, radiusCells = 1.5) {
+  const layer = document.getElementById("grid-fx");
+  if (!layer) return;
+  const p = isoGrid(tx, ty);
+  const impact = el("circle", {
+    cx: p.x,
+    cy: p.y,
+    r: Math.max(4, gridUnits(radiusCells) * 0.28),
+    class: "mortar-impact",
+  });
+  layer.appendChild(impact);
+  setTimeout(() => impact.remove(), 420);
+}
+
+function spawnImpactFlash(tx, ty, radiusCells = 0.3) {
+  const layer = document.getElementById("grid-fx");
+  if (!layer) return;
+  const p = isoGrid(tx, ty);
+  const impact = el("circle", {
+    cx: p.x,
+    cy: p.y,
+    r: Math.max(3, gridUnits(radiusCells) * 0.22),
+    class: "mortar-impact",
+  });
+  layer.appendChild(impact);
+  setTimeout(() => impact.remove(), 360);
+}
+
+function spawnWizardImpact(tx, ty, radiusCells, seed) {
+  const layer = document.getElementById("grid-fx");
+  if (!layer) return;
+  const p = isoGrid(tx, ty);
+  spawnWizardSplash(layer, p.x, p.y, radiusCells, seed);
 }
 
 function splashEllipseRadius(radiusCells) {
@@ -1456,35 +1496,93 @@ function spawnWallBreakerExplosion(x, y, radiusCells, seed) {
   requestAnimationFrame(frame);
 }
 
-function defenseFireEvery(e) {
-  const cooldown = Number(e.attack_cooldown || 0);
-  if (!Number.isFinite(cooldown) || cooldown <= 0 || !state.tick_seconds) return DEFAULT_FIRE_EVERY;
-  return Math.max(1, Math.round(cooldown / state.tick_seconds));
-}
-
 function maybeFireDefenseProjectiles() {
   if (!state) return;
-  for (const e of state.engagements || []) {
-    if (e.kind === "wall_breaker_explosion") {
-      const last = lastWallBreakerExplosionTick.get(e.attacker_id);
-      if (last === state.tick) continue;
-      lastWallBreakerExplosionTick.set(e.attacker_id, state.tick);
-      spawnWallBreakerExplosion(e.to_x, e.to_y, Number(e.radius || 1.6), e.attacker_id + state.tick);
-      continue;
+  const events = transientFxEvents();
+  if (events.length === 0) return;
+  const firstTick = events.reduce((minTick, event) => Math.min(minTick, fxEventTick(event)), fxEventTick(events[0]));
+  const msPerTick = playing ? TICK_BASE_MS / Math.max(1, playSpeed) : 0;
+  for (const event of events) {
+    const delay = Math.min(280, Math.max(0, (fxEventTick(event) - firstTick) * msPerTick));
+    if (delay > 0) {
+      setTimeout(() => playFxEvent(event), delay);
+    } else {
+      playFxEvent(event);
     }
-    if (e.kind !== "defense") continue;
-    if (e.source_kind !== "cannon" && e.source_kind !== "mortar" && e.source_kind !== "wizard_tower") continue;
-    const last = lastFireTick.get(e.attacker_id);
-    if (last !== undefined && state.tick - last < defenseFireEvery(e)) continue;
-    lastFireTick.set(e.attacker_id, state.tick);
-    if (e.source_kind === "mortar") {
-      const durationMs = Math.max(550, Number(e.projectile_delay || 1) * 1000);
-      spawnMortarShell(e.from_x, e.from_y, e.to_x, e.to_y, durationMs, Number(e.splash_radius || 1.5));
-    } else if (e.source_kind === "cannon") {
-      spawnCannonball(e.from_x, e.from_y, e.to_x, e.to_y);
-    } else if (e.source_kind === "wizard_tower") {
-      spawnWizardZap(e.from_x, e.from_y, e.to_x, e.to_y, Number(e.splash_radius || 1.0), e.attacker_id + state.tick);
+  }
+}
+
+function transientFxEvents() {
+  if (Array.isArray(state.event_stream) && state.event_stream.length > 0) {
+    return state.event_stream;
+  }
+  return (state.engagements || []).filter(e =>
+    e.kind === "wall_breaker_explosion" || e.kind === "defense_fire" || e.kind === "impact"
+  );
+}
+
+function fxEventTick(event) {
+  const tick = Number(event.tick);
+  return Number.isFinite(tick) ? tick : state.tick;
+}
+
+function impactKey(event) {
+  const tick = Number(event.impact_tick ?? event.tick ?? state.tick);
+  const x = Number(event.to_x || 0).toFixed(2);
+  const y = Number(event.to_y || 0).toFixed(2);
+  return `${event.attacker_id}:${tick}:${x}:${y}`;
+}
+
+function markImpactCovered(event, ttlMs) {
+  const key = impactKey(event);
+  pendingProjectileImpacts.add(key);
+  setTimeout(() => pendingProjectileImpacts.delete(key), ttlMs);
+  return key;
+}
+
+function playFxEvent(event) {
+  if (event.kind === "wall_breaker_explosion") {
+    spawnWallBreakerExplosion(event.to_x, event.to_y, Number(event.radius || 1.6), event.attacker_id + fxEventTick(event));
+    return;
+  }
+
+  if (event.kind === "defense_fire") {
+    if (event.source_kind === "mortar") {
+      const durationMs = Math.max(550, Number(event.projectile_delay || 1) * 1000);
+      markImpactCovered(event, Math.max(6000, durationMs + 800));
+      spawnMortarShell(event.from_x, event.from_y, event.to_x, event.to_y, durationMs, Number(event.splash_radius || 1.5));
+    } else if (event.source_kind === "cannon") {
+      markImpactCovered(event, 1200);
+      spawnCannonball(event.from_x, event.from_y, event.to_x, event.to_y);
+    } else if (event.source_kind === "wizard_tower") {
+      markImpactCovered(event, 1200);
+      spawnWizardZap(
+        event.from_x,
+        event.from_y,
+        event.to_x,
+        event.to_y,
+        Number(event.splash_radius || 1.0),
+        event.attacker_id + fxEventTick(event)
+      );
     }
+    return;
+  }
+
+  if (event.kind !== "impact") return;
+  const key = impactKey(event);
+  if (pendingProjectileImpacts.has(key)) {
+    pendingProjectileImpacts.delete(key);
+    return;
+  }
+  const radius = Number(event.radius || event.splash_radius || 0.3);
+  if (event.source_kind === "mortar") {
+    spawnMortarImpact(event.to_x, event.to_y, radius);
+  } else if (event.source_kind === "wizard_tower") {
+    spawnWizardImpact(event.to_x, event.to_y, radius, event.attacker_id + fxEventTick(event));
+  } else if (event.source_kind === "bomb") {
+    spawnWallBreakerExplosion(event.to_x, event.to_y, Math.max(1.2, radius), event.attacker_id + fxEventTick(event));
+  } else if (event.source_kind === "cannon") {
+    spawnImpactFlash(event.to_x, event.to_y, radius);
   }
 }
 function attackPose(troopId, tick) {
@@ -1557,6 +1655,9 @@ function saveDebugSettings() {
     // calibration still works for the current page session
   }
 }
+function debugSignature() {
+  return Object.keys(DEFAULT_DEBUG).map(key => `${key}:${DEBUG[key]}`).join("|");
+}
 function gridCell() {
   return (SVG_SIZE - DEBUG.inset * 2) / GRID;
 }
@@ -1625,6 +1726,7 @@ function syncDebugControls() {
 function setDebugValue(key, value) {
   if (!(key in DEFAULT_DEBUG) || !Number.isFinite(value)) return;
   DEBUG[key] = value;
+  boardBuildingsKey = "";
   saveDebugSettings();
   syncDebugControls();
   render();
@@ -1834,6 +1936,8 @@ let boardGuideKey = "";
 let boardRangeKey = "";
 let boardDeployKey = "";
 let boardBuildingsKey = "";
+let actionStreamKeys = [];
+let traceNodes = null;
 let selectedTroopKind = "barbarian";
 
 // playback state
@@ -1865,8 +1969,7 @@ async function reset() {
   previousStars = 0;
   cannonAim = new Map();
   mortarAim = new Map();
-  lastFireTick = new Map();
-  lastWallBreakerExplosionTick = new Map();
+  pendingProjectileImpacts = new Set();
   boardBuildingsKey = "";
   clearDeadLayer();
   clearFxLayer();
@@ -2195,30 +2298,50 @@ function renderActionStream() {
   const stream = document.getElementById("actionStream");
   const actions = state.actions || [];
   if (actions.length === 0) {
-    stream.replaceChildren();
-    const empty = document.createElement("div");
-    empty.className = "action-empty";
-    empty.textContent = "no actions yet";
-    stream.appendChild(empty);
+    if (actionStreamKeys.length !== 0 || stream.firstElementChild?.className !== "action-empty") {
+      stream.replaceChildren();
+      const empty = document.createElement("div");
+      empty.className = "action-empty";
+      empty.textContent = "no actions yet";
+      stream.appendChild(empty);
+      actionStreamKeys = [];
+    }
     return;
   }
-  stream.replaceChildren();
-  for (const a of actions) {
-    const item = document.createElement("div");
-    const tick = document.createElement("span");
-    const source = document.createElement("span");
-    const label = document.createElement("span");
-    item.className = "action-item";
-    tick.className = "action-tick";
-    source.className = "action-source" + (a.source === "policy" ? " policy" : "");
-    label.className = "action-label";
-    tick.textContent = `τ ${a.tick}`;
-    source.textContent = a.source;
-    label.textContent = a.label;
-    item.append(tick, source, label);
-    stream.appendChild(item);
+  const keys = actions.map(actionKey);
+  const canAppend =
+    actionStreamKeys.length > 0 &&
+    keys.length >= actionStreamKeys.length &&
+    actionStreamKeys.every((key, index) => keys[index] === key);
+  if (!canAppend) {
+    stream.replaceChildren();
+    actionStreamKeys = [];
   }
-  stream.scrollTop = stream.scrollHeight;
+  for (let i = actionStreamKeys.length; i < actions.length; i++) {
+    stream.appendChild(actionItem(actions[i]));
+  }
+  if (keys.length !== actionStreamKeys.length) stream.scrollTop = stream.scrollHeight;
+  actionStreamKeys = keys;
+}
+
+function actionKey(action) {
+  return `${action.tick}:${action.source}:${action.action}:${action.applied ? 1 : 0}:${action.label}`;
+}
+
+function actionItem(action) {
+  const item = document.createElement("div");
+  const tick = document.createElement("span");
+  const source = document.createElement("span");
+  const label = document.createElement("span");
+  item.className = "action-item";
+  tick.className = "action-tick";
+  source.className = "action-source" + (action.source === "policy" ? " policy" : "");
+  label.className = "action-label";
+  tick.textContent = `τ ${action.tick}`;
+  source.textContent = action.source;
+  label.textContent = action.label;
+  item.append(tick, source, label);
+  return item;
 }
 
 function drawBoard() {
@@ -2229,7 +2352,7 @@ function drawBoard() {
   if (!main) {
     const bg = el("image", {
       id: "grid-bg",
-      href: `/img/surface.png?v=${SPRITE_V}`,
+      href: assetUrl("surface"),
       x: 0, y: 0, width: SVG_SIZE, height: SVG_SIZE,
       preserveAspectRatio: "xMidYMid slice",
       class: "sprite",
@@ -2287,7 +2410,7 @@ function drawBoard() {
     + "|" + [...cannonTargets.entries()]
         .map(([id, e]) => `${id}:${Math.round(e.to_x)}:${Math.round(e.to_y)}`)
         .sort().join("|")
-    + "|" + DEBUG.inset;
+    + "|" + debugSignature();
   const buildingsDirty = buildingsKey !== boardBuildingsKey;
   if (buildingsDirty) {
     buildings.innerHTML = "";
@@ -2521,45 +2644,63 @@ function drawBoard() {
 }
 
 function drawTrace() {
-  trace.innerHTML = "";
-  if (damageHistory.length === 0) return;
   const W = 100, H = 20;
+  if (damageHistory.length === 0) {
+    if (traceNodes) {
+      trace.replaceChildren();
+      traceNodes = null;
+    }
+    return;
+  }
+  if (!traceNodes) {
+    const fill = el("polygon", {
+      points: "",
+      fill: "var(--phosphor-08)",
+    });
+    const line = el("polyline", {
+      points: "",
+      fill: "none",
+      stroke: "var(--phosphor)",
+      "stroke-width": 1,
+      "stroke-linejoin": "round",
+      "stroke-linecap": "round",
+    });
+    const baseline = el("line", {
+      x1: 0, y1: H - 0.5, x2: W, y2: H - 0.5,
+      stroke: "var(--rule)", "stroke-width": 0.5,
+    });
+    const cursor = el("line", {
+      x1: 0, y1: 0, x2: 0, y2: H,
+      stroke: "var(--rule-2)", "stroke-width": 0.5, "stroke-dasharray": "1 1.5",
+    });
+    trace.replaceChildren(fill, baseline, line, cursor);
+    traceNodes = { fill, line, cursor };
+  }
   const maxT = Math.max(state.max_ticks, 1);
 
-  // baseline
-  trace.appendChild(el("line", {
-    x1: 0, y1: H - 0.5, x2: W, y2: H - 0.5,
-    stroke: "var(--rule)", "stroke-width": 0.5,
-  }));
-
-  // current-tick cursor (faint)
   const cursorX = (state.tick / maxT) * W;
-  trace.appendChild(el("line", {
+  setAttrs(traceNodes.cursor, {
     x1: cursorX, y1: 0, x2: cursorX, y2: H,
-    stroke: "var(--rule-2)", "stroke-width": 0.5, "stroke-dasharray": "1 1.5",
-  }));
+  });
 
-  // damage trace polyline
   const pts = damageHistory.map(([t, d]) => {
     const x = (t / maxT) * W;
     const y = H - d * H;
     return `${x.toFixed(2)},${y.toFixed(2)}`;
   });
   if (pts.length >= 2) {
-    trace.appendChild(el("polyline", {
+    setAttrs(traceNodes.line, {
       points: pts.join(" "),
-      fill: "none",
-      stroke: "var(--phosphor)",
-      "stroke-width": 1,
-      "stroke-linejoin": "round",
-      "stroke-linecap": "round",
-    }));
-    // glow fill below curve
+      visibility: "visible",
+    });
     const fillPts = [...pts, `${W},${H}`, `0,${H}`].join(" ");
-    trace.appendChild(el("polygon", {
+    setAttrs(traceNodes.fill, {
       points: fillPts,
-      fill: "var(--phosphor-08)",
-    }));
+      visibility: "visible",
+    });
+  } else {
+    setAttrs(traceNodes.line, { points: "", visibility: "hidden" });
+    setAttrs(traceNodes.fill, { points: "", visibility: "hidden" });
   }
 }
 

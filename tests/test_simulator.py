@@ -216,6 +216,24 @@ def test_wizard_tower_splash_damages_grouped_troops() -> None:
     assert all(t.hp < t.spec.hp for t in sim.troops)
 
 
+def test_defense_fire_and_impact_are_explicit_visual_events() -> None:
+    layout = [Building(0, BUILDING_SPECS["wizard_tower"], 10, 10)]
+    sim = Simulator(layout=layout, army_size=1)
+    assert sim.deploy(15.0, 11.5)
+
+    sim.tick()
+
+    assert [event["kind"] for event in sim.visual_events] == ["defense_fire", "impact"]
+    fire, impact = sim.visual_events
+    assert fire["tick"] == sim.tick_count
+    assert fire["attacker_id"] == 0
+    assert fire["target_id"] == 0
+    assert fire["source_kind"] == "wizard_tower"
+    assert impact["tick"] == sim.tick_count
+    assert impact["source_kind"] == "wizard_tower"
+    assert all(event["kind"] not in {"defense_fire", "impact"} for event in sim.current_engagements())
+
+
 def test_mortar_uses_blind_spot_and_delayed_splash() -> None:
     layout = [Building(0, BUILDING_SPECS["mortar"], 20, 20)]
     sim = Simulator(layout=layout, army_size=2)
@@ -229,6 +247,25 @@ def test_mortar_uses_blind_spot_and_delayed_splash() -> None:
     assert impact.source_kind == "mortar"
     assert impact.radius == BUILDING_SPECS["mortar"].splash_radius
     assert math.hypot(impact.x - sim.troops[1].x, impact.y - sim.troops[1].y) < 1e-9
+
+
+def test_mortar_delayed_impact_emits_visual_event_on_impact_tick() -> None:
+    layout = [Building(0, BUILDING_SPECS["mortar"], 20, 20)]
+    sim = Simulator(layout=layout, army_size=1)
+    assert sim.deploy(21.5, 12.5)
+
+    sim.tick()
+    fire = next(event for event in sim.visual_events if event["kind"] == "defense_fire")
+    impact_tick = int(fire["impact_tick"])
+    assert impact_tick > sim.tick_count
+
+    while sim.tick_count < impact_tick:
+        sim.tick()
+
+    impact = next(event for event in sim.visual_events if event["kind"] == "impact")
+    assert impact["tick"] == impact_tick
+    assert impact["source_kind"] == "mortar"
+    assert impact["impact_tick"] == impact_tick
 
 
 def test_hidden_bomb_reveals_triggers_and_explodes_once() -> None:
@@ -393,7 +430,7 @@ def test_wall_breaker_explodes_on_nearest_connected_walls() -> None:
         if b.spec.kind == "wall" and b.hp == b.spec.hp * 0.5
     ]
     explosion_events = [
-        e for e in sim.current_engagements()
+        e for e in sim.visual_events
         if e["kind"] == "wall_breaker_explosion"
     ]
     assert len(damaged_walls) == TROOP_SPECS["wall_breaker"].wall_damage_count

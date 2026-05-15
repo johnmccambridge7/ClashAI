@@ -20,6 +20,8 @@ WALL_STEP_COST: float = 20.0
 
 @dataclass
 class PendingImpact:
+    from_x: float
+    from_y: float
     x: float
     y: float
     damage: float
@@ -27,6 +29,8 @@ class PendingImpact:
     delay: float
     source_id: int
     source_kind: str
+    target_id: int
+    impact_tick: int
 
 
 class Simulator:
@@ -375,6 +379,10 @@ class Simulator:
             self.terrain_version += 1
             self._flow_cache.clear()
 
+    def _emit_visual_event(self, event: Engagement) -> None:
+        event["tick"] = self.tick_count
+        self.visual_events.append(event)
+
     def _should_wall_break(self, troop: Troop, target: Building, distance: float) -> bool:
         return (
             troop.spec.explodes_on_wall
@@ -389,7 +397,7 @@ class Simulator:
         if wall_count > 0 and troop.spec.wall_damage_fraction > 0.0:
             for wall in self._connected_walls(target, wall_count):
                 self._damage_building(wall, wall.spec.hp * troop.spec.wall_damage_fraction)
-        self.visual_events.append({
+        self._emit_visual_event({
             "kind": "wall_breaker_explosion",
             "source_kind": troop.spec.kind,
             "attacker_id": troop.id,
@@ -567,8 +575,29 @@ class Simulator:
     def _fire_defense(self, defense: Building, victim: Troop) -> None:
         damage = self._attack_damage(defense)
         radius = defense.spec.splash_radius
+        cx, cy = defense.center
+        impact_tick = self.tick_count + max(
+            0,
+            math.ceil(defense.spec.projectile_delay / TICK_SECONDS),
+        )
+        self._emit_visual_event({
+            "kind": "defense_fire",
+            "source_kind": defense.spec.kind,
+            "attacker_id": defense.id,
+            "target_id": victim.id,
+            "from_x": cx,
+            "from_y": cy,
+            "to_x": victim.x,
+            "to_y": victim.y,
+            "attack_cooldown": defense.spec.attack_cooldown,
+            "projectile_delay": defense.spec.projectile_delay,
+            "splash_radius": radius,
+            "impact_tick": impact_tick,
+        })
         if defense.spec.projectile_delay > 0.0:
             self.pending_impacts.append(PendingImpact(
+                from_x=cx,
+                from_y=cy,
                 x=victim.x,
                 y=victim.y,
                 damage=damage,
@@ -576,9 +605,22 @@ class Simulator:
                 delay=defense.spec.projectile_delay,
                 source_id=defense.id,
                 source_kind=defense.spec.kind,
+                target_id=victim.id,
+                impact_tick=impact_tick,
             ))
             return
         self._damage_troops_at(victim.x, victim.y, radius, damage, fallback=victim)
+        self._emit_visual_event({
+            "kind": "impact",
+            "source_kind": defense.spec.kind,
+            "attacker_id": defense.id,
+            "target_id": victim.id,
+            "from_x": cx,
+            "from_y": cy,
+            "to_x": victim.x,
+            "to_y": victim.y,
+            "radius": radius,
+        })
 
     def _update_traps(self) -> None:
         for b in self.buildings:
@@ -591,6 +633,17 @@ class Simulator:
                 self._damage_troops_at(*b.center, b.spec.splash_radius, self._attack_damage(b))
                 if b.spec.one_shot:
                     self._damage_building(b, b.hp)
+                self._emit_visual_event({
+                    "kind": "impact",
+                    "source_kind": b.spec.kind,
+                    "attacker_id": b.id,
+                    "target_id": -1,
+                    "from_x": b.center[0],
+                    "from_y": b.center[1],
+                    "to_x": b.center[0],
+                    "to_y": b.center[1],
+                    "radius": b.spec.splash_radius,
+                })
                 b.triggered = False
                 continue
 
@@ -609,6 +662,18 @@ class Simulator:
                 remaining.append(impact)
                 continue
             self._damage_troops_at(impact.x, impact.y, impact.radius, impact.damage)
+            self._emit_visual_event({
+                "kind": "impact",
+                "source_kind": impact.source_kind,
+                "attacker_id": impact.source_id,
+                "target_id": impact.target_id,
+                "from_x": impact.from_x,
+                "from_y": impact.from_y,
+                "to_x": impact.x,
+                "to_y": impact.y,
+                "radius": impact.radius,
+                "impact_tick": impact.impact_tick,
+            })
         self.pending_impacts = remaining
 
     def _damage_troops_at(
@@ -630,7 +695,7 @@ class Simulator:
 
     # ── visualisation helper ─────────────────────────────────────────────
     def current_engagements(self) -> list[Engagement]:
-        out: list[Engagement] = list(self.visual_events)
+        out: list[Engagement] = []
         for b in self.buildings:
             if not b.alive or not b.spec.is_defense:
                 continue
@@ -647,17 +712,6 @@ class Simulator:
                 "attack_cooldown": b.spec.attack_cooldown,
                 "projectile_delay": b.spec.projectile_delay,
                 "splash_radius": b.spec.splash_radius,
-            })
-        for impact in self.pending_impacts:
-            out.append({
-                "kind": "impact",
-                "source_kind": impact.source_kind,
-                "attacker_id": impact.source_id,
-                "target_id": -1,
-                "from_x": impact.x, "from_y": impact.y,
-                "to_x": impact.x, "to_y": impact.y,
-                "radius": impact.radius,
-                "delay": impact.delay,
             })
         for t in self.troops:
             if not t.alive:
