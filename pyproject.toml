@@ -23,6 +23,7 @@ train = [
 ]
 viewer = [
     "flask>=3.0",
+    "pillow>=10.0",
     "pygame>=2.6",
 ]
 

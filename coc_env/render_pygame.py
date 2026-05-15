@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import Callable
+from typing import Callable, Protocol
+import warnings
 
 import pygame
 
@@ -23,6 +24,9 @@ ACCENT = (250, 200, 100)
 BUILDING_COLORS: dict[str, tuple[int, int, int]] = {
     "townhall": (220, 180, 50),
     "cannon":   (210, 80,  60),
+    "wizard_tower": (150, 95, 210),
+    "mortar":   (90,  170, 150),
+    "bomb":     (70,  70,  78),
     "storage":  (80,  140, 210),
     "wall":     (125, 125, 135),
 }
@@ -30,10 +34,78 @@ TROOP_COLOR = (255, 150, 80)
 RANGE_COLOR = (210, 80, 60, 70)
 
 
+class PanelFont(Protocol):
+    def render(
+        self,
+        text: str,
+        antialias: bool,
+        color: tuple[int, int, int],
+    ) -> pygame.Surface:
+        ...
+
+
+class PillowPanelFont:
+    def __init__(self, size: int):
+        from PIL import ImageFont
+
+        self._cache: dict[tuple[str, tuple[int, int, int]], pygame.Surface] = {}
+        font_paths = [
+            "/System/Library/Fonts/Menlo.ttc",
+            "/System/Library/Fonts/Monaco.ttf",
+            "/Library/Fonts/Arial.ttf",
+        ]
+        for path in font_paths:
+            try:
+                self._font = ImageFont.truetype(path, size)
+                break
+            except OSError:
+                continue
+        else:
+            self._font = ImageFont.load_default()
+
+    def render(
+        self,
+        text: str,
+        antialias: bool,
+        color: tuple[int, int, int],
+    ) -> pygame.Surface:
+        del antialias
+        key = (text, color)
+        cached = self._cache.get(key)
+        if cached is not None:
+            return cached.copy()
+
+        from PIL import Image, ImageDraw
+
+        if not text:
+            surface = pygame.Surface((1, 1), pygame.SRCALPHA)
+            self._cache[key] = surface
+            return surface.copy()
+
+        bbox = self._font.getbbox(text)
+        width = max(1, bbox[2] - bbox[0] + 2)
+        height = max(1, bbox[3] - bbox[1] + 2)
+        image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(image)
+        draw.text((-bbox[0] + 1, -bbox[1] + 1), text, font=self._font, fill=(*color, 255))
+        surface = pygame.image.frombuffer(image.tobytes(), image.size, "RGBA").convert_alpha()
+        self._cache[key] = surface
+        return surface.copy()
+
+
+def make_panel_font(size: int) -> PanelFont:
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            return pygame.font.SysFont("menlo,monaco,courier,monospace", size)
+    except (ImportError, NotImplementedError, RuntimeWarning):
+        return PillowPanelFont(size)
+
+
 def render(
     screen: pygame.Surface,
     sim: Simulator,
-    font: pygame.font.Font,
+    font: PanelFont,
     show_ranges: bool = False,
     last_action_text: str = "",
     paused: bool = False,
@@ -47,7 +119,7 @@ def render(
     if show_ranges:
         overlay = pygame.Surface((GRID_PX, GRID_PX), pygame.SRCALPHA)
         for b in sim.buildings:
-            if b.spec.is_defense and b.alive:
+            if b.spec.is_defense and b.alive and b.revealed:
                 cx, cy = b.center
                 pygame.draw.circle(
                     overlay, RANGE_COLOR,
@@ -57,7 +129,7 @@ def render(
         screen.blit(overlay, (0, 0))
 
     for b in sim.buildings:
-        if not b.alive:
+        if not b.alive or not b.revealed:
             continue
         color = BUILDING_COLORS.get(b.spec.kind, (180, 180, 180))
         hp_frac = b.hp / b.spec.hp
@@ -96,7 +168,7 @@ def render(
         (f"Stars: {sim.stars}", TEXT),
         (f"Army left: {sim.army_remaining}", TEXT),
         (f"Active: {len(sim.active_troops)}", TEXT),
-        (f"Buildings: {len(sim.alive_buildings)}", TEXT),
+        (f"Buildings: {len(sim.visible_buildings)}", TEXT),
         (f"TH: {'destroyed' if sim.townhall_destroyed else 'alive'}", TEXT),
         ("", TEXT),
         ("[PAUSED]" if paused else "[playing]", ACCENT if paused else TEXT_DIM),
@@ -121,7 +193,7 @@ def play(
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_W, WINDOW_H))
     pygame.display.set_caption("CoC RL env")
-    font = pygame.font.SysFont("menlo,monaco,courier,monospace", 14)
+    font = make_panel_font(14)
     clock = pygame.time.Clock()
 
     sim = sim_factory()

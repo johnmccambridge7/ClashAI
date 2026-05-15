@@ -4,13 +4,16 @@ import pytest
 
 from coc_env.env import (
     CoCEnv,
+    DEPLOY_TROOP_KINDS,
+    N_DEPLOY_ACTIONS,
     N_DEPLOY_CELLS,
     WAIT_ACTION,
     TIME_COST_PER_TICK,
     cell_to_action,
 )
-from coc_env.entities import GRID_SIZE, MAX_TICKS
+from coc_env.entities import BUILDING_SPECS, GRID_SIZE, MAX_TICKS, Building
 from coc_env.generation import preset_layout_profile
+from coc_env.simulator import Simulator
 
 
 def test_reset_returns_obs_and_info() -> None:
@@ -53,7 +56,11 @@ def test_procedural_layout_uses_present_mask_for_padding() -> None:
 
     assert env.sim is not None
     assert env.observation_space.contains(obs)
-    assert int(obs["buildings_present"].sum()) == len(env.sim.buildings)
+    visible_buildings = [
+        b for b in env.sim.buildings
+        if not (b.spec.hidden and not b.revealed)
+    ]
+    assert int(obs["buildings_present"].sum()) == len(visible_buildings)
     assert not obs["buildings_present"][-3:].any()
 
 
@@ -88,14 +95,17 @@ def test_building_slots_stable_across_destruction() -> None:
     env = CoCEnv(army_size=10)
     env.reset(seed=0)
     initial_kind = None
+    initial_present = None
     while True:
         mask = env.action_masks()
         a = int(np.where(mask)[0][0])
         obs, _, term, trunc, _ = env.step(a)
         if initial_kind is None:
             initial_kind = obs["buildings_kind"].copy()
+            initial_present = obs["buildings_present"].copy()
         # kind/pos/size never reshuffle; only alive/hp drop to 0
-        assert np.array_equal(obs["buildings_kind"], initial_kind)
+        known_slots = initial_present.astype(bool)
+        assert np.array_equal(obs["buildings_kind"][known_slots], initial_kind[known_slots])
         if term or trunc:
             assert any(obs["buildings_alive"][i] == 0 for i in range(env.n_buildings)) \
                 or all(obs["buildings_alive"])
@@ -146,7 +156,7 @@ def test_out_of_space_action_raises() -> None:
     with pytest.raises(ValueError):
         env.step(-1)
     with pytest.raises(ValueError):
-        env.step(N_DEPLOY_CELLS + 1)
+        env.step(N_DEPLOY_ACTIONS + 1)
 
 
 def test_action_mask_blocks_buildings_and_defense_ranges() -> None:
@@ -159,9 +169,79 @@ def test_action_mask_blocks_buildings_and_defense_ranges() -> None:
     assert mask[cell_to_action(0, 0)]
 
 
+def test_action_mask_honors_mortar_blind_spot() -> None:
+    env = CoCEnv(army_size=1)
+    env.reset(seed=0)
+    env.sim = Simulator([Building(0, BUILDING_SPECS["mortar"], 20, 20)], army_size=1)
+    env._mask_cache_key = None
+
+    mask = env.action_masks()
+    assert mask[cell_to_action(21, 18)]      # inside minimum range
+    assert not mask[cell_to_action(21, 12)]  # inside attackable range
+
+
+def test_hidden_bomb_is_unobserved_until_triggered_and_does_not_block_deploy() -> None:
+    env = CoCEnv(army_size=1)
+    env.reset(seed=0)
+    env.sim = Simulator([
+        Building(0, BUILDING_SPECS["storage"], 6, 5),
+        Building(1, BUILDING_SPECS["bomb"], 5, 5),
+    ], army_size=1)
+    env._mask_cache_key = None
+
+    obs = env._obs()
+    assert obs["buildings_present"][0] == 1
+    assert obs["buildings_present"][1] == 0
+    assert env.action_masks()[cell_to_action(5, 5)]
+
+    assert env.sim.deploy(5.5, 5.5)
+    env.sim.tick()
+    obs = env._obs()
+
+    assert obs["buildings_present"][1] == 1
+    assert obs["buildings_is_trap"][1] == 1
+
+
+def test_action_mask_returns_copy() -> None:
+    env = CoCEnv()
+    env.reset(seed=0)
+    mask = env.action_masks()
+    mask[:] = False
+    assert env.action_masks()[WAIT_ACTION]
+
+
 def test_action_space_covers_the_whole_grid() -> None:
-    assert WAIT_ACTION == GRID_SIZE * GRID_SIZE
+    assert WAIT_ACTION == GRID_SIZE * GRID_SIZE * len(DEPLOY_TROOP_KINDS)
     assert cell_to_action(GRID_SIZE - 1, GRID_SIZE - 1) == N_DEPLOY_CELLS - 1
+    assert cell_to_action(GRID_SIZE - 1, GRID_SIZE - 1, "wall_breaker") == N_DEPLOY_ACTIONS - 1
+
+
+def test_last_grid_cell_can_deploy_when_unmasked() -> None:
+    env = CoCEnv(army_size=1)
+    env.reset(seed=0)
+    action = cell_to_action(GRID_SIZE - 1, GRID_SIZE - 1)
+    assert env.action_masks()[action]
+    env.step(action)
+    assert env.sim is not None
+    assert env.sim.army_remaining == 0
+
+
+def test_wall_breaker_actions_use_second_deploy_layer() -> None:
+    env = CoCEnv(army_composition={"barbarian": 0, "wall_breaker": 1})
+    env.reset(seed=0)
+
+    barbarian_action = cell_to_action(0, 0)
+    wall_breaker_action = cell_to_action(0, 0, "wall_breaker")
+    mask = env.action_masks()
+
+    assert not mask[barbarian_action]
+    assert mask[wall_breaker_action]
+    obs, _, _, _, info = env.step(wall_breaker_action)
+
+    assert env.sim is not None
+    assert env.sim.troops[0].spec.kind == "wall_breaker"
+    assert obs["troops_kind"][0] == DEPLOY_TROOP_KINDS.index("wall_breaker")
+    assert info["army_remaining_by_kind"]["wall_breaker"] == 0
 
 
 def test_target_observation_uses_building_slot_not_id() -> None:

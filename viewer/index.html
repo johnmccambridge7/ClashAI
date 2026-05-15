@@ -28,6 +28,9 @@
     --th:         #c9a050;
     --storage:    #5587b6;
     --cannon:     #c25a5a;
+    --wizard:     #9b6fd3;
+    --mortar:     #5aa895;
+    --bomb:       #4a4f59;
     --threat:     rgba(194, 90, 90, 0.22);
 
     --r:          2px;
@@ -223,12 +226,56 @@
     border-top: 1px solid var(--rule);
   }
   .stars {
-    display: inline-flex; gap: 4px;
-    font-size: 13px;
-    letter-spacing: 0.18em;
-    color: var(--phosphor);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
   }
-  .stars .off { color: var(--ink-faint); }
+  .star-slot {
+    position: relative;
+    width: 26px;
+    height: 26px;
+    display: inline-grid;
+    place-items: center;
+    transform-origin: 50% 56%;
+    opacity: 0.25;
+    filter: grayscale(1) brightness(0.62);
+    transition: opacity 160ms ease, filter 160ms ease, transform 160ms ease;
+  }
+  .star-slot img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    pointer-events: none;
+  }
+  .star-slot.earned {
+    opacity: 1;
+    filter: drop-shadow(0 0 7px rgba(236, 159, 90, 0.55));
+  }
+  .star-slot.earned.is-new {
+    animation: star-pop 520ms cubic-bezier(.18, .89, .32, 1.26);
+  }
+  .star-slot.earned.is-new::after {
+    content: "";
+    position: absolute;
+    inset: -7px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 245, 184, 0.55) 0 18%, rgba(255, 245, 184, 0) 62%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+    animation: star-flash 520ms ease-out forwards;
+  }
+  @keyframes star-pop {
+    0%   { transform: scale(0.35) rotate(-18deg); }
+    55%  { transform: scale(1.28) rotate(8deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  @keyframes star-flash {
+    0%   { opacity: 0; transform: scale(0.5); }
+    28%  { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.55); }
+  }
 
   .overlays {
     display: flex; flex-direction: column; gap: 8px;
@@ -491,9 +538,13 @@
   }
   .sw.th    { background: var(--th); }
   .sw.can   { background: var(--cannon); }
+  .sw.wiz   { background: var(--wizard); }
+  .sw.mor   { background: var(--mortar); }
+  .sw.bomb  { background: var(--bomb); }
   .sw.stor  { background: var(--storage); }
   .sw.wall  { background: var(--ink-mute); }
   .sw.trp   { background: var(--hot); border-radius: 50%; }
+  .sw.wb    { background: #d9c0a2; border-radius: 50%; }
 
   /* ── svg primitives ───────────────────────────────────── */
   .perim {
@@ -528,25 +579,218 @@
     stroke-dasharray: 3 3;
     opacity: 0.55;
   }
+  .range-blind {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 0.6;
+    stroke-dasharray: 2 2;
+    opacity: 0.45;
+  }
+  .path-line {
+    fill: none;
+    stroke: #55e3c4;
+    stroke-width: 1.45;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 4 3;
+    opacity: 0.78;
+    filter: drop-shadow(0 0 3px rgba(85, 227, 196, 0.48));
+    animation: path-flow 520ms linear infinite;
+    pointer-events: none;
+  }
+  .path-dot {
+    fill: #55e3c4;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .path-end {
+    fill: var(--hot);
+    stroke: rgba(9, 12, 17, 0.7);
+    stroke-width: 0.7;
+    filter: drop-shadow(0 0 4px rgba(236, 159, 90, 0.65));
+    pointer-events: none;
+  }
+  @keyframes path-flow {
+    to { stroke-dashoffset: -7; }
+  }
 
   .sprite {
     pointer-events: none;
     image-rendering: -webkit-optimize-contrast;
   }
   .sprite.troop-sprite {
-    transition: x 220ms ease-out, y 220ms ease-out;
+    transition: x 90ms linear, y 90ms linear;
   }
   .dead-fade {
     pointer-events: none;
     animation: dead-fade 1100ms ease-out forwards;
   }
   .cannonball {
-    fill: #1a1d22;
-    stroke: #f0a040;
-    stroke-width: 0.6;
-    filter: drop-shadow(0 0 3px rgba(255, 180, 80, 0.9));
+    fill: #1b1710;
+    stroke: #ffe2a8;
+    stroke-width: 0.9;
+    filter: drop-shadow(0 0 6px rgba(255, 173, 79, 0.95));
     transition: cx 300ms linear, cy 300ms linear;
     pointer-events: none;
+  }
+  .mortar-shell {
+    fill: #10191d;
+    stroke: #c7f8ff;
+    stroke-width: 0.9;
+    filter: drop-shadow(0 0 7px rgba(108, 225, 255, 0.9));
+    pointer-events: none;
+  }
+  .mortar-shadow {
+    fill: rgba(8, 10, 13, 0.34);
+    pointer-events: none;
+  }
+  .mortar-impact {
+    fill: none;
+    stroke: #ffd477;
+    stroke-width: 1.1;
+    opacity: 0;
+    pointer-events: none;
+    animation: mortar-impact 360ms ease-out forwards;
+  }
+  @keyframes mortar-impact {
+    0%   { opacity: 0.95; r: 2; }
+    100% { opacity: 0; r: 14; }
+  }
+  .projectile-trail-glow,
+  .projectile-trail-core {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+    stroke-dasharray: var(--trail-len);
+    stroke-dashoffset: var(--trail-len);
+    animation: projectile-trail var(--trail-ms, 360ms) ease-out forwards;
+  }
+  .projectile-trail-glow.cannon-trail {
+    stroke: #ff9c3c;
+    stroke-width: 5.4;
+    opacity: 0.42;
+    filter: drop-shadow(0 0 8px rgba(255, 156, 60, 0.82));
+  }
+  .projectile-trail-core.cannon-trail {
+    stroke: #fff0b7;
+    stroke-width: 1.45;
+    opacity: 0.95;
+    filter: drop-shadow(0 0 4px rgba(255, 238, 183, 0.9));
+  }
+  .projectile-trail-glow.mortar-trail {
+    stroke: #64dfff;
+    stroke-width: 6.2;
+    opacity: 0.36;
+    filter: drop-shadow(0 0 10px rgba(100, 223, 255, 0.82));
+  }
+  .projectile-trail-core.mortar-trail {
+    stroke: #fff0a8;
+    stroke-width: 1.55;
+    opacity: 0.9;
+    filter: drop-shadow(0 0 5px rgba(255, 232, 145, 0.86));
+  }
+  @keyframes projectile-trail {
+    0%   { stroke-dashoffset: var(--trail-len); opacity: 0; }
+    18%  { opacity: 1; }
+    76%  { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+  .wizard-zap-glow,
+  .wizard-zap-core {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+    stroke-dasharray: var(--zap-len);
+    stroke-dashoffset: var(--zap-len);
+    animation: wizard-zap-travel 310ms ease-out forwards;
+  }
+  .wizard-zap-glow {
+    stroke: #9b6fd3;
+    stroke-width: 6;
+    opacity: 0.42;
+    filter: drop-shadow(0 0 8px rgba(155, 111, 211, 0.8));
+  }
+  .wizard-zap-core {
+    stroke: #f3dcff;
+    stroke-width: 1.55;
+    opacity: 0.95;
+    filter: drop-shadow(0 0 4px rgba(255, 235, 255, 0.85));
+  }
+  .wizard-zap-spark {
+    fill: #f3dcff;
+    stroke: #9b6fd3;
+    stroke-width: 0.8;
+    pointer-events: none;
+    animation: wizard-zap-spark 310ms ease-out forwards;
+  }
+  .wizard-splash-fill,
+  .wizard-splash-ring {
+    pointer-events: none;
+  }
+  .wizard-splash-fill {
+    fill: rgba(176, 112, 255, 0.24);
+    filter: drop-shadow(0 0 10px rgba(155, 111, 211, 0.42));
+  }
+  .wizard-splash-ring {
+    fill: none;
+    stroke: #c68cff;
+    stroke-width: 1.25;
+  }
+  .wizard-splash-shard {
+    stroke: #f3dcff;
+    stroke-width: 1.05;
+    stroke-linecap: round;
+    pointer-events: none;
+  }
+  .wallbreaker-blast-fill,
+  .wallbreaker-shockwave {
+    pointer-events: none;
+  }
+  .wallbreaker-blast-fill {
+    fill: rgba(255, 150, 58, 0.32);
+    filter: drop-shadow(0 0 12px rgba(255, 115, 38, 0.64));
+  }
+  .wallbreaker-shockwave {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .wallbreaker-shockwave.inner {
+    stroke: #fff1b8;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 8px rgba(255, 225, 120, 0.9));
+  }
+  .wallbreaker-shockwave.outer {
+    stroke: #ff7b2c;
+    stroke-width: 2.2;
+    filter: drop-shadow(0 0 11px rgba(255, 110, 34, 0.72));
+  }
+  .wallbreaker-spark {
+    stroke: #fff1b8;
+    stroke-width: 1.25;
+    stroke-linecap: round;
+    pointer-events: none;
+    filter: drop-shadow(0 0 5px rgba(255, 208, 92, 0.9));
+  }
+  .wallbreaker-core {
+    fill: #fff2b1;
+    stroke: #ff7b2c;
+    stroke-width: 1;
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px rgba(255, 190, 90, 0.95));
+  }
+  @keyframes wizard-zap-travel {
+    0%   { stroke-dashoffset: var(--zap-len); opacity: 0; }
+    18%  { opacity: 1; }
+    68%  { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+  @keyframes wizard-zap-spark {
+    0%   { r: 1.2; opacity: 0; }
+    42%  { r: 4.2; opacity: 1; }
+    100% { r: 1.2; opacity: 0; }
   }
   @keyframes dead-fade {
     0%   { opacity: 1; filter: grayscale(0);   }
@@ -566,6 +810,17 @@
     from { opacity: 0.45; stroke-width: 0.5; }
     to   { opacity: 1.00; stroke-width: 1.2; }
   }
+  .engage-wizard-guide {
+    stroke: #b98cff;
+    stroke-width: 0.9;
+    stroke-dasharray: 1.5 3;
+    pointer-events: none;
+    animation: wizard-guide 260ms ease-in-out infinite alternate;
+  }
+  @keyframes wizard-guide {
+    from { opacity: 0.25; stroke-width: 0.7; }
+    to   { opacity: 0.75; stroke-width: 1.4; }
+  }
   .engage-impact {
     fill: none;
     stroke: var(--cannon);
@@ -578,6 +833,18 @@
   @keyframes impact {
     0%   { r: 1.5; opacity: 0.95; }
     100% { r: 6;   opacity: 0;    }
+  }
+  .engage-wizard-impact {
+    fill: rgba(176, 112, 255, 0.12);
+    stroke: #dcb6ff;
+    stroke-width: 0.8;
+    stroke-dasharray: 2 2;
+    pointer-events: none;
+    animation: wizard-impact 320ms ease-out infinite;
+  }
+  @keyframes wizard-impact {
+    0%   { opacity: 0.62; }
+    100% { opacity: 0.18; }
   }
   .engage-spark {
     fill: var(--hot);
@@ -646,14 +913,14 @@
       </div>
 
       <div class="row-line">
-        <span class="k">stars</span>
-        <span class="stars" id="stars">★★★</span>
+        <span class="stars" id="stars" aria-label="0 of 3 stars"></span>
       </div>
 
       <div class="overlays">
         <div class="k">overlays</div>
         <div class="toggles">
           <label class="chk"><input type="checkbox" id="t-ranges"><span class="ind"></span><span>ranges</span></label>
+          <label class="chk"><input type="checkbox" id="t-paths"><span class="ind"></span><span>paths</span></label>
           <label class="chk"><input type="checkbox" id="t-grid"><span class="ind"></span><span>grid</span></label>
           <label class="chk"><input type="checkbox" id="t-json"><span class="ind"></span><span>json</span></label>
         </div>
@@ -718,34 +985,40 @@
       <button id="btn-tick">tick +1</button>
     </div>
     <label class="ctrl-group profile-select">
-      <span>base</span>
       <select id="profile-select" aria-label="base profile">
-        <option value="default">default</option>
+        <option value="hard" selected>hard</option>
+      </select>
+    </label>
+    <label class="ctrl-group profile-select">
+      <select id="troop-select" aria-label="troop kind">
+        <option value="barbarian" selected>barbarian</option>
       </select>
     </label>
     <div class="ctrl-group">
-      <span>speed</span>
       <div class="chips" id="speed-chips">
-        <button class="chip active" data-speed="1">1×</button>
+        <button class="chip" data-speed="1">1×</button>
         <button class="chip" data-speed="2">2×</button>
         <button class="chip" data-speed="4">4×</button>
         <button class="chip" data-speed="8">8×</button>
+        <button class="chip active" data-speed="32">32×</button>
       </div>
     </div>
     <div class="ctrl-group">
-      <span>agent</span>
       <div class="chips" id="agent-chips">
-        <button class="chip active" data-agent="off">manual</button>
-        <button class="chip" data-agent="random">random</button>
+        <button class="chip" data-agent="off">manual</button>
+        <button class="chip active" data-agent="random">random</button>
       </div>
     </div>
-    <div class="hint">click any legal cell to deploy</div>
     <div class="legend">
       <span><i class="sw th"></i>townhall</span>
       <span><i class="sw can"></i>cannon</span>
+      <span><i class="sw wiz"></i>wizard</span>
+      <span><i class="sw mor"></i>mortar</span>
+      <span><i class="sw bomb"></i>bomb</span>
       <span><i class="sw stor"></i>storage</span>
       <span><i class="sw wall"></i>wall</span>
       <span><i class="sw trp"></i>barbarian</span>
+      <span><i class="sw wb"></i>wall breaker</span>
     </div>
   </footer>
 
@@ -759,11 +1032,14 @@ const SVG_SIZE = GRID * CELL;     // 616
 const BUILDING_COLORS = {
   townhall: "var(--th)",
   cannon:   "var(--cannon)",
+  wizard_tower: "var(--wizard)",
+  mortar:   "var(--mortar)",
+  bomb:     "var(--bomb)",
   storage:  "var(--storage)",
   wall:     "var(--ink-mute)",
 };
 
-const SPRITE_V = 15;
+const SPRITE_V = 18;
 const SPRITES = {
   townhall:        `/img/townhall.png?v=${SPRITE_V}`,
   townhall_rubble: `/img/townhall_rubble.png?v=${SPRITE_V}`,
@@ -772,41 +1048,56 @@ const SPRITES = {
   storage_full:    `/img/storage_full.png?v=${SPRITE_V}`,
   storage_dmg:     `/img/storage_dmg.png?v=${SPRITE_V}`,
   cannon:          `/img/cannon.png?v=${SPRITE_V}`,
+  wizard_tower:    `/img/wizard_tower.png?v=${SPRITE_V}`,
+  wizard_tower_broken: `/img/wizard_tower_broken.png?v=${SPRITE_V}`,
+  bomb:            `/img/bomb.png?v=${SPRITE_V}`,
   wall:            `/img/wall.png?v=${SPRITE_V}`,
   barbarian_run_a: `/img/barbarian_run_a.png?v=${SPRITE_V}`,
   barbarian_hit:   `/img/barbarian_hit.png?v=${SPRITE_V}`,
   barbarian_dead:  `/img/barbarian_dead.png?v=${SPRITE_V}`,
   barbarian_tombstone: `/img/barbarian_tombstone.png?v=${SPRITE_V}`,
+  wall_breaker:    `/img/wall_breaker.png?v=${SPRITE_V}`,
+  star:            `/img/star.png?v=${SPRITE_V}`,
 };
 const CANNON_FRAMES = Array.from({ length: 36 }, (_, i) =>
   `/img/cannon_${String(i).padStart(2, "0")}.png?v=${SPRITE_V}`
 );
-// preload rotated cannon frames
+const MORTAR_FRAMES = Array.from({ length: 36 }, (_, i) =>
+  `/img/mortar_${String(i).padStart(2, "0")}.png?v=${SPRITE_V}`
+);
 for (const url of CANNON_FRAMES) { const i = new Image(); i.src = url; }
+for (const url of MORTAR_FRAMES) { const i = new Image(); i.src = url; }
 let cannonAim = new Map();      // building id -> last-known frame index 0..35
+let mortarAim = new Map();      // building id -> last-known frame index 0..35
 let lastFireTick = new Map();   // attacker_id -> tick of last shot
-const FIRE_EVERY = 3;           // cannons fire on every Nth tick
+let lastWallBreakerExplosionTick = new Map(); // troop id -> tick of last blast fx
+let fxGradientSeq = 0;
+const DEFAULT_FIRE_EVERY = 3;   // fallback if a defense omits cooldown metadata
 const CANNONBALL_MUZZLE_OFFSET = 1.8; // grid cells from cannon center before projectile appears
 
-function cannonFrameIdx(b, targets) {
+// 36-frame rotation: derive frame index from angle to current target. Shared
+// by cannons and mortars; each defense kind has its own `aim` cache so a target
+// switch on one doesn't reset the other.
+function defenseFrameIdx(b, targets, aimCache) {
   const t = targets.get(b.id);
   if (t) {
     const cx = b.x + b.size / 2;
     const cy = b.y + b.size / 2;
-    const dx = t.to_x - cx;
-    const dy = t.to_y - cy;
-    let ang = Math.atan2(dx, dy);            // 0 = south, +CW on screen
+    let ang = Math.atan2(t.to_x - cx, t.to_y - cy);  // 0 = south, +CW on screen
     if (ang < 0) ang += 2 * Math.PI;
     const idx = Math.round(ang / (Math.PI / 18)) % 36;  // 360° / 36 = 10°
-    cannonAim.set(b.id, idx);
+    aimCache.set(b.id, idx);
     return idx;
   }
-  return cannonAim.get(b.id) ?? 0;
+  return aimCache.get(b.id) ?? 0;
 }
 
 function buildingSprite(b, cannonTargets) {
   if (b.kind === "townhall") return SPRITES.townhall;
-  if (b.kind === "cannon")   return CANNON_FRAMES[cannonFrameIdx(b, cannonTargets)];
+  if (b.kind === "cannon")   return CANNON_FRAMES[defenseFrameIdx(b, cannonTargets, cannonAim)];
+  if (b.kind === "mortar")   return MORTAR_FRAMES[defenseFrameIdx(b, cannonTargets, mortarAim)];
+  if (b.kind === "wizard_tower") return SPRITES.wizard_tower;
+  if (b.kind === "bomb")     return SPRITES.bomb;
   if (b.kind === "storage")  return b.hp / b.max_hp < 0.5 ? SPRITES.storage_dmg : SPRITES.storage_full;
   if (b.kind === "wall")     return SPRITES.wall;
   return null;
@@ -823,6 +1114,50 @@ function cannonballStart(fx, fy, tx, ty) {
   };
 }
 
+function createTrailGradient(layer, start, end, color, endOpacity) {
+  const svg = layer.ownerSVGElement || grid;
+  if (!svg) return null;
+  let defs = svg.querySelector("defs#fx-defs");
+  if (!defs) {
+    defs = el("defs", { id: "fx-defs" });
+    svg.insertBefore(defs, svg.firstChild);
+  }
+  const id = `trail-grad-${++fxGradientSeq}`;
+  const gradient = el("linearGradient", {
+    id,
+    gradientUnits: "userSpaceOnUse",
+    x1: start.x,
+    y1: start.y,
+    x2: end.x,
+    y2: end.y,
+  });
+  gradient.appendChild(el("stop", {
+    offset: "0%",
+    "stop-color": color,
+    "stop-opacity": 0,
+  }));
+  gradient.appendChild(el("stop", {
+    offset: "38%",
+    "stop-color": color,
+    "stop-opacity": endOpacity * 0.18,
+  }));
+  gradient.appendChild(el("stop", {
+    offset: "78%",
+    "stop-color": color,
+    "stop-opacity": endOpacity,
+  }));
+  gradient.appendChild(el("stop", {
+    offset: "100%",
+    "stop-color": color,
+    "stop-opacity": endOpacity,
+  }));
+  defs.appendChild(gradient);
+  return {
+    stroke: `url(#${id})`,
+    remove: () => gradient.remove(),
+  };
+}
+
 function spawnCannonball(fx, fy, tx, ty) {
   const layer = document.getElementById("grid-fx");
   if (!layer) return;
@@ -830,28 +1165,335 @@ function spawnCannonball(fx, fy, tx, ty) {
   if (!start) return;
   const a = isoGrid(start.x, start.y);
   const b = isoGrid(tx, ty);
+  const d = `M ${a.x} ${a.y} L ${b.x} ${b.y}`;
+  const glowGradient = createTrailGradient(layer, a, b, "#ff9c3c", 0.92);
+  const coreGradient = createTrailGradient(layer, a, b, "#fff0b7", 1.0);
+  const glowStyle = `--trail-len: 1; --trail-ms: 360ms;${glowGradient ? ` stroke: ${glowGradient.stroke};` : ""}`;
+  const coreStyle = `--trail-len: 1; --trail-ms: 360ms;${coreGradient ? ` stroke: ${coreGradient.stroke};` : ""}`;
+  const glow = el("path", { d, pathLength: 1, class: "projectile-trail-glow cannon-trail", style: glowStyle });
+  const core = el("path", { d, pathLength: 1, class: "projectile-trail-core cannon-trail", style: coreStyle });
   const ball = el("circle", { cx: a.x, cy: a.y, r: 2.5, class: "cannonball" });
+  layer.appendChild(glow);
+  layer.appendChild(core);
   layer.appendChild(ball);
   requestAnimationFrame(() => requestAnimationFrame(() => {
     ball.setAttribute("cx", b.x);
     ball.setAttribute("cy", b.y);
   }));
-  setTimeout(() => ball.remove(), 400);
+  setTimeout(() => {
+    glow.remove();
+    core.remove();
+    glowGradient?.remove();
+    coreGradient?.remove();
+    ball.remove();
+  }, 430);
 }
 
-function maybeFireCannonballs() {
+function spawnMortarShell(fx, fy, tx, ty, durationMs, radiusCells = 1.5) {
+  const layer = document.getElementById("grid-fx");
+  if (!layer) return;
+  const start = isoGrid(fx, fy);
+  const end = isoGrid(tx, ty);
+  const dist = Math.hypot(end.x - start.x, end.y - start.y);
+  const arc = Math.max(32, Math.min(82, dist * 0.32));
+  const trailControlX = (start.x + end.x) / 2;
+  const trailControlY = (start.y + end.y) / 2 - arc * 1.45;
+  const trailPath = `M ${start.x} ${start.y} Q ${trailControlX} ${trailControlY} ${end.x} ${end.y}`;
+  const glowGradient = createTrailGradient(layer, start, end, "#64dfff", 0.9);
+  const coreGradient = createTrailGradient(layer, start, end, "#fff0a8", 1.0);
+  const trailMs = Math.max(420, durationMs);
+  const glowStyle = `--trail-len: 1; --trail-ms: ${trailMs}ms;${glowGradient ? ` stroke: ${glowGradient.stroke};` : ""}`;
+  const coreStyle = `--trail-len: 1; --trail-ms: ${trailMs}ms;${coreGradient ? ` stroke: ${coreGradient.stroke};` : ""}`;
+  const glow = el("path", {
+    d: trailPath,
+    pathLength: 1,
+    class: "projectile-trail-glow mortar-trail",
+    style: glowStyle,
+  });
+  const core = el("path", {
+    d: trailPath,
+    pathLength: 1,
+    class: "projectile-trail-core mortar-trail",
+    style: coreStyle,
+  });
+  const shell = el("circle", { cx: start.x, cy: start.y, r: 3.1, class: "mortar-shell" });
+  const shadow = el("ellipse", { cx: start.x, cy: start.y, rx: 4, ry: 1.8, class: "mortar-shadow" });
+  layer.appendChild(shadow);
+  layer.appendChild(glow);
+  layer.appendChild(core);
+  layer.appendChild(shell);
+
+  const started = performance.now();
+  function frame(now) {
+    const t = Math.min(1, (now - started) / durationMs);
+    const x = start.x + (end.x - start.x) * t;
+    const groundY = start.y + (end.y - start.y) * t;
+    const lift = Math.sin(Math.PI * t) * arc;
+    const scale = 1 + Math.sin(Math.PI * t) * 0.35;
+    shell.setAttribute("cx", x);
+    shell.setAttribute("cy", groundY - lift);
+    shell.setAttribute("r", 3.1 * scale);
+    shadow.setAttribute("cx", x);
+    shadow.setAttribute("cy", groundY + 3);
+    shadow.setAttribute("rx", 4 + 5 * t);
+    shadow.setAttribute("opacity", 0.42 - 0.18 * Math.sin(Math.PI * t));
+    if (t < 1) {
+      requestAnimationFrame(frame);
+      return;
+    }
+    shell.remove();
+    shadow.remove();
+    glow.remove();
+    core.remove();
+    glowGradient?.remove();
+    coreGradient?.remove();
+    const impact = el("circle", {
+      cx: end.x,
+      cy: end.y,
+      r: Math.max(4, gridUnits(radiusCells) * 0.28),
+      class: "mortar-impact",
+    });
+    layer.appendChild(impact);
+    setTimeout(() => impact.remove(), 420);
+  }
+  requestAnimationFrame(frame);
+}
+
+function splashEllipseRadius(radiusCells) {
+  const base = Math.max(7, gridUnits(Math.max(0.3, radiusCells)) * DEBUG.scale);
+  return {
+    rx: base,
+    ry: Math.max(4, base * DEBUG.squashY),
+  };
+}
+
+function setEllipsePulse(node, cx, cy, rx, ry, progress) {
+  const eased = 1 - Math.pow(1 - progress, 3);
+  node.setAttribute("rx", rx * eased);
+  node.setAttribute("ry", ry * eased);
+  node.setAttribute("opacity", Math.max(0, 1 - progress));
+  node.setAttribute("transform", `rotate(${DEBUG.rotation} ${cx} ${cy})`);
+}
+
+function spawnWizardSplash(layer, cx, cy, radiusCells, seed) {
+  const radius = splashEllipseRadius(radiusCells);
+  const fill = el("ellipse", {
+    cx, cy, rx: 0, ry: 0,
+    class: "wizard-splash-fill",
+    opacity: 0.85,
+  });
+  const ring = el("ellipse", {
+    cx, cy, rx: 0, ry: 0,
+    class: "wizard-splash-ring",
+    opacity: 0.95,
+  });
+  const shards = [];
+  const shardCount = 7;
+  for (let i = 0; i < shardCount; i++) {
+    const angle = ((Math.PI * 2) / shardCount) * i + (seed % 11) * 0.09;
+    const inner = 0.26 + (i % 2) * 0.08;
+    const outer = 0.58 + (i % 3) * 0.08;
+    const x1 = cx + Math.cos(angle) * radius.rx * inner;
+    const y1 = cy + Math.sin(angle) * radius.ry * inner;
+    const x2 = cx + Math.cos(angle) * radius.rx * outer;
+    const y2 = cy + Math.sin(angle) * radius.ry * outer;
+    const shard = el("line", {
+      x1, y1, x2, y2,
+      class: "wizard-splash-shard",
+      opacity: 0.85,
+      transform: `rotate(${DEBUG.rotation} ${cx} ${cy})`,
+    });
+    shards.push(shard);
+  }
+  layer.appendChild(fill);
+  layer.appendChild(ring);
+  for (const shard of shards) layer.appendChild(shard);
+
+  const started = performance.now();
+  function frame(now) {
+    const t = Math.min(1, (now - started) / 420);
+    setEllipsePulse(fill, cx, cy, radius.rx * 0.9, radius.ry * 0.9, t);
+    setEllipsePulse(ring, cx, cy, radius.rx, radius.ry, t);
+    for (const shard of shards) {
+      shard.setAttribute("opacity", Math.max(0, 1 - t * 1.4));
+    }
+    if (t < 1) {
+      requestAnimationFrame(frame);
+      return;
+    }
+    fill.remove();
+    ring.remove();
+    for (const shard of shards) shard.remove();
+  }
+  requestAnimationFrame(frame);
+}
+
+function spawnWizardZap(fx, fy, tx, ty, radiusCells, seed) {
+  const layer = document.getElementById("grid-fx");
+  if (!layer) return;
+  const start = isoGrid(fx, fy);
+  const end = isoGrid(tx, ty);
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const len = Math.hypot(dx, dy);
+  if (len < 1) return;
+  const side = seed % 2 === 0 ? 1 : -1;
+  const bend = Math.max(5, Math.min(18, len * 0.1));
+  const nx = -dy / len;
+  const ny = dx / len;
+  const mx = (start.x + end.x) / 2 + nx * bend * side;
+  const my = (start.y + end.y) / 2 + ny * bend * side;
+  const d = `M ${start.x} ${start.y} Q ${mx} ${my} ${end.x} ${end.y}`;
+  const glowGradient = createTrailGradient(layer, start, end, "#9b6fd3", 0.95);
+  const coreGradient = createTrailGradient(layer, start, end, "#f3dcff", 1.0);
+  const glowStyle = `--zap-len: 1;${glowGradient ? ` stroke: ${glowGradient.stroke};` : ""}`;
+  const coreStyle = `--zap-len: 1;${coreGradient ? ` stroke: ${coreGradient.stroke};` : ""}`;
+  const glow = el("path", { d, pathLength: 1, class: "wizard-zap-glow", style: glowStyle });
+  const core = el("path", { d, pathLength: 1, class: "wizard-zap-core", style: coreStyle });
+  const spark = el("circle", { cx: end.x, cy: end.y, r: 1.2, class: "wizard-zap-spark" });
+  layer.appendChild(glow);
+  layer.appendChild(core);
+  layer.appendChild(spark);
+  setTimeout(() => spawnWizardSplash(layer, end.x, end.y, radiusCells, seed), 145);
+  setTimeout(() => {
+    glow.remove();
+    core.remove();
+    glowGradient?.remove();
+    coreGradient?.remove();
+    spark.remove();
+  }, 430);
+}
+
+function spawnWallBreakerExplosion(x, y, radiusCells, seed) {
+  const layer = document.getElementById("grid-fx");
+  if (!layer) return;
+  const p = isoGrid(x, y);
+  const radius = splashEllipseRadius(radiusCells);
+  const fill = el("ellipse", {
+    cx: p.x, cy: p.y, rx: 0, ry: 0,
+    class: "wallbreaker-blast-fill",
+    opacity: 0.85,
+  });
+  const inner = el("ellipse", {
+    cx: p.x, cy: p.y, rx: 0, ry: 0,
+    class: "wallbreaker-shockwave inner",
+    opacity: 0.98,
+  });
+  const outer = el("ellipse", {
+    cx: p.x, cy: p.y, rx: 0, ry: 0,
+    class: "wallbreaker-shockwave outer",
+    opacity: 0.85,
+  });
+  const core = el("circle", {
+    cx: p.x, cy: p.y, r: 2,
+    class: "wallbreaker-core",
+    opacity: 1,
+  });
+  const sparks = [];
+  const sparkCount = 10;
+  for (let i = 0; i < sparkCount; i++) {
+    const angle = ((Math.PI * 2) / sparkCount) * i + (seed % 13) * 0.07;
+    const innerScale = 0.16 + (i % 2) * 0.06;
+    const outerScale = 0.58 + (i % 4) * 0.08;
+    const spark = el("line", {
+      x1: p.x + Math.cos(angle) * radius.rx * innerScale,
+      y1: p.y + Math.sin(angle) * radius.ry * innerScale,
+      x2: p.x + Math.cos(angle) * radius.rx * outerScale,
+      y2: p.y + Math.sin(angle) * radius.ry * outerScale,
+      class: "wallbreaker-spark",
+      opacity: 0.9,
+      transform: `rotate(${DEBUG.rotation} ${p.x} ${p.y})`,
+    });
+    sparks.push(spark);
+  }
+
+  layer.appendChild(fill);
+  layer.appendChild(inner);
+  layer.appendChild(outer);
+  for (const spark of sparks) layer.appendChild(spark);
+  layer.appendChild(core);
+
+  const started = performance.now();
+  function frame(now) {
+    const t = Math.min(1, (now - started) / 560);
+    const eased = 1 - Math.pow(1 - t, 3);
+    const rotation = `rotate(${DEBUG.rotation} ${p.x} ${p.y})`;
+    setAttrs(fill, {
+      rx: radius.rx * 0.78 * eased,
+      ry: radius.ry * 0.78 * eased,
+      opacity: Math.max(0, 0.58 * (1 - t)),
+      transform: rotation,
+    });
+    setAttrs(inner, {
+      rx: radius.rx * (0.18 + 0.72 * eased),
+      ry: radius.ry * (0.18 + 0.72 * eased),
+      opacity: Math.max(0, 1 - t * 1.15),
+      transform: rotation,
+    });
+    setAttrs(outer, {
+      rx: radius.rx * (0.18 + 1.18 * eased),
+      ry: radius.ry * (0.18 + 1.18 * eased),
+      opacity: Math.max(0, 0.85 * (1 - t)),
+      transform: rotation,
+    });
+    setAttrs(core, {
+      r: Math.max(0, 6 * (1 - t)),
+      opacity: Math.max(0, 1 - t * 1.7),
+    });
+    for (const spark of sparks) {
+      spark.setAttribute("opacity", Math.max(0, 1 - t * 1.35));
+    }
+    if (t < 1) {
+      requestAnimationFrame(frame);
+      return;
+    }
+    fill.remove();
+    inner.remove();
+    outer.remove();
+    core.remove();
+    for (const spark of sparks) spark.remove();
+  }
+  requestAnimationFrame(frame);
+}
+
+function defenseFireEvery(e) {
+  const cooldown = Number(e.attack_cooldown || 0);
+  if (!Number.isFinite(cooldown) || cooldown <= 0 || !state.tick_seconds) return DEFAULT_FIRE_EVERY;
+  return Math.max(1, Math.round(cooldown / state.tick_seconds));
+}
+
+function maybeFireDefenseProjectiles() {
   if (!state) return;
   for (const e of state.engagements || []) {
+    if (e.kind === "wall_breaker_explosion") {
+      const last = lastWallBreakerExplosionTick.get(e.attacker_id);
+      if (last === state.tick) continue;
+      lastWallBreakerExplosionTick.set(e.attacker_id, state.tick);
+      spawnWallBreakerExplosion(e.to_x, e.to_y, Number(e.radius || 1.6), e.attacker_id + state.tick);
+      continue;
+    }
     if (e.kind !== "defense") continue;
+    if (e.source_kind !== "cannon" && e.source_kind !== "mortar" && e.source_kind !== "wizard_tower") continue;
     const last = lastFireTick.get(e.attacker_id);
-    if (last !== undefined && state.tick - last < FIRE_EVERY) continue;
+    if (last !== undefined && state.tick - last < defenseFireEvery(e)) continue;
     lastFireTick.set(e.attacker_id, state.tick);
-    spawnCannonball(e.from_x, e.from_y, e.to_x, e.to_y);
+    if (e.source_kind === "mortar") {
+      const durationMs = Math.max(550, Number(e.projectile_delay || 1) * 1000);
+      spawnMortarShell(e.from_x, e.from_y, e.to_x, e.to_y, durationMs, Number(e.splash_radius || 1.5));
+    } else if (e.source_kind === "cannon") {
+      spawnCannonball(e.from_x, e.from_y, e.to_x, e.to_y);
+    } else if (e.source_kind === "wizard_tower") {
+      spawnWizardZap(e.from_x, e.from_y, e.to_x, e.to_y, Number(e.splash_radius || 1.0), e.attacker_id + state.tick);
+    }
   }
 }
 function attackPose(troopId, tick) {
   // alternate run_a (recover) and hit (strike), offset per troop to desync
   return ((tick + troopId) % 3 === 2) ? SPRITES.barbarian_hit : SPRITES.barbarian_run_a;
+}
+function troopSprite(t, attacking) {
+  if (t.kind === "wall_breaker") return SPRITES.wall_breaker;
+  return attacking ? attackPose(t.id, state.tick) : SPRITES.barbarian_run_a;
 }
 for (const url of Object.values(SPRITES)) { const i = new Image(); i.src = url; }
 const TROOP_PX = 32;        // viewBox-units for troop sprite size
@@ -859,12 +1501,18 @@ const TROOP_OFFSET_Y = 6;   // raise sprite so feet land at troop position
 const TOMBSTONE_W = 22;
 const TOMBSTONE_H = TOMBSTONE_W * 37 / 48;
 const TOMBSTONE_OFFSET_Y = 2;
+const WALL_BREAKER_TOMBSTONE_DELAY_MS = 520;
 const STORAGE_SCALE = 1.35; // storage sprite renders larger than its footprint
+const CANNON_SCALE = 0.92;
+const WIZARD_TOWER_SCALE = 1.16;
+const BOMB_SCALE = 1.65;
 const WALL_SCALE = 1.35;
+const MORTAR_SCALE = 0.85;
 const WALL_ASPECT = 71 / 75;
 const RUBBLE_ART = {
   townhall: { href: SPRITES.townhall_rubble, scale: 1.12, aspect: 1 },
   cannon: { href: SPRITES.cannon_rubble, scale: 1.2, aspect: 763 / 1083 },
+  wizard_tower: { href: SPRITES.wizard_tower_broken, scale: 1.1, aspect: 499 / 659 },
   storage: { href: SPRITES.resources_rubble, scale: 1.25, aspect: 760 / 1007 },
 };
 const BUILDING_HP_BAR_SCALE = 0.76;
@@ -988,8 +1636,12 @@ const trace = document.getElementById("trace");
 const SVG_NS = "http://www.w3.org/2000/svg";
 function el(tag, attrs = {}) {
   const e = document.createElementNS(SVG_NS, tag);
-  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  setAttrs(e, attrs);
   return e;
+}
+
+function setAttrs(node, attrs) {
+  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
 }
 
 function appendHealthBar(layer, x, y, width, height, hpFrac) {
@@ -1010,19 +1662,190 @@ function renderDepthForFootprint(item) {
   return isoGrid(item.x + item.size, item.y + item.size).y;
 }
 
+function renderTroops(troopsLayer, attackingIds) {
+  const seen = new Set();
+  const orderedTroops = [...state.troops].sort((a, b) => {
+    const ay = isoGrid(a.x, a.y).y;
+    const by = isoGrid(b.x, b.y).y;
+    if (ay !== by) return ay - by;
+    return a.id - b.id;
+  });
+
+  for (const t of orderedTroops) {
+    const id = String(t.id);
+    seen.add(id);
+    let node = troopsLayer.querySelector(`[data-troop-id="${id}"]`);
+    if (!node) {
+      node = el("g", { "data-troop-id": id });
+      node.appendChild(el("image", {
+        "data-role": "sprite",
+        class: "sprite troop-sprite",
+        preserveAspectRatio: "xMidYMid meet",
+      }));
+    }
+
+    const center = isoGrid(t.x, t.y);
+    const sprite = troopSprite(t, attackingIds.has(t.id));
+    const facing = troopFacing.get(t.id) || "right";
+    const px = center.x - TROOP_PX / 2;
+    const py = center.y - TROOP_PX / 2 - TROOP_OFFSET_Y;
+    const img = node.querySelector('[data-role="sprite"]');
+    if (!img) continue;
+    setAttrs(img, {
+      href: sprite,
+      x: px, y: py,
+      width: TROOP_PX, height: TROOP_PX,
+    });
+    if (facing === "left") {
+      img.setAttribute("transform", `translate(${2 * px + TROOP_PX} 0) scale(-1 1)`);
+    } else {
+      img.removeAttribute("transform");
+    }
+
+    const hpFrac = t.hp / t.max_hp;
+    let hp = node.querySelector('[data-role="hp"]');
+    if (hpFrac < 1) {
+      if (!hp) {
+        hp = el("g", { "data-role": "hp" });
+        hp.appendChild(el("rect", { "data-role": "hp-bg", class: "hp-bg" }));
+        hp.appendChild(el("rect", { "data-role": "hp-fg", class: "hp-fg" }));
+        node.appendChild(hp);
+      }
+      const rx = TROOP_HP_BAR_HEIGHT / 2;
+      const barX = center.x - TROOP_HP_BAR_WIDTH / 2;
+      const barY = center.y - TROOP_PX / 2 - TROOP_OFFSET_Y - 3;
+      const hpBg = hp.querySelector('[data-role="hp-bg"]');
+      const hpFg = hp.querySelector('[data-role="hp-fg"]');
+      if (!hpBg || !hpFg) continue;
+      setAttrs(hpBg, {
+        x: barX,
+        y: barY,
+        width: TROOP_HP_BAR_WIDTH,
+        height: TROOP_HP_BAR_HEIGHT,
+        rx, ry: rx,
+      });
+      setAttrs(hpFg, {
+        x: barX,
+        y: barY,
+        width: TROOP_HP_BAR_WIDTH * hpFrac,
+        height: TROOP_HP_BAR_HEIGHT,
+        rx, ry: rx,
+      });
+    } else if (hp) {
+      hp.remove();
+    }
+
+    troopsLayer.appendChild(node);
+  }
+
+  for (const node of [...troopsLayer.querySelectorAll("[data-troop-id]")]) {
+    if (!seen.has(node.getAttribute("data-troop-id"))) node.remove();
+  }
+}
+
+function renderStars(count) {
+  const host = document.getElementById("stars");
+  const stars = Math.max(0, Math.min(3, Number(count) || 0));
+  if (host.children.length !== 3) {
+    host.replaceChildren();
+    for (let i = 0; i < 3; i++) {
+      const slot = document.createElement("span");
+      const img = document.createElement("img");
+      slot.className = "star-slot";
+      slot.dataset.starIndex = String(i);
+      img.src = SPRITES.star;
+      img.alt = "";
+      img.decoding = "async";
+      slot.appendChild(img);
+      host.appendChild(slot);
+    }
+  }
+
+  host.setAttribute("aria-label", `${stars} of 3 stars`);
+  for (const slot of host.children) {
+    const index = Number(slot.dataset.starIndex);
+    const earned = index < stars;
+    const wasEarned = index < previousStars;
+    slot.classList.toggle("earned", earned);
+    if (earned && !wasEarned) {
+      slot.classList.remove("is-new");
+      void slot.getBoundingClientRect();
+      slot.classList.add("is-new");
+    } else if (!earned) {
+      slot.classList.remove("is-new");
+    }
+  }
+  previousStars = stars;
+}
+
+function drawPathPredictions(pathsLayer) {
+  if (!pathsEnabled()) {
+    if (pathsLayer.childNodes.length) pathsLayer.replaceChildren();
+    return;
+  }
+
+  // Diff-render: reuse polyline/dot per troop_id, just update attributes.
+  // Avoids destroying DOM (and restarting the CSS path-flow animation) every tick,
+  // which is the bulk of per-frame cost now that path viz is on.
+  const predictions = state.path_predictions || [];
+  const seen = new Set();
+  for (const prediction of predictions) {
+    const points = (prediction.points || []).map(p => isoGrid(p.x, p.y));
+    if (points.length < 2) continue;
+    const tid = prediction.troop_id;
+    seen.add(tid);
+
+    const pointsStr = points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
+    const end = points[points.length - 1];
+
+    let line = pathsLayer.querySelector(`polyline[data-path-id="${tid}"]`);
+    if (line) {
+      if (line.getAttribute("points") !== pointsStr) line.setAttribute("points", pointsStr);
+    } else {
+      pathsLayer.appendChild(el("polyline", {
+        points: pointsStr, class: "path-line", "data-path-id": tid,
+      }));
+    }
+
+    let dot = pathsLayer.querySelector(`circle[data-path-id="${tid}"]`);
+    if (dot) {
+      const cx = end.x.toFixed(1), cy = end.y.toFixed(1);
+      if (dot.getAttribute("cx") !== cx) dot.setAttribute("cx", cx);
+      if (dot.getAttribute("cy") !== cy) dot.setAttribute("cy", cy);
+    } else {
+      pathsLayer.appendChild(el("circle", {
+        cx: end.x, cy: end.y, r: 3, class: "path-end", "data-path-id": tid,
+      }));
+    }
+  }
+
+  for (const node of [...pathsLayer.querySelectorAll("[data-path-id]")]) {
+    const id = parseInt(node.dataset.pathId, 10);
+    if (!seen.has(id)) node.remove();
+  }
+}
+
 let state = null;
 let damageHistory = [];           // [tick, damage_pct] pairs
 let livePrev = new Map();         // troop id -> {x, y}; used to detect deaths
 let troopFacing = new Map();      // troop id -> "left" | "right"; sprite face direction
+let previousStars = 0;
+let boardGuideKey = "";
+let boardRangeKey = "";
+let boardDeployKey = "";
+let boardBuildingsKey = "";
+let selectedTroopKind = "barbarian";
 
 // playback state
 const TICK_BASE_MS = 250;          // 1× = real-time (matches TICK_SECONDS = 0.25s)
 let playing = false;
-let playTimer = null;
-let playSpeed = 1;                 // 1, 2, 4, 8
-let agentMode = "off";             // "off" or "random"
-let ticksSinceDecision = 0;
-const DECISION_EVERY = 10;         // matches DECISION_INTERVAL in env.py
+let playFrame = null;
+let playbackBusy = false;
+let playClockLast = 0;
+let tickAccumulator = 0;
+const DEFAULT_PROFILE = "hard";
+let playSpeed = 32;                // 1, 2, 4, 8, 32
+let agentMode = "random";          // "off" or "random"
 
 async function api(method, path, body) {
   const r = await fetch(path, {
@@ -1036,17 +1859,21 @@ async function api(method, path, body) {
 
 async function reset() {
   pause();
-  ticksSinceDecision = 0;
   damageHistory = [];
   livePrev = new Map();
   troopFacing = new Map();
+  previousStars = 0;
   cannonAim = new Map();
+  mortarAim = new Map();
   lastFireTick = new Map();
+  lastWallBreakerExplosionTick = new Map();
+  boardBuildingsKey = "";
   clearDeadLayer();
   clearFxLayer();
   state = await api("POST", "/reset", {
     seed: Math.floor(Math.random() * 1e6),
     profile: selectedProfile(),
+    include_paths: pathsEnabled(),
   });
   afterUpdate();
 }
@@ -1076,9 +1903,13 @@ function spawnTombstone(x, y) {
   }));
 }
 
-function spawnDeath(x, y, facing) {
+function spawnDeath(x, y, facing, kind = "barbarian") {
   const dead = document.getElementById("grid-dead");
   if (!dead) return;
+  if (kind === "wall_breaker") {
+    setTimeout(() => spawnTombstone(x, y), WALL_BREAKER_TOMBSTONE_DELAY_MS);
+    return;
+  }
   const p = isoGrid(x, y);
   const px = p.x - TROOP_PX / 2;
   const py = p.y - TROOP_PX / 2 - TROOP_OFFSET_Y;
@@ -1103,7 +1934,7 @@ function updateDeaths() {
   if (!state) return;
   const currentIds = new Set(state.troops.map(t => t.id));
   for (const [id, info] of livePrev) {
-    if (!currentIds.has(id)) spawnDeath(info.x, info.y, troopFacing.get(id));
+    if (!currentIds.has(id)) spawnDeath(info.x, info.y, troopFacing.get(id), info.kind);
   }
   // facing follows horizontal motion; sprites are drawn facing right by default
   for (const t of state.troops) {
@@ -1116,24 +1947,26 @@ function updateDeaths() {
       troopFacing.set(t.id, t.x > GRID / 2 ? "left" : "right");
     }
   }
-  livePrev = new Map(state.troops.map(t => [t.id, { x: t.x, y: t.y }]));
+  livePrev = new Map(state.troops.map(t => [t.id, { x: t.x, y: t.y, kind: t.kind }]));
   for (const id of [...troopFacing.keys()]) {
     if (!currentIds.has(id)) troopFacing.delete(id);
   }
 }
 
 async function tickOne() {
-  state = await api("POST", "/tick");
-  ticksSinceDecision++;
+  state = await api("POST", "/advance", { ticks: 1, agent_mode: "off", include_paths: pathsEnabled() });
   afterUpdate();
 }
 async function deploy(action) {
-  state = await api("POST", "/deploy", { action });
+  state = await api("POST", "/deploy", { action, include_paths: pathsEnabled() });
   afterUpdate();
 }
 async function agentRandom() {
-  state = await api("POST", "/agent_random");
-  ticksSinceDecision = 0;
+  state = await api("POST", "/agent_random", { include_paths: pathsEnabled() });
+  afterUpdate();
+}
+async function refreshState() {
+  state = await api("GET", `/state?include_paths=${pathsEnabled() ? 1 : 0}`);
   afterUpdate();
 }
 
@@ -1142,23 +1975,23 @@ function afterUpdate() {
     const last = damageHistory[damageHistory.length - 1];
     if (!last || last[0] !== state.tick) damageHistory.push([state.tick, state.damage_pct]);
     updateDeaths();
-    maybeFireCannonballs();
+    maybeFireDefenseProjectiles();
   }
   render();
   if (state && state.is_done && playing) pause();
 }
 
-function tickIntervalMs() { return TICK_BASE_MS / playSpeed; }
-
 function play() {
   if (playing || !state || state.is_done) return;
   playing = true;
+  playClockLast = performance.now();
+  tickAccumulator = 0;
   setPlayButton(true);
   scheduleTick();
 }
 function pause() {
   playing = false;
-  if (playTimer) { clearTimeout(playTimer); playTimer = null; }
+  if (playFrame) { cancelAnimationFrame(playFrame); playFrame = null; }
   setPlayButton(false);
 }
 function setPlayButton(isPlaying) {
@@ -1167,25 +2000,49 @@ function setPlayButton(isPlaying) {
 }
 function scheduleTick() {
   if (!playing) return;
-  playTimer = setTimeout(async () => {
+  playFrame = requestAnimationFrame(async () => {
+    playFrame = null;
+    if (playbackBusy) {
+      scheduleTick();
+      return;
+    }
     try {
-      if (agentMode === "random" && ticksSinceDecision >= DECISION_EVERY && state.army_remaining > 0) {
-        await agentRandom();
+      const now = performance.now();
+      const elapsedMs = Math.max(0, now - playClockLast);
+      playClockLast = now;
+      tickAccumulator += (elapsedMs / TICK_BASE_MS) * playSpeed;
+      const ticks = Math.floor(tickAccumulator);
+      if (ticks > 0) {
+        tickAccumulator -= ticks;
+        playbackBusy = true;
+        state = await api("POST", "/advance", { ticks, agent_mode: agentMode, include_paths: pathsEnabled() });
+        playbackBusy = false;
+        afterUpdate();
       }
-      await tickOne();
       if (playing) scheduleTick();
-    } catch (e) { pause(); console.error(e); }
-  }, tickIntervalMs());
+    } catch (e) {
+      playbackBusy = false;
+      pause();
+      console.error(e);
+    }
+  });
 }
 
 document.getElementById("btn-reset").addEventListener("click", () => { reset(); });
 document.getElementById("btn-play").addEventListener("click", () => { playing ? pause() : play(); });
 document.getElementById("btn-tick").addEventListener("click", () => { tickOne(); });
 document.getElementById("profile-select").addEventListener("change", () => { reset(); });
+document.getElementById("troop-select").addEventListener("change", (event) => {
+  selectedTroopKind = event.target.value || "barbarian";
+  boardDeployKey = "";
+  render();
+});
 
 document.querySelectorAll("#speed-chips .chip").forEach(b => {
   b.addEventListener("click", () => {
     playSpeed = parseInt(b.dataset.speed, 10);
+    playClockLast = performance.now();
+    tickAccumulator = 0;
     document.querySelectorAll("#speed-chips .chip").forEach(x => x.classList.toggle("active", x === b));
   });
 });
@@ -1193,12 +2050,27 @@ document.querySelectorAll("#agent-chips .chip").forEach(b => {
   b.addEventListener("click", () => {
     agentMode = b.dataset.agent;
     document.querySelectorAll("#agent-chips .chip").forEach(x => x.classList.toggle("active", x === b));
-    if (agentMode === "random") ticksSinceDecision = DECISION_EVERY;
   });
 });
 
-for (const id of ["t-ranges", "t-grid", "t-json"]) {
-  document.getElementById(id).addEventListener("change", render);
+for (const id of ["t-ranges", "t-paths", "t-grid", "t-json"]) {
+  const input = document.getElementById(id);
+  input.addEventListener("change", () => {
+    if (id !== "t-paths") {
+      render();
+      return;
+    }
+    const paths = document.getElementById("grid-paths");
+    if (!input.checked) {
+      if (paths) {
+        paths.dataset.pathKey = "";
+        paths.replaceChildren();
+      }
+      render();
+      return;
+    }
+    refreshState().catch(e => console.error(e));
+  });
 }
 document.querySelectorAll("[data-debug]").forEach(input => {
   input.addEventListener("input", () => {
@@ -1219,13 +2091,17 @@ function fmtReward(r) {
 }
 
 function selectedProfile() {
-  return document.getElementById("profile-select").value || "default";
+  return document.getElementById("profile-select").value || DEFAULT_PROFILE;
+}
+
+function pathsEnabled() {
+  return document.getElementById("t-paths").checked;
 }
 
 function syncProfileSelect() {
   const select = document.getElementById("profile-select");
-  const profiles = state.available_profiles || ["default"];
-  const current = state.profile || select.value || "default";
+  const profiles = state.available_profiles || [DEFAULT_PROFILE];
+  const current = state.profile || select.value || DEFAULT_PROFILE;
   if (profiles.join("|") !== Array.from(select.options).map(o => o.value).join("|")) {
     select.replaceChildren();
     for (const profile of profiles) {
@@ -1238,9 +2114,45 @@ function syncProfileSelect() {
   select.value = profiles.includes(current) ? current : profiles[0];
 }
 
+function syncTroopSelect() {
+  const select = document.getElementById("troop-select");
+  const kinds = state.deploy_troop_kinds || ["barbarian"];
+  if (kinds.join("|") !== Array.from(select.options).map(o => o.value).join("|")) {
+    select.replaceChildren();
+    for (const kind of kinds) {
+      const option = document.createElement("option");
+      option.value = kind;
+      option.textContent = kind.replaceAll("_", " ");
+      select.appendChild(option);
+    }
+  }
+  if (!kinds.includes(selectedTroopKind)) selectedTroopKind = kinds[0] || "barbarian";
+  select.value = selectedTroopKind;
+}
+
+function selectedTroopIndex() {
+  const kinds = state?.deploy_troop_kinds || ["barbarian"];
+  const index = kinds.indexOf(selectedTroopKind);
+  return index >= 0 ? index : 0;
+}
+
+function deployActionForCell(cellIndex) {
+  return selectedTroopIndex() * GRID * GRID + cellIndex;
+}
+
+function formatArmyRemaining() {
+  const byKind = state.army_remaining_by_kind || {};
+  const kinds = state.deploy_troop_kinds || Object.keys(byKind);
+  const parts = kinds
+    .filter(kind => kind in byKind)
+    .map(kind => `${kind.replaceAll("_", " ")} ${byKind[kind]}`);
+  return parts.length ? parts.join(" · ") : `${state.army_remaining} / ${state.army_initial}`;
+}
+
 function render() {
   if (!state) return;
   syncProfileSelect();
+  syncTroopSelect();
 
   // header
   document.getElementById("seedReadout").textContent = state.seed ?? 0;
@@ -1250,7 +2162,7 @@ function render() {
 
   // hero
   document.getElementById("damage").textContent = (state.damage_pct * 100).toFixed(1);
-  document.getElementById("army").textContent = `${state.army_remaining} / ${state.army_initial}`;
+  document.getElementById("army").textContent = formatArmyRemaining();
   document.getElementById("active").textContent = state.troops.length;
 
   const reward = state.last_reward ?? 0;
@@ -1260,10 +2172,7 @@ function render() {
   rewardEl.classList.toggle("delta-neg", reward <= 0);
   document.getElementById("totalReward").textContent = fmtReward(state.total_reward);
 
-  // stars
-  const s = state.stars;
-  document.getElementById("stars").innerHTML =
-    ["★","★","★"].map((c, i) => `<span class="${i < s ? "" : "off"}">${c}</span>`).join("");
+  renderStars(state.stars);
 
   renderActionStream();
 
@@ -1330,6 +2239,10 @@ function drawBoard() {
       transform: debugTransformString(),
     });
     main = el("g", { id: "grid-main" });
+    main.appendChild(el("g", { id: "grid-guides" }));
+    main.appendChild(el("g", { id: "grid-ranges" }));
+    main.appendChild(el("g", { id: "grid-deploy" }));
+    const paths = el("g", { id: "grid-paths" });
     const buildings = el("g", { id: "grid-buildings" });
     const combat = el("g", { id: "grid-combat" });
     const dead = el("g", { id: "grid-dead" });
@@ -1338,6 +2251,7 @@ function drawBoard() {
     rotated.appendChild(main);
     grid.appendChild(bg);
     grid.appendChild(rotated);
+    grid.appendChild(paths);
     grid.appendChild(buildings);
     grid.appendChild(combat);
     grid.appendChild(dead);
@@ -1345,14 +2259,16 @@ function drawBoard() {
     grid.appendChild(fx);
   }
   applyDebugTransform();
+  const guides = document.getElementById("grid-guides");
+  const ranges = document.getElementById("grid-ranges");
+  const deploy = document.getElementById("grid-deploy");
+  const paths = document.getElementById("grid-paths");
   const buildings = document.getElementById("grid-buildings");
   const combat = document.getElementById("grid-combat");
   const troops = document.getElementById("grid-troops");
-  if (!buildings || !combat || !troops) return;
-  main.innerHTML = "";
-  buildings.innerHTML = "";
+  if (!guides || !ranges || !deploy || !paths || !buildings || !combat || !troops) return;
+  drawPathPredictions(paths);
   combat.innerHTML = "";
-  troops.innerHTML = "";
 
   // build cannon -> target map for orientation
   const cannonTargets = new Map();
@@ -1360,67 +2276,104 @@ function drawBoard() {
     if (e.kind === "defense") cannonTargets.set(e.attacker_id, e);
   }
 
+  // Buildings layer only rebuilds when something visible changes:
+  // - any building's HP bucket (5% steps, finer than the eye picks up)
+  // - rubble appears (alive→dead transition)
+  // - a cannon's aim moves to a new cell
+  // - debug/grid inset toggles
+  const buildingsKey =
+    state.buildings.map(b => `${b.id}:${(b.hp / b.max_hp * 20) | 0}`).join(",")
+    + "|" + (state.rubble || []).map(r => r.id).join(",")
+    + "|" + [...cannonTargets.entries()]
+        .map(([id, e]) => `${id}:${Math.round(e.to_x)}:${Math.round(e.to_y)}`)
+        .sort().join("|")
+    + "|" + DEBUG.inset;
+  const buildingsDirty = buildingsKey !== boardBuildingsKey;
+  if (buildingsDirty) {
+    buildings.innerHTML = "";
+    boardBuildingsKey = buildingsKey;
+  }
+
   const cell = gridCell();
   const gridStart = DEBUG.inset;
   const gridEnd = gridCoord(GRID);
   const gridSpan = gridEnd - gridStart;
+  const showGrid = document.getElementById("t-grid").checked;
+  const showRanges = document.getElementById("t-ranges").checked;
 
-  // outer frame (rotated with the gameplay; reads as a diamond outline)
-  main.appendChild(el("rect", {
-    x: gridStart + 0.5, y: gridStart + 0.5, width: gridSpan - 1, height: gridSpan - 1,
-    class: "frame-stroke",
-  }));
-
-  // calibration tick marks every 4 cells (faint)
-  for (let i = 4; i < GRID; i += 4) {
-    const p = gridCoord(i);
-    main.appendChild(el("line", { x1: p, y1: gridStart, x2: p, y2: gridStart + 4, class: "tick-mark" }));
-    main.appendChild(el("line", { x1: p, y1: gridEnd, x2: p, y2: gridEnd - 4, class: "tick-mark" }));
-    main.appendChild(el("line", { x1: gridStart, y1: p, x2: gridStart + 4, y2: p, class: "tick-mark" }));
-    main.appendChild(el("line", { x1: gridEnd, y1: p, x2: gridEnd - 4, y2: p, class: "tick-mark" }));
-  }
-
-  // optional grid lines
-  if (document.getElementById("t-grid").checked) {
+  const guideKey = `${DEBUG.inset}|${showGrid ? 1 : 0}`;
+  if (guideKey !== boardGuideKey) {
+    guides.replaceChildren();
+    guides.appendChild(el("rect", {
+      x: gridStart + 0.5, y: gridStart + 0.5, width: gridSpan - 1, height: gridSpan - 1,
+      class: "frame-stroke",
+    }));
+    for (let i = 4; i < GRID; i += 4) {
+      const p = gridCoord(i);
+      guides.appendChild(el("line", { x1: p, y1: gridStart, x2: p, y2: gridStart + 4, class: "tick-mark" }));
+      guides.appendChild(el("line", { x1: p, y1: gridEnd, x2: p, y2: gridEnd - 4, class: "tick-mark" }));
+      guides.appendChild(el("line", { x1: gridStart, y1: p, x2: gridStart + 4, y2: p, class: "tick-mark" }));
+      guides.appendChild(el("line", { x1: gridEnd, y1: p, x2: gridEnd - 4, y2: p, class: "tick-mark" }));
+    }
     for (let i = 1; i < GRID; i++) {
       const p = gridCoord(i);
-      main.appendChild(el("line", { x1: p, y1: gridStart, x2: p, y2: gridEnd, class: "grid-rule" }));
-      main.appendChild(el("line", { x1: gridStart, y1: p, x2: gridEnd, y2: p, class: "grid-rule" }));
+      if (showGrid) {
+        guides.appendChild(el("line", { x1: p, y1: gridStart, x2: p, y2: gridEnd, class: "grid-rule" }));
+        guides.appendChild(el("line", { x1: gridStart, y1: p, x2: gridEnd, y2: p, class: "grid-rule" }));
+      }
     }
+    boardGuideKey = guideKey;
   }
 
-  // defense ranges
-  if (document.getElementById("t-ranges").checked) {
+  const rangeKey = showRanges
+    ? `${DEBUG.inset}|${state.buildings.filter(b => b.is_defense).map(b => `${b.id}:${b.x}:${b.y}:${b.size}:${b.attack_range}:${b.min_attack_range || 0}`).join("|")}`
+    : "off";
+  if (rangeKey !== boardRangeKey) {
+    ranges.replaceChildren();
+    boardRangeKey = rangeKey;
+  }
+  if (showRanges && ranges.childNodes.length === 0) {
     for (const b of state.buildings) {
       if (b.is_defense) {
         const center = gridPoint(b.x + b.size / 2, b.y + b.size / 2);
-        main.appendChild(el("circle", {
+        ranges.appendChild(el("circle", {
           cx: center.x, cy: center.y, r: gridUnits(b.attack_range), class: "range-circle",
         }));
+        if ((b.min_attack_range || 0) > 0) {
+          ranges.appendChild(el("circle", {
+            cx: center.x, cy: center.y, r: gridUnits(b.min_attack_range), class: "range-blind",
+          }));
+        }
       }
     }
   }
 
-  // legal deploy click zones
   const deployCells = state.deploy_cells || state.perimeter || [];
   const armyLeft = state.army_remaining > 0;
-  for (let i = 0; i < deployCells.length; i++) {
-    const [cx, cy] = deployCells[i];
-    const enabled = armyLeft && state.action_mask[i] && !state.is_done;
-    const r = el("rect", {
-      x: gridCoord(cx), y: gridCoord(cy), width: cell, height: cell,
-      class: "perim" + (enabled ? "" : " disabled"),
-    });
-    if (enabled) {
-      r.addEventListener("click", () => deploy(i));
-      const t = el("title", {});
-      t.textContent = `deploy @ (${cx}, ${cy})`;
-      r.appendChild(t);
+  const troopKind = selectedTroopKind;
+  const deployKey = `${DEBUG.inset}|${troopKind}|${armyLeft ? 1 : 0}|${state.is_done ? 1 : 0}|${(state.action_mask || []).join("")}`;
+  if (deployKey !== boardDeployKey) {
+    deploy.replaceChildren();
+    for (let i = 0; i < deployCells.length; i++) {
+      const [cx, cy] = deployCells[i];
+      const action = deployActionForCell(i);
+      const enabled = armyLeft && state.action_mask[action] && !state.is_done;
+      const r = el("rect", {
+        x: gridCoord(cx), y: gridCoord(cy), width: cell, height: cell,
+        class: "perim" + (enabled ? "" : " disabled"),
+      });
+      if (enabled) {
+        r.addEventListener("click", () => deploy(action));
+        const t = el("title", {});
+        t.textContent = `deploy ${troopKind.replaceAll("_", " ")} @ (${cx}, ${cy})`;
+        r.appendChild(t);
+      }
+      deploy.appendChild(r);
     }
-    main.appendChild(r);
+    boardDeployKey = deployKey;
   }
 
-  const depthItems = [
+  const depthItems = buildingsDirty ? [
     ...(state.rubble || []).map(item => ({ type: "rubble", item })),
     ...state.buildings.map(item => ({ type: "building", item })),
   ].sort((a, b) => {
@@ -1428,7 +2381,7 @@ function drawBoard() {
     const bd = renderDepthForFootprint(b.item);
     if (ad !== bd) return ad - bd;
     return a.item.id - b.item.id;
-  });
+  }) : [];
 
   // Buildings, walls, and rubble are sorted by projected front-edge depth.
   // This makes the upper wall ring draw behind the townhall while front wall
@@ -1460,7 +2413,13 @@ function drawBoard() {
 
     const sprite = buildingSprite(b, cannonTargets);
     if (sprite) {
-      const scale = b.kind === "storage" ? STORAGE_SCALE : b.kind === "wall" ? WALL_SCALE : 1.0;
+      const scale = b.kind === "storage" ? STORAGE_SCALE
+                  : b.kind === "cannon"  ? CANNON_SCALE
+                  : b.kind === "wizard_tower" ? WIZARD_TOWER_SCALE
+                  : b.kind === "bomb"    ? BOMB_SCALE
+                  : b.kind === "wall"    ? WALL_SCALE
+                  : b.kind === "mortar"  ? MORTAR_SCALE
+                  : 1.0;
       const ww = sz * scale;
       const hh = b.kind === "wall" ? ww * WALL_ASPECT : sz * scale;
       const center = isoGrid(b.x + b.size / 2, b.y + b.size / 2);
@@ -1515,58 +2474,42 @@ function drawBoard() {
     if (e.kind === "defense") {
       const from = isoGrid(e.from_x, e.from_y);
       const to = isoGrid(e.to_x, e.to_y);
+      const cls = e.source_kind === "wizard_tower" ? "engage-wizard-guide" : "engage-defense";
       combat.appendChild(el("line", {
         x1: from.x, y1: from.y,
         x2: to.x, y2: to.y,
-        class: "engage-defense",
+        class: cls,
       }));
     }
   }
 
-  // troops — swing sprite if currently attacking, run sprite otherwise
   const attackingIds = new Set(
     (state.engagements || []).filter(e => e.kind === "troop").map(e => e.attacker_id)
   );
-  for (const t of state.troops) {
-    const center = isoGrid(t.x, t.y);
-    const sprite = attackingIds.has(t.id)
-      ? attackPose(t.id, state.tick)
-      : SPRITES.barbarian_run_a;
-    const facing = troopFacing.get(t.id) || "right";
-    const px = center.x - TROOP_PX / 2;
-    const py = center.y - TROOP_PX / 2 - TROOP_OFFSET_Y;
-    const attrs = {
-      href: sprite,
-      x: px, y: py,
-      width: TROOP_PX, height: TROOP_PX,
-      class: "sprite troop-sprite",
-      preserveAspectRatio: "xMidYMid meet",
-    };
-    if (facing === "left") {
-      // flip horizontally around the sprite's own center via SVG transform
-      attrs.transform = `translate(${2 * px + TROOP_PX} 0) scale(-1 1)`;
-    }
-    troops.appendChild(el("image", attrs));
-    const hpFrac = t.hp / t.max_hp;
-    if (hpFrac < 1) {
-      const barY = center.y - TROOP_PX / 2 - TROOP_OFFSET_Y - 3;
-      appendHealthBar(
-        troops,
-        center.x - TROOP_HP_BAR_WIDTH / 2,
-        barY,
-        TROOP_HP_BAR_WIDTH,
-        TROOP_HP_BAR_HEIGHT,
-        hpFrac
-      );
-    }
-  }
+  renderTroops(troops, attackingIds);
 
   // engagement impacts on top
   for (const e of state.engagements || []) {
     if (e.kind === "defense") {
       const to = isoGrid(e.to_x, e.to_y);
+      if (e.source_kind === "wizard_tower") {
+        const radius = splashEllipseRadius(Number(e.splash_radius || 1.0));
+        combat.appendChild(el("ellipse", {
+          cx: to.x, cy: to.y,
+          rx: radius.rx,
+          ry: radius.ry,
+          class: "engage-wizard-impact",
+          transform: `rotate(${DEBUG.rotation} ${to.x} ${to.y})`,
+        }));
+        continue;
+      }
       combat.appendChild(el("circle", {
         cx: to.x, cy: to.y, r: 2, class: "engage-impact",
+      }));
+    } else if (e.kind === "impact") {
+      const to = isoGrid(e.to_x, e.to_y);
+      combat.appendChild(el("circle", {
+        cx: to.x, cy: to.y, r: Math.max(2, gridUnits(e.radius || 0.3) * 0.25), class: "engage-impact",
       }));
     } else if (e.kind === "troop") {
       const to = isoGrid(e.to_x, e.to_y);

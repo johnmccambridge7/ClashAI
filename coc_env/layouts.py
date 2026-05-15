@@ -25,8 +25,12 @@ def default_layout(seed: int | None = None) -> list[Building]:
         ("cannon",   11, 11),
         ("cannon",   28, 11),
         ("cannon",   19, 29),
+        ("wizard_tower", 11, 29),
+        ("mortar",   28, 29),
         ("storage",  20, 11),
         ("storage",  11, 22),
         ("storage",  28, 22),
+        ("bomb",     19, 19),
+        ("bomb",     24, 24),
     ] + _wall_ring(18, 18, 25, 25)
     return _build(placements)
