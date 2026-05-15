@@ -1,0 +1,1626 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>coc · rl env</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:      #0a0d12;
+    --surface-1:  #10141b;
+    --surface-2:  #141923;
+    --rule:       rgba(220, 230, 250, 0.06);
+    --rule-2:     rgba(220, 230, 250, 0.12);
+    --ink:        #d6dce6;
+    --ink-mute:   #7a8294;
+    --ink-faint:  #3d4453;
+
+    --phosphor:    #76d99a;
+    --phosphor-15: rgba(118, 217, 154, 0.15);
+    --phosphor-08: rgba(118, 217, 154, 0.08);
+
+    --hot:        #ec9f5a;
+    --hot-15:     rgba(236, 159, 90, 0.15);
+
+    --th:         #c9a050;
+    --storage:    #5587b6;
+    --cannon:     #c25a5a;
+    --threat:     rgba(194, 90, 90, 0.22);
+
+    --r:          2px;
+    --r-frame:    3px;
+    --gap:        14px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    font: 11px/1.4 "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+    overflow: hidden;
+  }
+  body { padding: 16px; }
+  button, input, select { font: inherit; color: inherit; }
+
+  .app {
+    display: grid;
+    grid-template-rows: 28px 1fr 48px;
+    gap: var(--gap);
+    height: 100%;
+    width: 100%;
+  }
+
+  /* ── header strip ─────────────────────────────────────── */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 4px;
+    color: var(--ink-mute);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+  }
+  .brand {
+    color: var(--ink);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .sep { color: var(--ink-faint); }
+  .meta em { font-style: normal; color: var(--ink); }
+  .grow { flex: 1; }
+
+  .status {
+    display: inline-flex; align-items: center; gap: 7px;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 10px;
+  }
+  .status .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--phosphor);
+    box-shadow: 0 0 8px var(--phosphor-15);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .status[data-state="done"] .dot {
+    background: var(--ink-faint);
+    box-shadow: none;
+    animation: none;
+  }
+  .status[data-state="done"] .status-text { color: var(--ink-mute); }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+  }
+
+  /* ── main row ─────────────────────────────────────────── */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: var(--gap);
+    min-height: 0;
+  }
+
+  /* board — instrument viewport */
+  .board {
+    position: relative;
+    background: var(--surface-1);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-frame);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .board::before, .board::after {
+    content: ""; position: absolute; pointer-events: none;
+    border: 1px solid var(--rule-2);
+    width: 14px; height: 14px;
+  }
+  .board::before {
+    top: 8px; left: 8px;
+    border-right: none; border-bottom: none;
+  }
+  .board::after {
+    bottom: 8px; right: 8px;
+    border-left: none; border-top: none;
+  }
+  .board-coords {
+    position: absolute;
+    color: var(--ink-faint);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+  .coord-tl { top: 10px;    right: 14px; }
+  .coord-br { bottom: 10px; left:  14px; }
+
+  #grid {
+    width: min(100%, calc(100vh - 200px));
+    height: min(100%, calc(100vh - 200px));
+    aspect-ratio: 1 / 1;
+    display: block;
+  }
+
+  /* ── readouts column ──────────────────────────────────── */
+  .readouts {
+    background: var(--surface-1);
+    border: 1px solid var(--rule);
+    border-radius: var(--r-frame);
+    padding: 18px 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  .k {
+    color: var(--ink-mute);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+
+  .hero { display: flex; flex-direction: column; gap: 8px; }
+  .hero-label {
+    color: var(--ink-mute);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  .hero-value {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    font-size: 44px;
+    line-height: 1;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .hero-unit {
+    font-size: 18px;
+    color: var(--ink-mute);
+    font-weight: 400;
+  }
+  .trace {
+    height: 22px;
+    border-bottom: 1px solid var(--rule);
+    border-top: 1px solid var(--rule);
+    background: var(--surface-2);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .trace svg { width: 100%; height: 100%; display: block; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 18px;
+    padding-top: 4px;
+  }
+  .stat { display: flex; flex-direction: column; gap: 3px; }
+  .stat .v {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .stat .v.delta-pos { color: var(--phosphor); }
+  .stat .v.delta-neg { color: var(--ink-mute); }
+
+  .row-line {
+    display: flex; align-items: center; gap: 14px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+  }
+  .stars {
+    display: inline-flex; gap: 4px;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    color: var(--phosphor);
+  }
+  .stars .off { color: var(--ink-faint); }
+
+  .overlays {
+    display: flex; flex-direction: column; gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+  .toggles { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chk {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 9px;
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r);
+    cursor: pointer;
+    color: var(--ink-mute);
+    user-select: none;
+    transition: color 120ms, border-color 120ms, background 120ms;
+  }
+  .chk:hover { color: var(--ink); border-color: var(--ink-faint); }
+  .chk input { display: none; }
+  .chk .ind {
+    width: 8px; height: 8px;
+    border: 1px solid var(--ink-faint);
+    border-radius: 1px;
+    display: inline-block;
+  }
+  .chk input:checked ~ .ind {
+    background: var(--phosphor);
+    border-color: var(--phosphor);
+    box-shadow: 0 0 6px var(--phosphor-15);
+  }
+  .chk:has(input:checked) { color: var(--ink); border-color: var(--ink-faint); }
+
+  .calibration {
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+  .calibration summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    list-style: none;
+  }
+  .calibration summary::-webkit-details-marker { display: none; }
+  .calibration summary::after {
+    content: "+";
+    color: var(--ink-mute);
+    font-size: 13px;
+  }
+  .calibration[open] summary::after { content: "-"; }
+  .calibration summary .k { flex: 1; }
+  button.mini {
+    padding: 4px 8px;
+    font-size: 9.5px;
+    color: var(--ink-mute);
+    justify-self: start;
+  }
+  .debug-controls {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+    margin-top: 9px;
+  }
+  .debug-control {
+    display: grid;
+    grid-template-columns: 58px 1fr 48px;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink-mute);
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+  }
+  .debug-control input {
+    width: 100%;
+    min-width: 0;
+    accent-color: var(--phosphor);
+  }
+  .debug-value {
+    color: var(--ink);
+    text-align: right;
+    font-size: 9.5px;
+  }
+
+  .action-stream {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+    min-height: 92px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .action-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-height: 132px;
+    overflow: auto;
+    padding-right: 4px;
+  }
+  .action-empty {
+    color: var(--ink-mute);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+  }
+  .action-item {
+    display: grid;
+    grid-template-columns: 40px 42px 1fr;
+    gap: 8px;
+    align-items: center;
+    min-height: 22px;
+    color: var(--ink-mute);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+  .action-tick { color: var(--ink-faint); }
+  .action-source {
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 8.5px;
+  }
+  .action-source.policy { color: var(--phosphor); }
+  .action-label {
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .json {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+  .json pre {
+    margin: 0;
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--r);
+    padding: 10px;
+    color: var(--ink-mute);
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  /* ── transport ────────────────────────────────────────── */
+  .transport {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0 4px;
+  }
+  .btns { display: flex; gap: 6px; }
+  button {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r);
+    padding: 9px 16px;
+    cursor: pointer;
+    text-transform: lowercase;
+    letter-spacing: 0.06em;
+    font-size: 11.5px;
+    transition: border-color 120ms, color 120ms, background 120ms;
+  }
+  button:hover:not(:disabled) {
+    border-color: var(--ink-mute);
+    background: var(--surface-2);
+  }
+  button:disabled { color: var(--ink-faint); border-color: var(--rule); cursor: not-allowed; }
+  button.primary {
+    color: var(--phosphor);
+    border-color: var(--phosphor-15);
+    background: var(--phosphor-08);
+  }
+  button.primary:hover:not(:disabled) {
+    border-color: var(--phosphor);
+    background: rgba(118, 217, 154, 0.12);
+  }
+
+  .hint {
+    flex: 1;
+    color: var(--ink-mute);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+  }
+  .legend {
+    display: flex; gap: 14px;
+    color: var(--ink-mute);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 1px;
+  }
+
+  /* chip groups (speed / agent) */
+  .ctrl-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink-mute);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+  .chips {
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r);
+  }
+  .chip {
+    padding: 4px 9px;
+    border: none;
+    border-radius: 1px;
+    background: transparent;
+    color: var(--ink-mute);
+    cursor: pointer;
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+    font-size: 10.5px;
+    transition: color 120ms, background 120ms;
+  }
+  .chip:hover { color: var(--ink); }
+  .chip.active {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+  .chip.active[data-agent="random"] {
+    color: var(--phosphor);
+  }
+  .profile-select select {
+    height: 28px;
+    min-width: 132px;
+    background: transparent;
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r);
+    color: var(--ink);
+    padding: 0 8px;
+    text-transform: lowercase;
+    cursor: pointer;
+  }
+  .profile-select select:focus {
+    outline: none;
+    border-color: var(--ink-mute);
+    background: var(--surface-2);
+  }
+  .sw.th    { background: var(--th); }
+  .sw.can   { background: var(--cannon); }
+  .sw.stor  { background: var(--storage); }
+  .sw.wall  { background: var(--ink-mute); }
+  .sw.trp   { background: var(--hot); border-radius: 50%; }
+
+  /* ── svg primitives ───────────────────────────────────── */
+  .perim {
+    fill: transparent;
+    cursor: pointer;
+    transition: fill 100ms;
+  }
+  .perim:hover { fill: var(--hot-15); }
+  .perim.disabled { cursor: not-allowed; }
+  .perim.disabled:hover { fill: transparent; }
+  .grid-rule { stroke: var(--rule); stroke-width: 0.5; }
+  .tick-mark { stroke: var(--ink-faint); stroke-width: 1; }
+  .frame-stroke { stroke: var(--rule-2); fill: none; stroke-width: 1; }
+  .b-fill { opacity: 0.18; }
+  .b-stroke { fill: none; stroke-width: 1.25; }
+  .hp-bg {
+    fill: rgba(9, 12, 17, 0.58);
+    opacity: 1;
+  }
+  .hp-fg {
+    fill: #55e3c4;
+    filter: drop-shadow(0 0 2px rgba(85, 227, 196, 0.45));
+  }
+  .troop {
+    fill: var(--hot);
+    transition: cx 220ms ease-out, cy 220ms ease-out;
+  }
+  .range-circle {
+    fill: var(--threat);
+    stroke: var(--cannon);
+    stroke-width: 0.6;
+    stroke-dasharray: 3 3;
+    opacity: 0.55;
+  }
+
+  .sprite {
+    pointer-events: none;
+    image-rendering: -webkit-optimize-contrast;
+  }
+  .sprite.troop-sprite {
+    transition: x 220ms ease-out, y 220ms ease-out;
+  }
+  .dead-fade {
+    pointer-events: none;
+    animation: dead-fade 1100ms ease-out forwards;
+  }
+  .cannonball {
+    fill: #1a1d22;
+    stroke: #f0a040;
+    stroke-width: 0.6;
+    filter: drop-shadow(0 0 3px rgba(255, 180, 80, 0.9));
+    transition: cx 300ms linear, cy 300ms linear;
+    pointer-events: none;
+  }
+  @keyframes dead-fade {
+    0%   { opacity: 1; filter: grayscale(0);   }
+    45%  { opacity: 1; filter: grayscale(1);   }
+    100% { opacity: 0; filter: grayscale(1);   }
+  }
+
+  /* combat engagements — visualized per render */
+  .engage-defense {
+    stroke: var(--cannon);
+    stroke-width: 0.7;
+    stroke-dasharray: 2.5 2;
+    pointer-events: none;
+    animation: defense-fire 260ms ease-in-out infinite alternate;
+  }
+  @keyframes defense-fire {
+    from { opacity: 0.45; stroke-width: 0.5; }
+    to   { opacity: 1.00; stroke-width: 1.2; }
+  }
+  .engage-impact {
+    fill: none;
+    stroke: var(--cannon);
+    stroke-width: 0.8;
+    pointer-events: none;
+    animation: impact 320ms ease-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  @keyframes impact {
+    0%   { r: 1.5; opacity: 0.95; }
+    100% { r: 6;   opacity: 0;    }
+  }
+  .engage-spark {
+    fill: var(--hot);
+    pointer-events: none;
+    animation: spark 320ms ease-out infinite;
+  }
+  @keyframes spark {
+    0%   { r: 1.8; opacity: 0.95; }
+    100% { r: 4.5; opacity: 0;    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <span class="brand">coc · rl env</span>
+    <span class="sep">/</span>
+    <span class="meta">seed <em id="seedReadout">—</em></span>
+    <span class="sep">/</span>
+    <span class="meta">port 5173</span>
+    <span class="grow"></span>
+    <span class="status" id="status" data-state="live">
+      <span class="dot"></span>
+      <span class="status-text">live</span>
+    </span>
+    <span class="sep">/</span>
+    <span class="meta">τ <em id="tick">0 / 720</em></span>
+  </header>
+
+  <main class="main">
+    <section class="board">
+      <span class="board-coords coord-tl">44 × 44</span>
+      <span class="board-coords coord-br">τ · 0.25s</span>
+      <svg id="grid" viewBox="0 0 616 616" preserveAspectRatio="xMidYMid meet"></svg>
+    </section>
+
+    <aside class="readouts">
+      <div class="hero">
+        <div class="hero-label">damage</div>
+        <div class="hero-value">
+          <span id="damage">0.0</span><span class="hero-unit">%</span>
+        </div>
+        <div class="trace">
+          <svg id="trace" viewBox="0 0 100 20" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="k">army</div>
+          <div class="v" id="army">0 / 0</div>
+        </div>
+        <div class="stat">
+          <div class="k">on field</div>
+          <div class="v" id="active">0</div>
+        </div>
+        <div class="stat">
+          <div class="k">Δ reward</div>
+          <div class="v" id="reward">+0.000</div>
+        </div>
+        <div class="stat">
+          <div class="k">Σ reward</div>
+          <div class="v" id="totalReward">+0.000</div>
+        </div>
+      </div>
+
+      <div class="row-line">
+        <span class="k">stars</span>
+        <span class="stars" id="stars">★★★</span>
+      </div>
+
+      <div class="overlays">
+        <div class="k">overlays</div>
+        <div class="toggles">
+          <label class="chk"><input type="checkbox" id="t-ranges"><span class="ind"></span><span>ranges</span></label>
+          <label class="chk"><input type="checkbox" id="t-grid"><span class="ind"></span><span>grid</span></label>
+          <label class="chk"><input type="checkbox" id="t-json"><span class="ind"></span><span>json</span></label>
+        </div>
+      </div>
+
+      <details class="calibration">
+        <summary>
+          <span class="k">grid debug</span>
+        </summary>
+        <div class="debug-controls" id="debug-controls">
+          <button class="mini" id="btn-debug-reset">reset</button>
+          <label class="debug-control">
+            <span>edge</span>
+            <input type="range" data-debug="inset" min="-60" max="120" step="1">
+            <span class="debug-value" data-debug-value="inset"></span>
+          </label>
+          <label class="debug-control">
+            <span>x</span>
+            <input type="range" data-debug="offsetX" min="-120" max="120" step="1">
+            <span class="debug-value" data-debug-value="offsetX"></span>
+          </label>
+          <label class="debug-control">
+            <span>y</span>
+            <input type="range" data-debug="offsetY" min="-120" max="120" step="1">
+            <span class="debug-value" data-debug-value="offsetY"></span>
+          </label>
+          <label class="debug-control">
+            <span>scale</span>
+            <input type="range" data-debug="scale" min="0.55" max="0.9" step="0.005">
+            <span class="debug-value" data-debug-value="scale"></span>
+          </label>
+          <label class="debug-control">
+            <span>squash</span>
+            <input type="range" data-debug="squashY" min="0.45" max="0.85" step="0.005">
+            <span class="debug-value" data-debug-value="squashY"></span>
+          </label>
+          <label class="debug-control">
+            <span>angle</span>
+            <input type="range" data-debug="rotation" min="35" max="55" step="0.25">
+            <span class="debug-value" data-debug-value="rotation"></span>
+          </label>
+        </div>
+      </details>
+
+      <div class="action-stream">
+        <div class="k">actions</div>
+        <div class="action-list" id="actionStream">
+          <div class="action-empty">no actions yet</div>
+        </div>
+      </div>
+
+      <div class="json" id="jsonBox" hidden>
+        <pre id="jsonOut"></pre>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="transport">
+    <div class="btns">
+      <button id="btn-reset">reset</button>
+      <button id="btn-play" class="primary">▸ play</button>
+      <button id="btn-tick">tick +1</button>
+    </div>
+    <label class="ctrl-group profile-select">
+      <span>base</span>
+      <select id="profile-select" aria-label="base profile">
+        <option value="default">default</option>
+      </select>
+    </label>
+    <div class="ctrl-group">
+      <span>speed</span>
+      <div class="chips" id="speed-chips">
+        <button class="chip active" data-speed="1">1×</button>
+        <button class="chip" data-speed="2">2×</button>
+        <button class="chip" data-speed="4">4×</button>
+        <button class="chip" data-speed="8">8×</button>
+      </div>
+    </div>
+    <div class="ctrl-group">
+      <span>agent</span>
+      <div class="chips" id="agent-chips">
+        <button class="chip active" data-agent="off">manual</button>
+        <button class="chip" data-agent="random">random</button>
+      </div>
+    </div>
+    <div class="hint">click any legal cell to deploy</div>
+    <div class="legend">
+      <span><i class="sw th"></i>townhall</span>
+      <span><i class="sw can"></i>cannon</span>
+      <span><i class="sw stor"></i>storage</span>
+      <span><i class="sw wall"></i>wall</span>
+      <span><i class="sw trp"></i>barbarian</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+const GRID = 44;
+const CELL = 14;                  // viewBox units per tile
+const SVG_SIZE = GRID * CELL;     // 616
+
+const BUILDING_COLORS = {
+  townhall: "var(--th)",
+  cannon:   "var(--cannon)",
+  storage:  "var(--storage)",
+  wall:     "var(--ink-mute)",
+};
+
+const SPRITE_V = 15;
+const SPRITES = {
+  townhall:        `/img/townhall.png?v=${SPRITE_V}`,
+  townhall_rubble: `/img/townhall_rubble.png?v=${SPRITE_V}`,
+  cannon_rubble:   `/img/cannon_rubble.png?v=${SPRITE_V}`,
+  resources_rubble: `/img/resources_rubble.png?v=${SPRITE_V}`,
+  storage_full:    `/img/storage_full.png?v=${SPRITE_V}`,
+  storage_dmg:     `/img/storage_dmg.png?v=${SPRITE_V}`,
+  cannon:          `/img/cannon.png?v=${SPRITE_V}`,
+  wall:            `/img/wall.png?v=${SPRITE_V}`,
+  barbarian_run_a: `/img/barbarian_run_a.png?v=${SPRITE_V}`,
+  barbarian_hit:   `/img/barbarian_hit.png?v=${SPRITE_V}`,
+  barbarian_dead:  `/img/barbarian_dead.png?v=${SPRITE_V}`,
+  barbarian_tombstone: `/img/barbarian_tombstone.png?v=${SPRITE_V}`,
+};
+const CANNON_FRAMES = Array.from({ length: 36 }, (_, i) =>
+  `/img/cannon_${String(i).padStart(2, "0")}.png?v=${SPRITE_V}`
+);
+// preload rotated cannon frames
+for (const url of CANNON_FRAMES) { const i = new Image(); i.src = url; }
+let cannonAim = new Map();      // building id -> last-known frame index 0..35
+let lastFireTick = new Map();   // attacker_id -> tick of last shot
+const FIRE_EVERY = 3;           // cannons fire on every Nth tick
+const CANNONBALL_MUZZLE_OFFSET = 1.8; // grid cells from cannon center before projectile appears
+
+function cannonFrameIdx(b, targets) {
+  const t = targets.get(b.id);
+  if (t) {
+    const cx = b.x + b.size / 2;
+    const cy = b.y + b.size / 2;
+    const dx = t.to_x - cx;
+    const dy = t.to_y - cy;
+    let ang = Math.atan2(dx, dy);            // 0 = south, +CW on screen
+    if (ang < 0) ang += 2 * Math.PI;
+    const idx = Math.round(ang / (Math.PI / 18)) % 36;  // 360° / 36 = 10°
+    cannonAim.set(b.id, idx);
+    return idx;
+  }
+  return cannonAim.get(b.id) ?? 0;
+}
+
+function buildingSprite(b, cannonTargets) {
+  if (b.kind === "townhall") return SPRITES.townhall;
+  if (b.kind === "cannon")   return CANNON_FRAMES[cannonFrameIdx(b, cannonTargets)];
+  if (b.kind === "storage")  return b.hp / b.max_hp < 0.5 ? SPRITES.storage_dmg : SPRITES.storage_full;
+  if (b.kind === "wall")     return SPRITES.wall;
+  return null;
+}
+
+function cannonballStart(fx, fy, tx, ty) {
+  const dx = tx - fx;
+  const dy = ty - fy;
+  const dist = Math.hypot(dx, dy);
+  if (dist <= CANNONBALL_MUZZLE_OFFSET) return null;
+  return {
+    x: fx + (dx / dist) * CANNONBALL_MUZZLE_OFFSET,
+    y: fy + (dy / dist) * CANNONBALL_MUZZLE_OFFSET,
+  };
+}
+
+function spawnCannonball(fx, fy, tx, ty) {
+  const layer = document.getElementById("grid-fx");
+  if (!layer) return;
+  const start = cannonballStart(fx, fy, tx, ty);
+  if (!start) return;
+  const a = isoGrid(start.x, start.y);
+  const b = isoGrid(tx, ty);
+  const ball = el("circle", { cx: a.x, cy: a.y, r: 2.5, class: "cannonball" });
+  layer.appendChild(ball);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    ball.setAttribute("cx", b.x);
+    ball.setAttribute("cy", b.y);
+  }));
+  setTimeout(() => ball.remove(), 400);
+}
+
+function maybeFireCannonballs() {
+  if (!state) return;
+  for (const e of state.engagements || []) {
+    if (e.kind !== "defense") continue;
+    const last = lastFireTick.get(e.attacker_id);
+    if (last !== undefined && state.tick - last < FIRE_EVERY) continue;
+    lastFireTick.set(e.attacker_id, state.tick);
+    spawnCannonball(e.from_x, e.from_y, e.to_x, e.to_y);
+  }
+}
+function attackPose(troopId, tick) {
+  // alternate run_a (recover) and hit (strike), offset per troop to desync
+  return ((tick + troopId) % 3 === 2) ? SPRITES.barbarian_hit : SPRITES.barbarian_run_a;
+}
+for (const url of Object.values(SPRITES)) { const i = new Image(); i.src = url; }
+const TROOP_PX = 32;        // viewBox-units for troop sprite size
+const TROOP_OFFSET_Y = 6;   // raise sprite so feet land at troop position
+const TOMBSTONE_W = 22;
+const TOMBSTONE_H = TOMBSTONE_W * 37 / 48;
+const TOMBSTONE_OFFSET_Y = 2;
+const STORAGE_SCALE = 1.35; // storage sprite renders larger than its footprint
+const WALL_SCALE = 1.35;
+const WALL_ASPECT = 71 / 75;
+const RUBBLE_ART = {
+  townhall: { href: SPRITES.townhall_rubble, scale: 1.12, aspect: 1 },
+  cannon: { href: SPRITES.cannon_rubble, scale: 1.2, aspect: 763 / 1083 },
+  storage: { href: SPRITES.resources_rubble, scale: 1.25, aspect: 760 / 1007 },
+};
+const BUILDING_HP_BAR_SCALE = 0.76;
+const BUILDING_HP_BAR_HEIGHT = 3.25;
+const TROOP_HP_BAR_WIDTH = 14;
+const TROOP_HP_BAR_HEIGHT = 2.4;
+
+// Orthogonal-to-iso projection. The geometric overlay layer (#grid-rotated)
+// has this same transform applied as a single SVG transform attribute, so
+  // grid lines, frame, range circles, and deploy cells warp uniformly with
+// the diamond. Sprites live in untransformed layers and are placed
+// at iso(centre) positions — keeps them upright and original-sized so the
+// already-iso-drawn art doesn't get double-rotated.
+const ISO_CENTER = SVG_SIZE / 2;
+const DEBUG_STORAGE_KEY = "coc-viewer-grid-debug-v2";
+const DEFAULT_DEBUG = Object.freeze({
+  rotation: 43.75,
+  scale: 0.640,
+  squashY: 0.690,
+  offsetX: -1,
+  offsetY: -33,
+  inset: -60,
+});
+let DEBUG = {
+  ...DEFAULT_DEBUG,
+};
+function loadDebugSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(DEBUG_STORAGE_KEY) || "{}");
+    for (const key of Object.keys(DEFAULT_DEBUG)) {
+      const value = saved[key];
+      if (Number.isFinite(value)) DEBUG[key] = value;
+    }
+  } catch {
+    DEBUG = { ...DEFAULT_DEBUG };
+  }
+}
+function saveDebugSettings() {
+  try {
+    localStorage.setItem(DEBUG_STORAGE_KEY, JSON.stringify(DEBUG));
+  } catch {
+    // calibration still works for the current page session
+  }
+}
+function gridCell() {
+  return (SVG_SIZE - DEBUG.inset * 2) / GRID;
+}
+function gridCoord(value) {
+  return DEBUG.inset + value * gridCell();
+}
+function gridUnits(value) {
+  return value * gridCell();
+}
+function gridPoint(x, y) {
+  return {
+    x: gridCoord(x),
+    y: gridCoord(y),
+  };
+}
+function iso(x, y) {
+  const dx = x - ISO_CENTER;
+  const dy = y - ISO_CENTER;
+  const a = DEBUG.rotation * Math.PI / 180;
+  const c = Math.cos(a), s = Math.sin(a);
+  const rx = (dx * c - dy * s) * DEBUG.scale;
+  const ry = (dx * s + dy * c) * DEBUG.scale * DEBUG.squashY;
+  return {
+    x: ISO_CENTER + DEBUG.offsetX + rx,
+    y: ISO_CENTER + DEBUG.offsetY + ry,
+  };
+}
+function isoGrid(x, y) {
+  const p = gridPoint(x, y);
+  return iso(p.x, p.y);
+}
+function debugTransformString() {
+  const c = ISO_CENTER;
+  // matrix(a b c d e f) = | a c e | applied to (x,y,1)
+  //                       | b d f |
+  // Build: translate(center+offset) * scale(scale, scale*squash) * rotate(angle) * translate(-center)
+  const ang = DEBUG.rotation * Math.PI / 180;
+  const cs = Math.cos(ang), sn = Math.sin(ang);
+  const a = DEBUG.scale * cs;
+  const b = DEBUG.scale * sn * DEBUG.squashY;
+  const cc = -DEBUG.scale * sn;
+  const d = DEBUG.scale * cs * DEBUG.squashY;
+  const e = c + DEBUG.offsetX - (a * c + cc * c);
+  const f = c + DEBUG.offsetY - (b * c + d * c);
+  return `matrix(${a} ${b} ${cc} ${d} ${e} ${f})`;
+}
+function applyDebugTransform() {
+  const r = document.getElementById("grid-rotated");
+  if (r) r.setAttribute("transform", debugTransformString());
+}
+function formatDebugValue(key, value) {
+  if (key === "scale" || key === "squashY") return value.toFixed(3);
+  if (key === "rotation") return value.toFixed(2);
+  return Math.round(value).toString();
+}
+function syncDebugControls() {
+  document.querySelectorAll("[data-debug]").forEach(input => {
+    const key = input.dataset.debug;
+    input.value = String(DEBUG[key]);
+  });
+  document.querySelectorAll("[data-debug-value]").forEach(readout => {
+    const key = readout.dataset.debugValue;
+    readout.textContent = formatDebugValue(key, DEBUG[key]);
+  });
+}
+function setDebugValue(key, value) {
+  if (!(key in DEFAULT_DEBUG) || !Number.isFinite(value)) return;
+  DEBUG[key] = value;
+  saveDebugSettings();
+  syncDebugControls();
+  render();
+}
+loadDebugSettings();
+
+const grid = document.getElementById("grid");
+const trace = document.getElementById("trace");
+const SVG_NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs = {}) {
+  const e = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function appendHealthBar(layer, x, y, width, height, hpFrac) {
+  const rx = height / 2;
+  layer.appendChild(el("rect", {
+    x, y, width, height,
+    class: "hp-bg",
+    rx, ry: rx,
+  }));
+  layer.appendChild(el("rect", {
+    x, y, width: width * hpFrac, height,
+    class: "hp-fg",
+    rx, ry: rx,
+  }));
+}
+
+function renderDepthForFootprint(item) {
+  return isoGrid(item.x + item.size, item.y + item.size).y;
+}
+
+let state = null;
+let damageHistory = [];           // [tick, damage_pct] pairs
+let livePrev = new Map();         // troop id -> {x, y}; used to detect deaths
+let troopFacing = new Map();      // troop id -> "left" | "right"; sprite face direction
+
+// playback state
+const TICK_BASE_MS = 250;          // 1× = real-time (matches TICK_SECONDS = 0.25s)
+let playing = false;
+let playTimer = null;
+let playSpeed = 1;                 // 1, 2, 4, 8
+let agentMode = "off";             // "off" or "random"
+let ticksSinceDecision = 0;
+const DECISION_EVERY = 10;         // matches DECISION_INTERVAL in env.py
+
+async function api(method, path, body) {
+  const r = await fetch(path, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!r.ok) throw new Error(`${path} ${r.status}: ${await r.text()}`);
+  return r.json();
+}
+
+async function reset() {
+  pause();
+  ticksSinceDecision = 0;
+  damageHistory = [];
+  livePrev = new Map();
+  troopFacing = new Map();
+  cannonAim = new Map();
+  lastFireTick = new Map();
+  clearDeadLayer();
+  clearFxLayer();
+  state = await api("POST", "/reset", {
+    seed: Math.floor(Math.random() * 1e6),
+    profile: selectedProfile(),
+  });
+  afterUpdate();
+}
+
+function clearFxLayer() {
+  const f = document.getElementById("grid-fx");
+  if (f) f.innerHTML = "";
+}
+
+function clearDeadLayer() {
+  const d = document.getElementById("grid-dead");
+  if (d) d.innerHTML = "";
+}
+
+function spawnTombstone(x, y) {
+  const dead = document.getElementById("grid-dead");
+  if (!dead) return;
+  const p = isoGrid(x, y);
+  dead.appendChild(el("image", {
+    href: SPRITES.barbarian_tombstone,
+    x: p.x - TOMBSTONE_W / 2,
+    y: p.y - TOMBSTONE_H + TOMBSTONE_OFFSET_Y,
+    width: TOMBSTONE_W,
+    height: TOMBSTONE_H,
+    class: "sprite",
+    preserveAspectRatio: "xMidYMid meet",
+  }));
+}
+
+function spawnDeath(x, y, facing) {
+  const dead = document.getElementById("grid-dead");
+  if (!dead) return;
+  const p = isoGrid(x, y);
+  const px = p.x - TROOP_PX / 2;
+  const py = p.y - TROOP_PX / 2 - TROOP_OFFSET_Y;
+  const attrs = {
+    href: SPRITES.barbarian_dead,
+    x: px, y: py,
+    width: TROOP_PX, height: TROOP_PX,
+    class: "sprite dead-fade",
+  };
+  if (facing === "left") {
+    attrs.transform = `translate(${2 * px + TROOP_PX} 0) scale(-1 1)`;
+  }
+  const img = el("image", attrs);
+  dead.appendChild(img);
+  setTimeout(() => {
+    img.remove();
+    spawnTombstone(x, y);
+  }, 1200);
+}
+
+function updateDeaths() {
+  if (!state) return;
+  const currentIds = new Set(state.troops.map(t => t.id));
+  for (const [id, info] of livePrev) {
+    if (!currentIds.has(id)) spawnDeath(info.x, info.y, troopFacing.get(id));
+  }
+  // facing follows horizontal motion; sprites are drawn facing right by default
+  for (const t of state.troops) {
+    const prev = livePrev.get(t.id);
+    if (prev) {
+      const dx = t.x - prev.x;
+      if (Math.abs(dx) > 0.05) troopFacing.set(t.id, dx < 0 ? "left" : "right");
+    } else {
+      // first sighting: guess from spawn position relative to grid center
+      troopFacing.set(t.id, t.x > GRID / 2 ? "left" : "right");
+    }
+  }
+  livePrev = new Map(state.troops.map(t => [t.id, { x: t.x, y: t.y }]));
+  for (const id of [...troopFacing.keys()]) {
+    if (!currentIds.has(id)) troopFacing.delete(id);
+  }
+}
+
+async function tickOne() {
+  state = await api("POST", "/tick");
+  ticksSinceDecision++;
+  afterUpdate();
+}
+async function deploy(action) {
+  state = await api("POST", "/deploy", { action });
+  afterUpdate();
+}
+async function agentRandom() {
+  state = await api("POST", "/agent_random");
+  ticksSinceDecision = 0;
+  afterUpdate();
+}
+
+function afterUpdate() {
+  if (state) {
+    const last = damageHistory[damageHistory.length - 1];
+    if (!last || last[0] !== state.tick) damageHistory.push([state.tick, state.damage_pct]);
+    updateDeaths();
+    maybeFireCannonballs();
+  }
+  render();
+  if (state && state.is_done && playing) pause();
+}
+
+function tickIntervalMs() { return TICK_BASE_MS / playSpeed; }
+
+function play() {
+  if (playing || !state || state.is_done) return;
+  playing = true;
+  setPlayButton(true);
+  scheduleTick();
+}
+function pause() {
+  playing = false;
+  if (playTimer) { clearTimeout(playTimer); playTimer = null; }
+  setPlayButton(false);
+}
+function setPlayButton(isPlaying) {
+  const btn = document.getElementById("btn-play");
+  btn.textContent = isPlaying ? "■ pause" : "▸ play";
+}
+function scheduleTick() {
+  if (!playing) return;
+  playTimer = setTimeout(async () => {
+    try {
+      if (agentMode === "random" && ticksSinceDecision >= DECISION_EVERY && state.army_remaining > 0) {
+        await agentRandom();
+      }
+      await tickOne();
+      if (playing) scheduleTick();
+    } catch (e) { pause(); console.error(e); }
+  }, tickIntervalMs());
+}
+
+document.getElementById("btn-reset").addEventListener("click", () => { reset(); });
+document.getElementById("btn-play").addEventListener("click", () => { playing ? pause() : play(); });
+document.getElementById("btn-tick").addEventListener("click", () => { tickOne(); });
+document.getElementById("profile-select").addEventListener("change", () => { reset(); });
+
+document.querySelectorAll("#speed-chips .chip").forEach(b => {
+  b.addEventListener("click", () => {
+    playSpeed = parseInt(b.dataset.speed, 10);
+    document.querySelectorAll("#speed-chips .chip").forEach(x => x.classList.toggle("active", x === b));
+  });
+});
+document.querySelectorAll("#agent-chips .chip").forEach(b => {
+  b.addEventListener("click", () => {
+    agentMode = b.dataset.agent;
+    document.querySelectorAll("#agent-chips .chip").forEach(x => x.classList.toggle("active", x === b));
+    if (agentMode === "random") ticksSinceDecision = DECISION_EVERY;
+  });
+});
+
+for (const id of ["t-ranges", "t-grid", "t-json"]) {
+  document.getElementById(id).addEventListener("change", render);
+}
+document.querySelectorAll("[data-debug]").forEach(input => {
+  input.addEventListener("input", () => {
+    setDebugValue(input.dataset.debug, parseFloat(input.value));
+  });
+});
+document.getElementById("btn-debug-reset").addEventListener("click", () => {
+  DEBUG = { ...DEFAULT_DEBUG };
+  saveDebugSettings();
+  syncDebugControls();
+  render();
+});
+syncDebugControls();
+
+function fmtReward(r) {
+  if (r == null) return "+0.000";
+  return (r >= 0 ? "+" : "") + r.toFixed(3);
+}
+
+function selectedProfile() {
+  return document.getElementById("profile-select").value || "default";
+}
+
+function syncProfileSelect() {
+  const select = document.getElementById("profile-select");
+  const profiles = state.available_profiles || ["default"];
+  const current = state.profile || select.value || "default";
+  if (profiles.join("|") !== Array.from(select.options).map(o => o.value).join("|")) {
+    select.replaceChildren();
+    for (const profile of profiles) {
+      const option = document.createElement("option");
+      option.value = profile;
+      option.textContent = profile.replaceAll("_", " ");
+      select.appendChild(option);
+    }
+  }
+  select.value = profiles.includes(current) ? current : profiles[0];
+}
+
+function render() {
+  if (!state) return;
+  syncProfileSelect();
+
+  // header
+  document.getElementById("seedReadout").textContent = state.seed ?? 0;
+  document.getElementById("tick").textContent = `${state.tick} / ${state.max_ticks}`;
+  document.getElementById("status").dataset.state = state.is_done ? "done" : "live";
+  document.getElementById("status").querySelector(".status-text").textContent = state.is_done ? "halted" : "live";
+
+  // hero
+  document.getElementById("damage").textContent = (state.damage_pct * 100).toFixed(1);
+  document.getElementById("army").textContent = `${state.army_remaining} / ${state.army_initial}`;
+  document.getElementById("active").textContent = state.troops.length;
+
+  const reward = state.last_reward ?? 0;
+  const rewardEl = document.getElementById("reward");
+  rewardEl.textContent = fmtReward(reward);
+  rewardEl.classList.toggle("delta-pos", reward > 0);
+  rewardEl.classList.toggle("delta-neg", reward <= 0);
+  document.getElementById("totalReward").textContent = fmtReward(state.total_reward);
+
+  // stars
+  const s = state.stars;
+  document.getElementById("stars").innerHTML =
+    ["★","★","★"].map((c, i) => `<span class="${i < s ? "" : "off"}">${c}</span>`).join("");
+
+  renderActionStream();
+
+  // json debug
+  const showJson = document.getElementById("t-json").checked;
+  document.getElementById("jsonBox").hidden = !showJson;
+  if (showJson) {
+    const lite = { ...state };
+    delete lite.deploy_cells;
+    delete lite.perimeter;
+    delete lite.action_mask;
+    document.getElementById("jsonOut").textContent = JSON.stringify(lite, null, 2);
+  }
+
+  drawBoard();
+  drawTrace();
+}
+
+function renderActionStream() {
+  const stream = document.getElementById("actionStream");
+  const actions = state.actions || [];
+  if (actions.length === 0) {
+    stream.replaceChildren();
+    const empty = document.createElement("div");
+    empty.className = "action-empty";
+    empty.textContent = "no actions yet";
+    stream.appendChild(empty);
+    return;
+  }
+  stream.replaceChildren();
+  for (const a of actions) {
+    const item = document.createElement("div");
+    const tick = document.createElement("span");
+    const source = document.createElement("span");
+    const label = document.createElement("span");
+    item.className = "action-item";
+    tick.className = "action-tick";
+    source.className = "action-source" + (a.source === "policy" ? " policy" : "");
+    label.className = "action-label";
+    tick.textContent = `τ ${a.tick}`;
+    source.textContent = a.source;
+    label.textContent = a.label;
+    item.append(tick, source, label);
+    stream.appendChild(item);
+  }
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function drawBoard() {
+  // bg sits outside the rotation. Only grid geometry is wrapped in the
+  // projection group; sprites are positioned with isoGrid() on unrotated
+  // layers so already-projected art is not transformed a second time.
+  let main = document.getElementById("grid-main");
+  if (!main) {
+    const bg = el("image", {
+      id: "grid-bg",
+      href: `/img/surface.png?v=${SPRITE_V}`,
+      x: 0, y: 0, width: SVG_SIZE, height: SVG_SIZE,
+      preserveAspectRatio: "xMidYMid slice",
+      class: "sprite",
+    });
+    const rotated = el("g", {
+      id: "grid-rotated",
+      transform: debugTransformString(),
+    });
+    main = el("g", { id: "grid-main" });
+    const buildings = el("g", { id: "grid-buildings" });
+    const combat = el("g", { id: "grid-combat" });
+    const dead = el("g", { id: "grid-dead" });
+    const troops = el("g", { id: "grid-troops" });
+    const fx   = el("g", { id: "grid-fx" });
+    rotated.appendChild(main);
+    grid.appendChild(bg);
+    grid.appendChild(rotated);
+    grid.appendChild(buildings);
+    grid.appendChild(combat);
+    grid.appendChild(dead);
+    grid.appendChild(troops);
+    grid.appendChild(fx);
+  }
+  applyDebugTransform();
+  const buildings = document.getElementById("grid-buildings");
+  const combat = document.getElementById("grid-combat");
+  const troops = document.getElementById("grid-troops");
+  if (!buildings || !combat || !troops) return;
+  main.innerHTML = "";
+  buildings.innerHTML = "";
+  combat.innerHTML = "";
+  troops.innerHTML = "";
+
+  // build cannon -> target map for orientation
+  const cannonTargets = new Map();
+  for (const e of (state.engagements || [])) {
+    if (e.kind === "defense") cannonTargets.set(e.attacker_id, e);
+  }
+
+  const cell = gridCell();
+  const gridStart = DEBUG.inset;
+  const gridEnd = gridCoord(GRID);
+  const gridSpan = gridEnd - gridStart;
+
+  // outer frame (rotated with the gameplay; reads as a diamond outline)
+  main.appendChild(el("rect", {
+    x: gridStart + 0.5, y: gridStart + 0.5, width: gridSpan - 1, height: gridSpan - 1,
+    class: "frame-stroke",
+  }));
+
+  // calibration tick marks every 4 cells (faint)
+  for (let i = 4; i < GRID; i += 4) {
+    const p = gridCoord(i);
+    main.appendChild(el("line", { x1: p, y1: gridStart, x2: p, y2: gridStart + 4, class: "tick-mark" }));
+    main.appendChild(el("line", { x1: p, y1: gridEnd, x2: p, y2: gridEnd - 4, class: "tick-mark" }));
+    main.appendChild(el("line", { x1: gridStart, y1: p, x2: gridStart + 4, y2: p, class: "tick-mark" }));
+    main.appendChild(el("line", { x1: gridEnd, y1: p, x2: gridEnd - 4, y2: p, class: "tick-mark" }));
+  }
+
+  // optional grid lines
+  if (document.getElementById("t-grid").checked) {
+    for (let i = 1; i < GRID; i++) {
+      const p = gridCoord(i);
+      main.appendChild(el("line", { x1: p, y1: gridStart, x2: p, y2: gridEnd, class: "grid-rule" }));
+      main.appendChild(el("line", { x1: gridStart, y1: p, x2: gridEnd, y2: p, class: "grid-rule" }));
+    }
+  }
+
+  // defense ranges
+  if (document.getElementById("t-ranges").checked) {
+    for (const b of state.buildings) {
+      if (b.is_defense) {
+        const center = gridPoint(b.x + b.size / 2, b.y + b.size / 2);
+        main.appendChild(el("circle", {
+          cx: center.x, cy: center.y, r: gridUnits(b.attack_range), class: "range-circle",
+        }));
+      }
+    }
+  }
+
+  // legal deploy click zones
+  const deployCells = state.deploy_cells || state.perimeter || [];
+  const armyLeft = state.army_remaining > 0;
+  for (let i = 0; i < deployCells.length; i++) {
+    const [cx, cy] = deployCells[i];
+    const enabled = armyLeft && state.action_mask[i] && !state.is_done;
+    const r = el("rect", {
+      x: gridCoord(cx), y: gridCoord(cy), width: cell, height: cell,
+      class: "perim" + (enabled ? "" : " disabled"),
+    });
+    if (enabled) {
+      r.addEventListener("click", () => deploy(i));
+      const t = el("title", {});
+      t.textContent = `deploy @ (${cx}, ${cy})`;
+      r.appendChild(t);
+    }
+    main.appendChild(r);
+  }
+
+  const depthItems = [
+    ...(state.rubble || []).map(item => ({ type: "rubble", item })),
+    ...state.buildings.map(item => ({ type: "building", item })),
+  ].sort((a, b) => {
+    const ad = renderDepthForFootprint(a.item);
+    const bd = renderDepthForFootprint(b.item);
+    if (ad !== bd) return ad - bd;
+    return a.item.id - b.item.id;
+  });
+
+  // Buildings, walls, and rubble are sorted by projected front-edge depth.
+  // This makes the upper wall ring draw behind the townhall while front wall
+  // segments naturally overlap it.
+  for (const draw of depthItems) {
+    if (draw.type === "rubble") {
+      const rubble = draw.item;
+      const art = RUBBLE_ART[rubble.kind];
+      if (!art) continue;
+      const width = gridUnits(rubble.size) * art.scale;
+      const height = width * art.aspect;
+      const center = isoGrid(rubble.x + rubble.size / 2, rubble.y + rubble.size / 2);
+      buildings.appendChild(el("image", {
+        href: art.href,
+        x: center.x - width / 2,
+        y: center.y - height / 2,
+        width,
+        height,
+        class: "sprite",
+        preserveAspectRatio: "xMidYMid meet",
+      }));
+      continue;
+    }
+
+    const b = draw.item;
+    const origin = gridPoint(b.x, b.y);
+    const sz = gridUnits(b.size);
+    const hpFrac = b.hp / b.max_hp;
+
+    const sprite = buildingSprite(b, cannonTargets);
+    if (sprite) {
+      const scale = b.kind === "storage" ? STORAGE_SCALE : b.kind === "wall" ? WALL_SCALE : 1.0;
+      const ww = sz * scale;
+      const hh = b.kind === "wall" ? ww * WALL_ASPECT : sz * scale;
+      const center = isoGrid(b.x + b.size / 2, b.y + b.size / 2);
+      const ox = center.x - ww / 2;
+      const oy = center.y - hh / 2;
+      buildings.appendChild(el("image", {
+        href: sprite,
+        x: ox, y: oy, width: ww, height: hh,
+        class: "sprite",
+        preserveAspectRatio: "xMidYMid meet",
+      }));
+      if (hpFrac < 1) {
+        const barWidth = sz * BUILDING_HP_BAR_SCALE;
+        appendHealthBar(
+          buildings,
+          center.x - barWidth / 2,
+          oy - 5,
+          barWidth,
+          BUILDING_HP_BAR_HEIGHT,
+          hpFrac
+        );
+      }
+    } else {
+      const color = BUILDING_COLORS[b.kind] || "var(--ink)";
+      main.appendChild(el("rect", {
+        x: origin.x, y: origin.y, width: sz, height: sz,
+        fill: color, class: "b-fill",
+        opacity: 0.22, rx: 1, ry: 1,
+      }));
+      main.appendChild(el("rect", {
+        x: origin.x + 0.5, y: origin.y + 0.5, width: sz - 1, height: sz - 1,
+        stroke: color, class: "b-stroke",
+        opacity: 0.85, rx: 1, ry: 1,
+      }));
+
+      if (hpFrac < 1) {
+        const barWidth = sz * BUILDING_HP_BAR_SCALE;
+        appendHealthBar(
+          main,
+          origin.x + (sz - barWidth) / 2,
+          origin.y - 5,
+          barWidth,
+          BUILDING_HP_BAR_HEIGHT,
+          hpFrac
+        );
+      }
+    }
+  }
+
+  // defense fire beams — drawn beneath troops
+  for (const e of state.engagements || []) {
+    if (e.kind === "defense") {
+      const from = isoGrid(e.from_x, e.from_y);
+      const to = isoGrid(e.to_x, e.to_y);
+      combat.appendChild(el("line", {
+        x1: from.x, y1: from.y,
+        x2: to.x, y2: to.y,
+        class: "engage-defense",
+      }));
+    }
+  }
+
+  // troops — swing sprite if currently attacking, run sprite otherwise
+  const attackingIds = new Set(
+    (state.engagements || []).filter(e => e.kind === "troop").map(e => e.attacker_id)
+  );
+  for (const t of state.troops) {
+    const center = isoGrid(t.x, t.y);
+    const sprite = attackingIds.has(t.id)
+      ? attackPose(t.id, state.tick)
+      : SPRITES.barbarian_run_a;
+    const facing = troopFacing.get(t.id) || "right";
+    const px = center.x - TROOP_PX / 2;
+    const py = center.y - TROOP_PX / 2 - TROOP_OFFSET_Y;
+    const attrs = {
+      href: sprite,
+      x: px, y: py,
+      width: TROOP_PX, height: TROOP_PX,
+      class: "sprite troop-sprite",
+      preserveAspectRatio: "xMidYMid meet",
+    };
+    if (facing === "left") {
+      // flip horizontally around the sprite's own center via SVG transform
+      attrs.transform = `translate(${2 * px + TROOP_PX} 0) scale(-1 1)`;
+    }
+    troops.appendChild(el("image", attrs));
+    const hpFrac = t.hp / t.max_hp;
+    if (hpFrac < 1) {
+      const barY = center.y - TROOP_PX / 2 - TROOP_OFFSET_Y - 3;
+      appendHealthBar(
+        troops,
+        center.x - TROOP_HP_BAR_WIDTH / 2,
+        barY,
+        TROOP_HP_BAR_WIDTH,
+        TROOP_HP_BAR_HEIGHT,
+        hpFrac
+      );
+    }
+  }
+
+  // engagement impacts on top
+  for (const e of state.engagements || []) {
+    if (e.kind === "defense") {
+      const to = isoGrid(e.to_x, e.to_y);
+      combat.appendChild(el("circle", {
+        cx: to.x, cy: to.y, r: 2, class: "engage-impact",
+      }));
+    } else if (e.kind === "troop") {
+      const to = isoGrid(e.to_x, e.to_y);
+      combat.appendChild(el("circle", {
+        cx: to.x, cy: to.y, r: 2, class: "engage-spark",
+      }));
+    }
+  }
+}
+
+function drawTrace() {
+  trace.innerHTML = "";
+  if (damageHistory.length === 0) return;
+  const W = 100, H = 20;
+  const maxT = Math.max(state.max_ticks, 1);
+
+  // baseline
+  trace.appendChild(el("line", {
+    x1: 0, y1: H - 0.5, x2: W, y2: H - 0.5,
+    stroke: "var(--rule)", "stroke-width": 0.5,
+  }));
+
+  // current-tick cursor (faint)
+  const cursorX = (state.tick / maxT) * W;
+  trace.appendChild(el("line", {
+    x1: cursorX, y1: 0, x2: cursorX, y2: H,
+    stroke: "var(--rule-2)", "stroke-width": 0.5, "stroke-dasharray": "1 1.5",
+  }));
+
+  // damage trace polyline
+  const pts = damageHistory.map(([t, d]) => {
+    const x = (t / maxT) * W;
+    const y = H - d * H;
+    return `${x.toFixed(2)},${y.toFixed(2)}`;
+  });
+  if (pts.length >= 2) {
+    trace.appendChild(el("polyline", {
+      points: pts.join(" "),
+      fill: "none",
+      stroke: "var(--phosphor)",
+      "stroke-width": 1,
+      "stroke-linejoin": "round",
+      "stroke-linecap": "round",
+    }));
+    // glow fill below curve
+    const fillPts = [...pts, `${W},${H}`, `0,${H}`].join(" ");
+    trace.appendChild(el("polygon", {
+      points: fillPts,
+      fill: "var(--phosphor-08)",
+    }));
+  }
+}
+
+reset();
+</script>
+</body>
+</html>

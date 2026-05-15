@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coc-rl-env"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "gymnasium>=1.0",
+    "numpy>=2.0",
+]
+
+[project.scripts]
+coc-viewer = "viewer.server:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+train = [
+    "sb3-contrib>=2.3",
+    "stable-baselines3>=2.3",
+    "tensorboard>=2.16",
+]
+viewer = [
+    "flask>=3.0",
+    "pygame>=2.6",
+]
+
+[tool.setuptools.packages.find]
+include = ["coc_env*", "viewer*"]
+
+[tool.setuptools.package-data]
+viewer = ["index.html", "img/*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
