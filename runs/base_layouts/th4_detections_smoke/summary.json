@@ -1,0 +1,16 @@
+{
+  "model": "keremberke/yolov5s-clash-of-clans",
+  "image_count": 10,
+  "total_detections": 7,
+  "avg_detections_per_image": 0.7,
+  "images_with_zero_detections": 4,
+  "class_counts": {
+    "mortar": 6,
+    "canon": 1
+  },
+  "params": {
+    "conf": 0.25,
+    "iou": 0.45,
+    "imgsz": 1280
+  }
+}

@@ -22,6 +22,16 @@ def test_reset_returns_obs_and_info() -> None:
     assert isinstance(obs, dict)
     assert "buildings_alive" in obs and "troops_alive" in obs
     assert info["damage_pct"] == 0.0 and info["ticks_elapsed"] == 0
+    assert info["profile"] == "default"
+
+
+def test_info_reports_active_layout_profile() -> None:
+    env = CoCEnv(layout_profile="easy", max_buildings=preset_layout_profile("hard").max_buildings)
+    _, info = env.reset(seed=0)
+    assert info["profile"] == "easy"
+
+    _, info = env.reset(seed=1, options={"profile": "hard"})
+    assert info["profile"] == "hard"
 
 
 def test_step_returns_5_tuple() -> None:

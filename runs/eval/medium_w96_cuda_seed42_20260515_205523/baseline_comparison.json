@@ -1,0 +1,32 @@
+{
+  "easy": {
+    "policy_score_mean": 2.10790365448505,
+    "random_score_mean": 3.562,
+    "score_lift": -1.4540963455149498,
+    "policy_damage_mean": 0.6679036544850497,
+    "random_damage_mean": 0.932,
+    "damage_lift": -0.2640963455149503,
+    "policy_stars_mean": 1.44,
+    "random_stars_mean": null
+  },
+  "medium": {
+    "policy_score_mean": 3.1068566978193144,
+    "random_score_mean": 2.101,
+    "score_lift": 1.0058566978193144,
+    "policy_damage_mean": 0.8068566978193148,
+    "random_damage_mean": 0.687,
+    "damage_lift": 0.11985669781931474,
+    "policy_stars_mean": 2.3,
+    "random_stars_mean": 1.414
+  },
+  "hard": {
+    "policy_score_mean": 0.4881967963386728,
+    "random_score_mean": 0.308,
+    "score_lift": 0.1801967963386728,
+    "policy_damage_mean": 0.2881967963386728,
+    "random_damage_mean": 0.274,
+    "damage_lift": 0.014196796338672768,
+    "policy_stars_mean": 0.2,
+    "random_stars_mean": 0.034
+  }
+}

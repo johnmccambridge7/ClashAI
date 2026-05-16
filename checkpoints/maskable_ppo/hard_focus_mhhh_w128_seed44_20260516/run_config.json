@@ -1,0 +1,83 @@
+{
+  "army_composition": {
+    "barbarian": 40,
+    "wall_breaker": 10
+  },
+  "batch_size": 4096,
+  "checkpoint_freq": 500000,
+  "clip_range": 0.2,
+  "device": "cuda",
+  "ent_coef": 0.01,
+  "eval_episodes": 20,
+  "eval_freq": 0,
+  "eval_profiles": [
+    "medium",
+    "hard",
+    "hard",
+    "hard"
+  ],
+  "eval_seed_start": 100000,
+  "gae_lambda": 0.95,
+  "gamma": 0.995,
+  "learning_rate": 0.0003,
+  "linear_lr": false,
+  "load_path": "checkpoints/maskable_ppo/curriculum_emmh_w128_seed43_20260515/final_model.zip",
+  "max_buildings": 257,
+  "max_grad_norm": 0.5,
+  "metadata": {
+    "argv": [
+      "scripts/train_maskable_ppo.py",
+      "--run-name",
+      "hard_focus_mhhh_w128_seed44_20260516",
+      "--load",
+      "checkpoints/maskable_ppo/curriculum_emmh_w128_seed43_20260515/final_model.zip",
+      "--profile",
+      "medium,hard,hard,hard",
+      "--workers",
+      "128",
+      "--total-timesteps",
+      "5000000",
+      "--device",
+      "cuda",
+      "--n-steps",
+      "512",
+      "--batch-size",
+      "4096",
+      "--checkpoint-freq",
+      "500000",
+      "--eval-freq",
+      "0",
+      "--monitor-dir",
+      "runs/monitor",
+      "--seed",
+      "44"
+    ],
+    "cpu_count": 384,
+    "cwd": "/workspace/ClashAI",
+    "host": "800f0fbd3e15",
+    "platform": "Linux-6.8.0-111-lowlatency-x86_64-with-glibc2.39",
+    "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]"
+  },
+  "n_epochs": 10,
+  "n_steps": 512,
+  "paths": {
+    "monitor_dir": "runs/monitor/hard_focus_mhhh_w128_seed44_20260516",
+    "save_dir": "checkpoints/maskable_ppo/hard_focus_mhhh_w128_seed44_20260516",
+    "tensorboard_log": "runs/maskable_ppo/hard_focus_mhhh_w128_seed44_20260516"
+  },
+  "run_name": "hard_focus_mhhh_w128_seed44_20260516",
+  "seed": 44,
+  "start_method": "forkserver",
+  "stochastic_eval": false,
+  "torch_threads": 1,
+  "total_timesteps": 5000000,
+  "train_profiles": [
+    "medium",
+    "hard",
+    "hard",
+    "hard"
+  ],
+  "vec_env": "auto",
+  "vf_coef": 0.5,
+  "workers": 128
+}

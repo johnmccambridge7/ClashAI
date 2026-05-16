@@ -1,0 +1,10 @@
+{"image": "defence/th4_defence_1.jpg", "width": 1644, "height": 1604, "detections": []}
+{"image": "defence/th4_defence_10.jpg", "width": 1640, "height": 1604, "detections": []}
+{"image": "defence/th4_defence_11.jpg", "width": 1642, "height": 1602, "detections": []}
+{"image": "defence/th4_defence_111.jpg", "width": 2532, "height": 1170, "detections": [{"bbox": [1124.478759765625, 603.8392333984375, 1197.82666015625, 683.0675048828125], "score": 0.7549459338188171, "class_id": 8, "class_name": "mortar"}]}
+{"image": "defence/th4_defence_112.jpg", "width": 2532, "height": 1170, "detections": [{"bbox": [1244.173095703125, 583.41796875, 1314.35986328125, 650.2394409179688], "score": 0.885967493057251, "class_id": 8, "class_name": "mortar"}, {"bbox": [121.38578033447266, 866.6908569335938, 179.0728302001953, 914.9196166992188], "score": 0.5323646664619446, "class_id": 3, "class_name": "canon"}]}
+{"image": "defence/th4_defence_113.jpg", "width": 2532, "height": 1170, "detections": [{"bbox": [1248.2484130859375, 731.2520141601562, 1326.571044921875, 815.2466430664062], "score": 0.7684928178787231, "class_id": 8, "class_name": "mortar"}]}
+{"image": "defence/th4_defence_114.jpg", "width": 2532, "height": 1170, "detections": [{"bbox": [1252.79150390625, 625.75537109375, 1327.1419677734375, 697.8453979492188], "score": 0.7945292592048645, "class_id": 8, "class_name": "mortar"}]}
+{"image": "defence/th4_defence_115.jpg", "width": 2532, "height": 1170, "detections": [{"bbox": [1012.6265869140625, 586.7902221679688, 1075.57763671875, 654.5797729492188], "score": 0.38239315152168274, "class_id": 8, "class_name": "mortar"}]}
+{"image": "defence/th4_defence_116.jpg", "width": 2532, "height": 1170, "detections": []}
+{"image": "defence/th4_defence_117.jpg", "width": 2532, "height": 1170, "detections": [{"bbox": [1145.3621826171875, 644.9428100585938, 1218.1275634765625, 713.1045532226562], "score": 0.8501675724983215, "class_id": 8, "class_name": "mortar"}]}

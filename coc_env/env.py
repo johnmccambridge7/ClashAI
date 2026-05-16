@@ -102,6 +102,7 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
         self.army_composition = _coerce_army_composition(army_size, army_composition)
         self.army_size: int = sum(self.army_composition.values())
         self.layout_profile = _coerce_layout_profile(layout_profile)
+        self._current_profile_name = self.layout_profile.name if self.layout_profile is not None else "default"
 
         required_slots = (
             self.layout_profile.max_buildings
@@ -253,6 +254,7 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
         if options is not None and "profile" in options:
             profile = _coerce_layout_profile(options["profile"])
 
+        self._current_profile_name = profile.name if profile is not None else "default"
         if profile is None:
             layout = default_layout()
         else:
@@ -350,6 +352,7 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
     def _info(self) -> dict[str, Any]:
         assert self.sim is not None
         return {
+            "profile":        self._current_profile_name,
             "damage_pct":     self.sim.damage_pct,
             "stars":          self.sim.stars,
             "score":          self.sim.score,

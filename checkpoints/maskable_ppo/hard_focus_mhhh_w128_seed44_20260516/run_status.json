@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 15304.165960162994,
+  "final_model": "checkpoints/maskable_ppo/hard_focus_mhhh_w128_seed44_20260516/final_model.zip",
+  "finished_at_unix": 1778921124.8453262,
+  "num_timesteps": 10092544,
+  "run_name": "hard_focus_mhhh_w128_seed44_20260516",
+  "started_at_unix": 1778905820.6793683,
+  "status": "completed"
+}

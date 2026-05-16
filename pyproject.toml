@@ -20,6 +20,12 @@ train = [
     "sb3-contrib>=2.3",
     "stable-baselines3>=2.3",
     "tensorboard>=2.16",
+    "wandb>=0.19",
+    "wandb-workspaces>=0.1",
+]
+notebook = [
+    "ipykernel>=6.29",
+    "jupyterlab>=4.2",
 ]
 viewer = [
     "flask>=3.0",
