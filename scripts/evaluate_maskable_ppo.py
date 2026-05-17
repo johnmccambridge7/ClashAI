@@ -31,6 +31,8 @@ from scripts.train_maskable_ppo import (
     write_json,
 )
 from scripts.wandb_support import (
+    DEFAULT_WANDB_ENTITY,
+    DEFAULT_WANDB_PROJECT,
     finish_wandb_run,
     init_wandb_run,
     log_wandb_artifact,
@@ -72,8 +74,8 @@ def _rotated_profiles(profiles: list[str], offset: int) -> list[str]:
     return profiles[i:] + profiles[:i]
 
 
-def _eval_worker(task: tuple[str, list[str], int, int, int, dict[str, int], bool, str, int]) -> tuple[int, list[EpisodeResult], float]:
-    checkpoint, profiles, seed_start, episodes, max_buildings, army_composition, deterministic, device, episode_offset = task
+def _eval_worker(task: tuple[str, list[str], int, int, int, dict[str, int], int, bool, str, int]) -> tuple[int, list[EpisodeResult], float]:
+    checkpoint, profiles, seed_start, episodes, max_buildings, army_composition, max_ticks, deterministic, device, episode_offset = task
     deps = import_training_deps()
     model = deps.MaskablePPO.load(checkpoint, device=device)
     worker_profiles = _rotated_profiles(profiles, episode_offset)
@@ -84,6 +86,7 @@ def _eval_worker(task: tuple[str, list[str], int, int, int, dict[str, int], bool
         episodes=episodes,
         max_buildings=max_buildings,
         army_composition=army_composition,
+        max_ticks=max_ticks,
         deterministic=deterministic,
     )
     return episode_offset, results, elapsed
@@ -97,6 +100,7 @@ def evaluate_parallel(
     episodes: int,
     max_buildings: int,
     army_composition: dict[str, int],
+    max_ticks: int,
     deterministic: bool,
     device: str,
     workers: int,
@@ -111,6 +115,7 @@ def evaluate_parallel(
             episodes=episodes,
             max_buildings=max_buildings,
             army_composition=army_composition,
+            max_ticks=max_ticks,
             deterministic=deterministic,
         )
 
@@ -130,6 +135,7 @@ def evaluate_parallel(
             count,
             max_buildings,
             army_composition,
+            max_ticks,
             deterministic,
             device,
             offset,
@@ -155,14 +161,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--episodes", type=int, default=200)
     parser.add_argument("--seed-start", type=int, default=DEFAULT_EVAL_SEED_START)
     parser.add_argument("--army-composition", default=",".join(f"{k}={v}" for k, v in DEFAULT_ARMY_COMPOSITION.items()))
+    parser.add_argument("--max-ticks", type=int, default=720)
     parser.add_argument("--device", default="cpu", help="Use cpu for parallel eval unless there is a reason to share cuda.")
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--stochastic", action="store_true")
     parser.add_argument("--output-dir", type=Path, default=Path("runs/eval"))
     parser.add_argument("--name", default=None)
     parser.add_argument("--wandb", action="store_true", help="Log evaluation summary, table, and artifacts to W&B.")
-    parser.add_argument("--wandb-project", default=None, help="Default: WANDB_PROJECT or clashai-rl.")
-    parser.add_argument("--wandb-entity", default=None, help="Default: WANDB_ENTITY.")
+    parser.add_argument("--wandb-project", default=None, help="Default: WANDB_PROJECT or ClashAI.")
+    parser.add_argument("--wandb-entity", default=None, help="Default: WANDB_ENTITY or the repo W&B entity.")
     parser.add_argument("--wandb-group", default=None)
     parser.add_argument("--wandb-tags", default=None, help="Comma-separated W&B tags.")
     parser.add_argument("--wandb-mode", default=None, help="Default: WANDB_MODE or online.")
@@ -176,6 +183,8 @@ def main() -> None:
         raise ValueError("episodes must be positive")
     if args.workers <= 0:
         raise ValueError("workers must be positive")
+    if args.max_ticks <= 0:
+        raise ValueError("max-ticks must be positive")
 
     checkpoint = resolve_model_path(args.checkpoint)
     profiles = profile_sequence(args.profile)
@@ -189,14 +198,15 @@ def main() -> None:
         "episodes": args.episodes,
         "seed_start": args.seed_start,
         "army_composition": army_composition,
+        "max_ticks": args.max_ticks,
         "max_buildings": max_buildings,
         "deterministic": not args.stochastic,
         "device": args.device,
         "workers": args.workers,
         "wandb": {
             "enabled": args.wandb,
-            "project": args.wandb_project or os.environ.get("WANDB_PROJECT", "clashai-rl"),
-            "entity": args.wandb_entity or os.environ.get("WANDB_ENTITY"),
+            "project": args.wandb_project or os.environ.get("WANDB_PROJECT", DEFAULT_WANDB_PROJECT),
+            "entity": args.wandb_entity or os.environ.get("WANDB_ENTITY", DEFAULT_WANDB_ENTITY),
             "group": args.wandb_group,
             "tags": parse_wandb_tags(args.wandb_tags),
             "mode": args.wandb_mode or os.environ.get("WANDB_MODE", "online"),
@@ -227,6 +237,7 @@ def main() -> None:
             episodes=args.episodes,
             max_buildings=max_buildings,
             army_composition=army_composition,
+            max_ticks=args.max_ticks,
             deterministic=not args.stochastic,
             device=args.device,
             workers=args.workers,

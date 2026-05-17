@@ -95,12 +95,16 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
         layout_profile: LayoutProfile | str | None = None,
         max_buildings: int | None = None,
         army_composition: dict[str, int] | None = None,
+        max_ticks: int = MAX_TICKS,
     ) -> None:
         super().__init__()
         if army_size < 0:
             raise ValueError("army_size must be non-negative")
+        if max_ticks <= 0:
+            raise ValueError("max_ticks must be positive")
         self.army_composition = _coerce_army_composition(army_size, army_composition)
         self.army_size: int = sum(self.army_composition.values())
+        self.max_ticks: int = int(max_ticks)
         self.layout_profile = _coerce_layout_profile(layout_profile)
         self._current_profile_name = self.layout_profile.name if self.layout_profile is not None else "default"
 
@@ -164,6 +168,7 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
             army_size=self.army_size,
             seed=seed if seed is not None else 0,
             army_composition=self.army_composition,
+            max_ticks=self.max_ticks,
         )
         self._prev_score = 0.0
         self._mask_cache_key = None
@@ -346,7 +351,7 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
             "army_remaining":         np.array(
                 [self.sim.army_remaining / max(1, self.army_size)], dtype=np.float32),
             "time_remaining":         np.array(
-                [1.0 - self.sim.tick_count / MAX_TICKS], dtype=np.float32),
+                [1.0 - self.sim.tick_count / self.max_ticks], dtype=np.float32),
         }
 
     def _info(self) -> dict[str, Any]:

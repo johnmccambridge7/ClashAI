@@ -1,0 +1,42 @@
+{
+  "checkpoint": "/workspace/ClashAI/checkpoints/maskable_ppo/prod_medium_hard_v1_gpu0_seed45/final_model.zip",
+  "profiles": [
+    "easy",
+    "medium",
+    "hard"
+  ],
+  "episodes": 600,
+  "seed_start": 300000,
+  "army_composition": {
+    "barbarian": 40,
+    "wall_breaker": 10
+  },
+  "max_ticks": 720,
+  "max_buildings": 257,
+  "deterministic": true,
+  "device": "cpu",
+  "workers": 48,
+  "wandb": {
+    "enabled": true,
+    "project": "ClashAI",
+    "entity": "jmc314-lumenary-com",
+    "group": "prod_medium_hard_v1_holdout",
+    "tags": [
+      "eval",
+      "holdout",
+      "prod_medium_hard_v1",
+      "gpu0"
+    ],
+    "mode": "online",
+    "run_id": null
+  }
+}
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from WANDB_API_KEY.
+wandb: Currently logged in as: jmc314 (jmc314-lumenary-com) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run is9bcx6z
+wandb: Tracking run with wandb version 0.27.0
+wandb: Run data is saved locally in /workspace/ClashAI/wandb/run-20260517_061438-is9bcx6z
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run eval-prod_medium_hard_v1_gpu0_holdout_600
+wandb: ⭐️ View project at https://wandb.ai/jmc314-lumenary-com/ClashAI
+wandb: 🚀 View run at https://wandb.ai/jmc314-lumenary-com/ClashAI/runs/is9bcx6z

@@ -1,0 +1,19 @@
+2026-05-17 06:14:38,170 INFO    MainThread:90094 [wandb_setup.py:_flush():81] Current SDK version is 0.27.0
+2026-05-17 06:14:38,170 INFO    MainThread:90094 [wandb_setup.py:_flush():81] Configure stats pid to 90094
+2026-05-17 06:14:38,170 INFO    MainThread:90094 [wandb_setup.py:_flush():81] Loading settings from environment variables
+2026-05-17 06:14:38,170 INFO    MainThread:90094 [wandb_init.py:setup_run_log_directory():723] Logging user logs to /workspace/ClashAI/wandb/run-20260517_061438-is9bcx6z/logs/debug.log
+2026-05-17 06:14:38,170 INFO    MainThread:90094 [wandb_init.py:setup_run_log_directory():724] Logging internal logs to /workspace/ClashAI/wandb/run-20260517_061438-is9bcx6z/logs/debug-internal.log
+2026-05-17 06:14:38,170 INFO    MainThread:90094 [wandb_init.py:init():851] calling init triggers
+2026-05-17 06:14:38,170 INFO    MainThread:90094 [wandb_init.py:init():856] wandb.init called with sweep_config: {}
+config: {'checkpoint': '/workspace/ClashAI/checkpoints/maskable_ppo/prod_medium_hard_v1_gpu0_seed45/final_model.zip', 'profiles': ['easy', 'medium', 'hard'], 'episodes': 600, 'seed_start': 300000, 'army_composition': {'barbarian': 40, 'wall_breaker': 10}, 'max_ticks': 720, 'max_buildings': 257, 'deterministic': True, 'device': 'cpu', 'workers': 48, 'wandb': {'enabled': True, 'project': 'ClashAI', 'entity': 'jmc314-lumenary-com', 'group': 'prod_medium_hard_v1_holdout', 'tags': ['eval', 'holdout', 'prod_medium_hard_v1', 'gpu0'], 'mode': 'online', 'run_id': None}, '_wandb': {}}
+2026-05-17 06:14:38,170 INFO    MainThread:90094 [wandb_init.py:init():899] starting backend
+2026-05-17 06:14:38,385 INFO    MainThread:90094 [wandb_init.py:init():914] sending inform_init request
+2026-05-17 06:14:38,659 INFO    MainThread:90094 [wandb_init.py:init():919] backend started and connected
+2026-05-17 06:14:38,676 INFO    MainThread:90094 [wandb_init.py:init():989] updated telemetry
+2026-05-17 06:14:38,683 INFO    MainThread:90094 [wandb_init.py:init():1012] communicating run to backend with 90.0 second timeout
+2026-05-17 06:14:39,100 INFO    MainThread:90094 [wandb_init.py:init():1057] starting run threads in backend
+2026-05-17 06:14:39,173 INFO    MainThread:90094 [wandb_run.py:_console_start():2509] atexit reg
+2026-05-17 06:14:39,173 INFO    MainThread:90094 [wandb_run.py:_redirect():2359] redirect: wrap_raw
+2026-05-17 06:14:39,173 INFO    MainThread:90094 [wandb_run.py:_redirect():2428] Wrapping output streams.
+2026-05-17 06:14:39,173 INFO    MainThread:90094 [wandb_run.py:_redirect():2451] Redirects installed.
+2026-05-17 06:14:39,175 INFO    MainThread:90094 [wandb_init.py:init():1095] run started, returning control to user process

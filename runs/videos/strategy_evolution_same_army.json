@@ -1,0 +1,200 @@
+{
+  "output": "runs/videos/strategy_evolution_same_army.mp4",
+  "preset": "same_army",
+  "profile": "hard",
+  "seed": 220000,
+  "stages": [
+    {
+      "army_composition": {
+        "barbarian": 40,
+        "wall_breaker": 10
+      },
+      "checkpoint": null,
+      "final": {
+        "army_remaining": 0,
+        "damage_pct": 0.19805491990846683,
+        "defenses_destroyed": 2,
+        "deployed": 50,
+        "score": 0.19805491990846683,
+        "stars": 0,
+        "terminated": false,
+        "tick": 720,
+        "truncated": true,
+        "walls_destroyed": 22
+      },
+      "label": "random valid deploy",
+      "max_ticks": 720,
+      "phase": "baseline",
+      "run_name": "random",
+      "step": 0
+    },
+    {
+      "army_composition": {
+        "barbarian": 40,
+        "wall_breaker": 10
+      },
+      "checkpoint": "checkpoints/maskable_ppo/prod_medium_hard_v1_gpu1_seed46/checkpoint_499968_steps.zip",
+      "final": {
+        "army_remaining": 0,
+        "damage_pct": 0.3085812356979405,
+        "defenses_destroyed": 2,
+        "deployed": 50,
+        "score": 0.3085812356979405,
+        "stars": 0,
+        "terminated": true,
+        "tick": 595,
+        "truncated": false,
+        "walls_destroyed": 16
+      },
+      "label": "500k steps",
+      "max_ticks": 720,
+      "phase": "prod medium hard v1 gpu1 seed46",
+      "run_name": "prod_medium_hard_v1_gpu1_seed46",
+      "step": 499968
+    },
+    {
+      "army_composition": {
+        "barbarian": 40,
+        "wall_breaker": 10
+      },
+      "checkpoint": "checkpoints/maskable_ppo/prod_medium_hard_v1_gpu1_seed46/checkpoint_2499840_steps.zip",
+      "final": {
+        "army_remaining": 0,
+        "damage_pct": 0.2141304347826087,
+        "defenses_destroyed": 2,
+        "deployed": 50,
+        "score": 0.2141304347826087,
+        "stars": 0,
+        "terminated": true,
+        "tick": 527,
+        "truncated": false,
+        "walls_destroyed": 24
+      },
+      "label": "2.50M steps",
+      "max_ticks": 720,
+      "phase": "prod medium hard v1 gpu1 seed46",
+      "run_name": "prod_medium_hard_v1_gpu1_seed46",
+      "step": 2499840
+    },
+    {
+      "army_composition": {
+        "barbarian": 40,
+        "wall_breaker": 10
+      },
+      "checkpoint": "checkpoints/maskable_ppo/prod_medium_hard_v1_gpu1_seed46/checkpoint_4499712_steps.zip",
+      "final": {
+        "army_remaining": 0,
+        "damage_pct": 0.2141304347826087,
+        "defenses_destroyed": 2,
+        "deployed": 50,
+        "score": 0.2141304347826087,
+        "stars": 0,
+        "terminated": true,
+        "tick": 522,
+        "truncated": false,
+        "walls_destroyed": 23
+      },
+      "label": "4.50M steps",
+      "max_ticks": 720,
+      "phase": "prod medium hard v1 gpu1 seed46",
+      "run_name": "prod_medium_hard_v1_gpu1_seed46",
+      "step": 4499712
+    },
+    {
+      "army_composition": {
+        "barbarian": 40,
+        "wall_breaker": 10
+      },
+      "checkpoint": "checkpoints/maskable_ppo/prod_medium_hard_v1_gpu1_seed46/checkpoint_6499584_steps.zip",
+      "final": {
+        "army_remaining": 0,
+        "damage_pct": 0.2437070938215103,
+        "defenses_destroyed": 2,
+        "deployed": 50,
+        "score": 0.2437070938215103,
+        "stars": 0,
+        "terminated": true,
+        "tick": 519,
+        "truncated": false,
+        "walls_destroyed": 23
+      },
+      "label": "6.50M steps",
+      "max_ticks": 720,
+      "phase": "prod medium hard v1 gpu1 seed46",
+      "run_name": "prod_medium_hard_v1_gpu1_seed46",
+      "step": 6499584
+    },
+    {
+      "army_composition": {
+        "barbarian": 40,
+        "wall_breaker": 10
+      },
+      "checkpoint": "checkpoints/maskable_ppo/prod_medium_hard_v1_gpu1_seed46/checkpoint_8499456_steps.zip",
+      "final": {
+        "army_remaining": 0,
+        "damage_pct": 0.17116704805491992,
+        "defenses_destroyed": 1,
+        "deployed": 50,
+        "score": 0.17116704805491992,
+        "stars": 0,
+        "terminated": true,
+        "tick": 529,
+        "truncated": false,
+        "walls_destroyed": 15
+      },
+      "label": "8.50M steps",
+      "max_ticks": 720,
+      "phase": "prod medium hard v1 gpu1 seed46",
+      "run_name": "prod_medium_hard_v1_gpu1_seed46",
+      "step": 8499456
+    },
+    {
+      "army_composition": {
+        "barbarian": 40,
+        "wall_breaker": 10
+      },
+      "checkpoint": "checkpoints/maskable_ppo/prod_medium_hard_v1_gpu1_seed46/final_model.zip",
+      "final": {
+        "army_remaining": 0,
+        "damage_pct": 0.17116704805491992,
+        "defenses_destroyed": 1,
+        "deployed": 50,
+        "score": 0.17116704805491992,
+        "stars": 0,
+        "terminated": true,
+        "tick": 522,
+        "truncated": false,
+        "walls_destroyed": 17
+      },
+      "label": "final (10.03M steps)",
+      "max_ticks": 720,
+      "phase": "prod medium hard v1 gpu1 seed46",
+      "run_name": "prod_medium_hard_v1_gpu1_seed46",
+      "step": 10027008
+    },
+    {
+      "army_composition": {
+        "barbarian": 40,
+        "wall_breaker": 10
+      },
+      "checkpoint": "checkpoints/maskable_ppo/hard_focus_same_army_seed47/checkpoint_12026880_steps.zip",
+      "final": {
+        "army_remaining": 0,
+        "damage_pct": 0.17116704805491992,
+        "defenses_destroyed": 1,
+        "deployed": 50,
+        "score": 0.17116704805491992,
+        "stars": 0,
+        "terminated": true,
+        "tick": 538,
+        "truncated": false,
+        "walls_destroyed": 19
+      },
+      "label": "12.03M steps",
+      "max_ticks": 720,
+      "phase": "hard focus same army seed47",
+      "run_name": "hard_focus_same_army_seed47",
+      "step": 12026880
+    }
+  ]
+}

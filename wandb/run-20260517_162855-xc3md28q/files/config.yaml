@@ -1,0 +1,62 @@
+_wandb:
+    value:
+        cli_version: 0.27.0
+        e:
+            0sa7eej1g30jx0owb4k9pm2in9axdk8k:
+                cpu_count: 192
+                cpu_count_logical: 384
+                cudaVersion: "13.0"
+                disk:
+                    /:
+                        total: "68719476736"
+                        used: "15537307648"
+                email: john@lumenary.com
+                executable: /workspace/ClashAI/.venv/bin/python
+                git:
+                    commit: 1c1e2bdc9fc395688546f98114e148c59354bc22
+                    remote: https://github.com/johnmccambridge7/ClashAI
+                gpu: NVIDIA RTX PRO 5000 Blackwell
+                gpu_count: 2
+                gpu_nvidia:
+                    - architecture: Blackwell
+                      cudaCores: 14080
+                      memoryTotal: "51312066560"
+                      name: NVIDIA RTX PRO 5000 Blackwell
+                      uuid: GPU-071138fc-ce7b-5544-2219-f0476262ad3e
+                    - architecture: Blackwell
+                      cudaCores: 14080
+                      memoryTotal: "51312066560"
+                      name: NVIDIA RTX PRO 5000 Blackwell
+                      uuid: GPU-dbde3035-a6b5-3a2b-3b64-c7a6af6d02f8
+                host: 800f0fbd3e15
+                memory:
+                    total: "540499230720"
+                os: Linux-6.8.0-111-lowlatency-x86_64-with-glibc2.39
+                program: <stdin>
+                python: CPython 3.12.13
+                root: /workspace/ClashAI
+                startedAt: "2026-05-17T16:28:55.920177Z"
+                writerId: 0sa7eej1g30jx0owb4k9pm2in9axdk8k
+        m: []
+        python_version: 3.12.13
+        t:
+            "3":
+                - 2
+                - 13
+                - 16
+            "4": 3.12.13
+            "5": 0.27.0
+            "12": 0.27.0
+            "13": linux-x86_64
+layout_fix:
+    value: title_subtitle_spacing
+profile:
+    value: hard
+seed:
+    value: 220000
+source:
+    value: scripts/render_strategy_evolution.py
+videos:
+    value:
+        - strategy_evolution_same_army.mp4
+        - strategy_evolution_hard_v2.mp4

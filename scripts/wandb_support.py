@@ -6,6 +6,10 @@ import re
 from typing import Any
 
 
+DEFAULT_WANDB_ENTITY = "jmc314-lumenary-com"
+DEFAULT_WANDB_PROJECT = "ClashAI"
+
+
 def parse_wandb_tags(value: str | None) -> list[str]:
     if value is None:
         return []

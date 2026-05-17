@@ -1,0 +1,56 @@
+{
+  "output": "runs/videos/smoke_strategy_video.mp4",
+  "preset": "hard_v2",
+  "profile": "hard",
+  "seed": 220000,
+  "stages": [
+    {
+      "army_composition": {
+        "barbarian": 50,
+        "wall_breaker": 15
+      },
+      "checkpoint": null,
+      "final": {
+        "army_remaining": 0,
+        "damage_pct": 0.25577803203661326,
+        "defenses_destroyed": 2,
+        "deployed": 65,
+        "score": 0.25577803203661326,
+        "stars": 0,
+        "terminated": true,
+        "tick": 766,
+        "truncated": false,
+        "walls_destroyed": 28
+      },
+      "label": "random valid deploy",
+      "max_ticks": 900,
+      "phase": "baseline",
+      "run_name": "random",
+      "step": 0
+    },
+    {
+      "army_composition": {
+        "barbarian": 50,
+        "wall_breaker": 15
+      },
+      "checkpoint": "checkpoints/maskable_ppo/hard_v2_more_army_longer_seed48/checkpoint_1499904_steps.zip",
+      "final": {
+        "army_remaining": 0,
+        "damage_pct": 0.5348970251716247,
+        "defenses_destroyed": 4,
+        "deployed": 65,
+        "score": 2.5348970251716247,
+        "stars": 2,
+        "terminated": true,
+        "tick": 667,
+        "truncated": false,
+        "walls_destroyed": 32
+      },
+      "label": "1.50M steps",
+      "max_ticks": 900,
+      "phase": "hard v2 more army longer seed48",
+      "run_name": "hard_v2_more_army_longer_seed48",
+      "step": 1499904
+    }
+  ]
+}

@@ -2,7 +2,15 @@ from __future__ import annotations
 
 import argparse
 import os
+from pathlib import Path
+import sys
 from typing import Any
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from scripts.wandb_support import DEFAULT_WANDB_ENTITY, DEFAULT_WANDB_PROJECT
 
 
 def _resolve_entity(explicit: str | None) -> str:
@@ -125,8 +133,8 @@ def build_workspace(*, entity: str, project: str, name: str) -> Any:
 
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Create the ClashAI production W&B workspace.")
-    parser.add_argument("--project", default=os.environ.get("WANDB_PROJECT", "clashai-rl"))
-    parser.add_argument("--entity", default=os.environ.get("WANDB_ENTITY"))
+    parser.add_argument("--project", default=os.environ.get("WANDB_PROJECT", DEFAULT_WANDB_PROJECT))
+    parser.add_argument("--entity", default=os.environ.get("WANDB_ENTITY", DEFAULT_WANDB_ENTITY))
     parser.add_argument("--name", default="ClashAI RL Production")
     return parser
 

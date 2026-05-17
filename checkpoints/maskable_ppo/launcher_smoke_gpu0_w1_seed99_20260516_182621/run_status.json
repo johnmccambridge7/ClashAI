@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 2.1430123220197856,
+  "final_model": "checkpoints/maskable_ppo/launcher_smoke_gpu0_w1_seed99_20260516_182621/final_model.zip",
+  "finished_at_unix": 1778955987.070685,
+  "num_timesteps": 16,
+  "run_name": "launcher_smoke_gpu0_w1_seed99_20260516_182621",
+  "started_at_unix": 1778955984.9276745,
+  "status": "completed"
+}

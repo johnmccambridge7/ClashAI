@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 36924.56119968707,
+  "final_model": "checkpoints/maskable_ppo/prod_medium_hard_v1_gpu0_seed45/final_model.zip",
+  "finished_at_unix": 1778993311.8832135,
+  "num_timesteps": 10027008,
+  "run_name": "prod_medium_hard_v1_gpu0_seed45",
+  "started_at_unix": 1778956387.3220153,
+  "status": "completed"
+}

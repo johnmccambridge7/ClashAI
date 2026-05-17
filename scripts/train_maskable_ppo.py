@@ -22,6 +22,8 @@ from coc_env.env import CoCEnv
 from coc_env.generation import PRESET_LAYOUT_PROFILES
 from scripts.random_baseline import EpisodeResult, summarize
 from scripts.wandb_support import (
+    DEFAULT_WANDB_ENTITY,
+    DEFAULT_WANDB_PROJECT,
     finish_wandb_run,
     init_wandb_run,
     log_wandb_artifact,
@@ -153,6 +155,31 @@ def linear_schedule(initial_value: float) -> Any:
     return schedule
 
 
+def constant_schedule(value: float) -> Any:
+    def schedule(_: float) -> float:
+        return float(value)
+
+    return schedule
+
+
+def schedule_from_args(value: float, *, linear: bool) -> Any:
+    return linear_schedule(value) if linear else constant_schedule(value)
+
+
+def apply_finetune_hyperparameters(model: Any, args: argparse.Namespace, lr: float | Any) -> None:
+    model.learning_rate = lr
+    model.lr_schedule = schedule_from_args(args.learning_rate, linear=args.linear_lr)
+    model.clip_range = constant_schedule(args.clip_range)
+    model.batch_size = args.batch_size
+    model.n_epochs = args.n_epochs
+    model.gamma = args.gamma
+    model.gae_lambda = args.gae_lambda
+    model.ent_coef = args.ent_coef
+    model.vf_coef = args.vf_coef
+    model.max_grad_norm = args.max_grad_norm
+    model.target_kl = args.target_kl
+
+
 def gpu_snapshot() -> dict[str, float] | None:
     try:
         output = subprocess.check_output(
@@ -222,6 +249,7 @@ def make_env_factory(
     seed: int,
     max_buildings: int,
     army_composition: dict[str, int],
+    max_ticks: int,
     monitor_cls: Any,
     monitor_file: Path | None,
 ) -> Any:
@@ -230,6 +258,7 @@ def make_env_factory(
             layout_profile=profile,
             max_buildings=max_buildings,
             army_composition=army_composition,
+            max_ticks=max_ticks,
         )
         env.reset(seed=seed)
         filename = str(monitor_file) if monitor_file is not None else None
@@ -250,6 +279,7 @@ def evaluate_model(
     episodes: int,
     max_buildings: int,
     army_composition: dict[str, int],
+    max_ticks: int,
     deterministic: bool,
 ) -> tuple[list[EpisodeResult], float]:
     if episodes <= 0:
@@ -259,6 +289,7 @@ def evaluate_model(
         layout_profile=profiles[0],
         max_buildings=max_buildings,
         army_composition=army_composition,
+        max_ticks=max_ticks,
     )
     results: list[EpisodeResult] = []
     start = time.perf_counter()
@@ -484,6 +515,7 @@ def make_holdout_eval_callback(base_callback_cls: Any) -> type:
             episodes: int,
             max_buildings: int,
             army_composition: dict[str, int],
+            max_ticks: int,
             deterministic: bool,
             best_model_path: Path | None,
             wandb_run: Any | None = None,
@@ -496,6 +528,7 @@ def make_holdout_eval_callback(base_callback_cls: Any) -> type:
             self.episodes = episodes
             self.max_buildings = max_buildings
             self.army_composition = army_composition
+            self.max_ticks = max_ticks
             self.deterministic = deterministic
             self.best_model_path = best_model_path
             self.wandb_run = wandb_run
@@ -516,6 +549,7 @@ def make_holdout_eval_callback(base_callback_cls: Any) -> type:
                 episodes=self.episodes,
                 max_buildings=self.max_buildings,
                 army_composition=self.army_composition,
+                max_ticks=self.max_ticks,
                 deterministic=self.deterministic,
             )
             if not results:
@@ -580,6 +614,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--profile", default="hard", help="Preset profile, comma-list, or 'all'.")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--army-composition", default="barbarian=40,wall_breaker=10")
+    parser.add_argument("--max-ticks", type=int, default=720)
 
     parser.add_argument("--n-steps", type=int, default=512)
     parser.add_argument("--batch-size", type=int, default=2048)
@@ -592,6 +627,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--ent-coef", type=float, default=0.01)
     parser.add_argument("--vf-coef", type=float, default=0.5)
     parser.add_argument("--max-grad-norm", type=float, default=0.5)
+    parser.add_argument("--target-kl", type=float, default=None)
     parser.add_argument("--device", default="auto")
     parser.add_argument("--torch-threads", type=int, default=1)
 
@@ -604,14 +640,20 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--checkpoint-freq", type=int, default=250_000)
     parser.add_argument("--load", type=Path, default=None, help="Model zip or run directory to load.")
     parser.add_argument("--resume", action="store_true", help="Resume from --save-dir/--run-name by resolving final/interrupted/best/latest checkpoint.")
+    parser.add_argument("--keep-loaded-hparams", action="store_true", help="With --load, keep checkpoint optimizer/PPO hyperparameters instead of applying CLI fine-tune values.")
     parser.add_argument("--dry-run", action="store_true", help="Validate config, write manifest, and exit before building envs.")
     parser.add_argument("--progress-bar", action="store_true")
     parser.add_argument("--log-interval", type=int, default=1)
-    parser.add_argument("--status-interval", type=float, default=30.0)
+    parser.add_argument(
+        "--status-interval",
+        type=float,
+        default=5.0,
+        help="Seconds between live console/W&B throughput, GPU, and rollout-window updates.",
+    )
 
     parser.add_argument("--wandb", action="store_true", help="Stream training metrics and artifacts to W&B.")
-    parser.add_argument("--wandb-project", default=os.environ.get("WANDB_PROJECT", "clashai-rl"))
-    parser.add_argument("--wandb-entity", default=os.environ.get("WANDB_ENTITY"))
+    parser.add_argument("--wandb-project", default=os.environ.get("WANDB_PROJECT", DEFAULT_WANDB_PROJECT))
+    parser.add_argument("--wandb-entity", default=os.environ.get("WANDB_ENTITY", DEFAULT_WANDB_ENTITY))
     parser.add_argument("--wandb-group", default=None)
     parser.add_argument("--wandb-tags", default=None, help="Comma-separated W&B tags.")
     parser.add_argument("--wandb-mode", default=os.environ.get("WANDB_MODE", "online"))
@@ -638,6 +680,8 @@ def main() -> None:
         raise ValueError("workers must be positive")
     if args.total_timesteps <= 0:
         raise ValueError("total-timesteps must be positive")
+    if args.max_ticks <= 0:
+        raise ValueError("max-ticks must be positive")
     if args.resume and not args.run_name:
         raise ValueError("--resume requires --run-name so the existing run directory can be resolved")
 
@@ -668,6 +712,7 @@ def main() -> None:
         "train_profiles": train_profiles,
         "eval_profiles": eval_profiles,
         "army_composition": army_composition,
+        "max_ticks": args.max_ticks,
         "max_buildings": max_buildings,
         "total_timesteps": args.total_timesteps,
         "workers": args.workers,
@@ -683,6 +728,7 @@ def main() -> None:
         "ent_coef": args.ent_coef,
         "vf_coef": args.vf_coef,
         "max_grad_norm": args.max_grad_norm,
+        "target_kl": args.target_kl,
         "device": args.device,
         "torch_threads": args.torch_threads,
         "vec_env": args.vec_env,
@@ -693,6 +739,7 @@ def main() -> None:
         "eval_seed_start": args.eval_seed_start,
         "stochastic_eval": args.stochastic_eval,
         "load_path": str(load_path) if load_path is not None else None,
+        "keep_loaded_hparams": args.keep_loaded_hparams,
         "paths": {
             "tensorboard_log": tensorboard_log,
             "save_dir": save_dir,
@@ -754,6 +801,7 @@ def main() -> None:
             seed=seed,
             max_buildings=max_buildings,
             army_composition=army_composition,
+            max_ticks=args.max_ticks,
             monitor_cls=deps.Monitor,
             monitor_file=monitor_file,
         ))
@@ -774,6 +822,15 @@ def main() -> None:
             device=args.device,
             tensorboard_log=str(args.log_dir),
         )
+        if not args.resume and not args.keep_loaded_hparams:
+            apply_finetune_hyperparameters(model, args, lr)
+            loaded_n_steps = getattr(model, "n_steps", None)
+            if loaded_n_steps is not None and loaded_n_steps != args.n_steps:
+                print(
+                    f"loaded model keeps rollout buffer n_steps={loaded_n_steps}; "
+                    f"requested --n-steps={args.n_steps} applies only to fresh models",
+                    flush=True,
+                )
         reset_num_timesteps = False
     else:
         model = deps.MaskablePPO(
@@ -789,6 +846,7 @@ def main() -> None:
             ent_coef=args.ent_coef,
             vf_coef=args.vf_coef,
             max_grad_norm=args.max_grad_norm,
+            target_kl=args.target_kl,
             tensorboard_log=str(args.log_dir),
             device=args.device,
             verbose=1,
@@ -818,6 +876,7 @@ def main() -> None:
             episodes=args.eval_episodes,
             max_buildings=max_buildings,
             army_composition=army_composition,
+            max_ticks=args.max_ticks,
             deterministic=not args.stochastic_eval,
             best_model_path=save_dir / "best_model",
             wandb_run=wandb_run,

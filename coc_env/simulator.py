@@ -52,9 +52,12 @@ class Simulator:
         army_size: int,
         seed: int = 0,
         army_composition: dict[str, int] | None = None,
+        max_ticks: int = MAX_TICKS,
     ):
         if army_size < 0:
             raise ValueError("army_size must be non-negative")
+        if max_ticks <= 0:
+            raise ValueError("max_ticks must be positive")
         composition = (
             {"barbarian": int(army_size)}
             if army_composition is None
@@ -70,6 +73,7 @@ class Simulator:
         ]
         self.army_remaining_by_kind: dict[str, int] = composition
         self.army_size: int = sum(composition.values())
+        self.max_ticks: int = int(max_ticks)
         self.troops: list[Troop] = []
         self.tick_count: int = 0
         self.next_troop_id: int = 0
@@ -779,7 +783,7 @@ class Simulator:
     @property
     def is_truncated(self) -> bool:
         """Episode ends because the time limit fired (no other terminal cause)."""
-        return self.tick_count >= MAX_TICKS and not self.is_terminal
+        return self.tick_count >= self.max_ticks and not self.is_terminal
 
     @property
     def is_done(self) -> bool:
