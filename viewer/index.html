@@ -31,6 +31,9 @@
     --wizard:     #9b6fd3;
     --mortar:     #5aa895;
     --bomb:       #4a4f59;
+    --select:     #58a6ff;
+    --select-28:  rgba(88, 166, 255, 0.28);
+    --select-14:  rgba(88, 166, 255, 0.14);
     --threat:     rgba(194, 90, 90, 0.22);
 
     --r:          2px;
@@ -98,6 +101,12 @@
     animation: none;
   }
   .status[data-state="done"] .status-text { color: var(--ink-mute); }
+  .status[data-state="loading"] .dot {
+    background: var(--hot);
+    box-shadow: 0 0 10px var(--hot-15);
+    animation: pulse 760ms ease-in-out infinite;
+  }
+  .status[data-state="loading"] .status-text { color: var(--hot); }
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50%      { opacity: 0.35; }
@@ -146,11 +155,213 @@
   .coord-tl { top: 10px;    right: 14px; }
   .coord-br { bottom: 10px; left:  14px; }
 
-  #grid {
+  .rollout-grid {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    min-height: 0;
+  }
+  .rollout-card {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    border: 1px solid var(--rule);
+    border-radius: var(--r-frame);
+    background: rgba(20, 25, 35, 0.62);
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .rollout-card:hover,
+  .rollout-card.is-selected {
+    border-color: var(--select-28);
+  }
+  .rollout-card.is-selected {
+    border-color: var(--select);
+    background: rgba(16, 28, 44, 0.78);
+    box-shadow:
+      inset 0 0 0 2px var(--select-28),
+      0 0 0 1px rgba(88, 166, 255, 0.16),
+      0 10px 26px rgba(88, 166, 255, 0.08);
+  }
+  .rollout-card.is-selected::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(88, 166, 255, 0.42);
+    pointer-events: none;
+  }
+  .rollout-card.is-selected .rollout-card-head strong,
+  .rollout-card.is-selected .rollout-damage {
+    color: var(--select);
+  }
+  .rollout-card-head {
+    position: absolute;
+    z-index: 2;
+    top: 7px;
+    left: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink-mute);
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+  }
+  .rollout-card-head strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .rollout-card-head .rollout-damage {
+    margin-left: auto;
+    color: var(--phosphor);
+  }
+  .rollout-svg {
     width: min(100%, calc(100vh - 200px));
-    height: min(100%, calc(100vh - 200px));
+    height: 100%;
     aspect-ratio: 1 / 1;
     display: block;
+    margin: 0 auto;
+  }
+  body.is-rollout-loading .rollout-grid {
+    opacity: 0.38;
+  }
+  .rollout-overlay {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(10, 13, 18, 0.42);
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+    z-index: 5;
+  }
+  .rollout-overlay[hidden] { display: none; }
+  .rollout-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(520px, 100%);
+    max-height: min(520px, calc(100% - 16px));
+    padding: 14px 16px 16px;
+    border: 1px solid var(--rule-2);
+    border-radius: var(--r-frame);
+    background: rgba(16, 20, 27, 0.92);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
+  }
+  .rollout-panel-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .rollout-panel-copy {
+    min-width: 0;
+  }
+  .rollout-spinner {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--rule-2);
+    border-top-color: var(--hot);
+    animation: spin 760ms linear infinite;
+    flex: 0 0 auto;
+  }
+  .rollout-overlay[data-state="error"] .rollout-spinner {
+    animation: none;
+    border-color: var(--cannon);
+  }
+  .rollout-title {
+    color: var(--ink);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .rollout-detail {
+    margin-top: 3px;
+    color: var(--ink-mute);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+  .rollout-progress-list {
+    display: grid;
+    gap: 7px;
+    overflow: auto;
+    padding-right: 2px;
+  }
+  .rollout-progress-row {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 82px;
+    align-items: center;
+    gap: 10px;
+    min-height: 34px;
+    padding: 7px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.035);
+  }
+  .rollout-progress-row.is-done {
+    border-color: rgba(88, 166, 255, 0.28);
+  }
+  .rollout-progress-row.is-error {
+    border-color: rgba(255, 103, 103, 0.35);
+  }
+  .rollout-progress-index {
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .rollout-progress-main {
+    min-width: 0;
+  }
+  .rollout-progress-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 5px;
+    color: var(--ink-mute);
+    font-size: 10px;
+    letter-spacing: 0.03em;
+  }
+  .rollout-progress-seed,
+  .rollout-progress-status {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .rollout-progress-status {
+    text-align: right;
+  }
+  .rollout-progress-bar {
+    height: 4px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .rollout-progress-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--hot), var(--select));
+    transition: width 160ms ease;
+  }
+  .rollout-progress-row.is-done .rollout-progress-fill {
+    background: var(--select);
+  }
+  .rollout-progress-row.is-error .rollout-progress-fill {
+    background: var(--cannon);
+  }
+  .rollout-progress-count {
+    color: var(--ink);
+    font-size: 10px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
   /* ── readouts column ──────────────────────────────────── */
@@ -275,6 +486,87 @@
     0%   { opacity: 0; transform: scale(0.5); }
     28%  { opacity: 1; transform: scale(1); }
     100% { opacity: 0; transform: scale(1.55); }
+  }
+
+  .rollout-summary {
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+  }
+  .rollout-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .rollout-summary-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3px 8px;
+    min-width: 0;
+    min-height: 54px;
+    padding: 7px;
+    border: 1px solid var(--rule);
+    border-radius: var(--r-frame);
+    background: rgba(255, 255, 255, 0.025);
+    color: var(--ink-mute);
+    text-align: left;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .rollout-summary-card:hover:not(:disabled) {
+    border-color: var(--select-28);
+    background: var(--select-14);
+  }
+  .rollout-summary-card.is-selected {
+    border-color: var(--select);
+    background: rgba(88, 166, 255, 0.11);
+    box-shadow: inset 0 0 0 1px var(--select-28);
+  }
+  .rollout-summary-card:disabled {
+    opacity: 0.58;
+  }
+  .rollout-summary-top {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--ink-mute);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .rollout-summary-index {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .rollout-summary-card.is-selected .rollout-summary-index,
+  .rollout-summary-card.is-selected .rollout-summary-damage {
+    color: var(--select);
+  }
+  .rollout-summary-damage {
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .rollout-summary-stars {
+    align-self: end;
+    color: var(--ink-mute);
+    font-size: 10px;
+  }
+  .rollout-summary-meta {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+    color: var(--ink-mute);
+    font-size: 9px;
+  }
+  .rollout-summary-meta span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .overlays {
@@ -453,6 +745,11 @@
     background: var(--surface-2);
   }
   button:disabled { color: var(--ink-faint); border-color: var(--rule); cursor: not-allowed; }
+  select:disabled,
+  input:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
   button.primary {
     color: var(--phosphor);
     border-color: var(--phosphor-15);
@@ -530,6 +827,17 @@
     border-color: var(--ink-mute);
     background: var(--surface-2);
   }
+  .replay-scrub input {
+    width: min(280px, 28vw);
+    accent-color: var(--phosphor);
+  }
+  .replay-scrub output {
+    min-width: 72px;
+    color: var(--ink);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+  }
   .sw.th    { background: var(--th); }
   .sw.can   { background: var(--cannon); }
   .sw.wiz   { background: var(--wizard); }
@@ -541,14 +849,6 @@
   .sw.wb    { background: #d9c0a2; border-radius: 50%; }
 
   /* ── svg primitives ───────────────────────────────────── */
-  .perim {
-    fill: transparent;
-    cursor: pointer;
-    transition: fill 100ms;
-  }
-  .perim:hover { fill: var(--hot-15); }
-  .perim.disabled { cursor: not-allowed; }
-  .perim.disabled:hover { fill: transparent; }
   .grid-rule { stroke: var(--rule); stroke-width: 0.5; }
   .tick-mark { stroke: var(--ink-faint); stroke-width: 1; }
   .frame-stroke { stroke: var(--rule-2); fill: none; stroke-width: 1; }
@@ -869,7 +1169,19 @@
     <section class="board">
       <span class="board-coords coord-tl">44 × 44</span>
       <span class="board-coords coord-br">τ · 0.25s</span>
-      <svg id="grid" viewBox="0 0 616 616" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="rollout-grid" id="rollout-grid"></div>
+      <div class="rollout-overlay" id="rollout-overlay" hidden>
+        <div class="rollout-panel">
+          <div class="rollout-panel-head">
+            <div class="rollout-spinner" aria-hidden="true"></div>
+            <div class="rollout-panel-copy">
+              <div class="rollout-title" id="rollout-title">computing rollout</div>
+              <div class="rollout-detail" id="rollout-detail">server is simulating the full episode</div>
+            </div>
+          </div>
+          <div class="rollout-progress-list" id="rollout-progress-list" aria-live="polite"></div>
+        </div>
+      </div>
     </section>
 
     <aside class="readouts">
@@ -904,6 +1216,11 @@
 
       <div class="row-line">
         <span class="stars" id="stars" aria-label="0 of 3 stars"></span>
+      </div>
+
+      <div class="rollout-summary">
+        <div class="k">rollouts</div>
+        <div class="rollout-summary-grid" id="rollout-summary-grid"></div>
       </div>
 
       <div class="overlays">
@@ -970,18 +1287,17 @@
 
   <footer class="transport">
     <div class="btns">
-      <button id="btn-reset">reset</button>
+      <button id="btn-reset">new rollout</button>
       <button id="btn-play" class="primary">▸ play</button>
-      <button id="btn-tick">tick +1</button>
     </div>
+    <label class="ctrl-group replay-scrub">
+      <span>τ</span>
+      <input type="range" id="replay-scrub" min="0" max="0" value="0" step="1" aria-label="replay frame">
+      <output id="replay-frame-readout">0 / 0</output>
+    </label>
     <label class="ctrl-group profile-select">
       <select id="profile-select" aria-label="base profile">
         <option value="hard" selected>hard</option>
-      </select>
-    </label>
-    <label class="ctrl-group profile-select">
-      <select id="troop-select" aria-label="troop kind">
-        <option value="barbarian" selected>barbarian</option>
       </select>
     </label>
     <div class="ctrl-group">
@@ -995,7 +1311,6 @@
     </div>
     <div class="ctrl-group">
       <div class="chips" id="agent-chips">
-        <button class="chip" data-agent="off">manual</button>
         <button class="chip active" data-agent="random">random</button>
       </div>
     </div>
@@ -1104,10 +1419,10 @@ function defenseFrameIdx(b, targets, aimCache) {
   return aimCache.get(b.id) ?? 0;
 }
 
-function buildingSprite(b, cannonTargets) {
+function buildingSprite(b, cannonTargets, aimCaches = { cannon: cannonAim, mortar: mortarAim }) {
   if (b.kind === "townhall") return SPRITES.townhall;
-  if (b.kind === "cannon")   return CANNON_FRAMES[defenseFrameIdx(b, cannonTargets, cannonAim)];
-  if (b.kind === "mortar")   return MORTAR_FRAMES[defenseFrameIdx(b, cannonTargets, mortarAim)];
+  if (b.kind === "cannon")   return CANNON_FRAMES[defenseFrameIdx(b, cannonTargets, aimCaches.cannon)];
+  if (b.kind === "mortar")   return MORTAR_FRAMES[defenseFrameIdx(b, cannonTargets, aimCaches.mortar)];
   if (b.kind === "wizard_tower") return SPRITES.wizard_tower;
   if (b.kind === "bomb")     return SPRITES.bomb;
   if (b.kind === "storage")  return b.hp / b.max_hp < 0.5 ? SPRITES.storage_dmg : SPRITES.storage_full;
@@ -1170,8 +1485,16 @@ function createTrailGradient(layer, start, end, color, endOpacity) {
   };
 }
 
+function selectedFxLayer() {
+  return selectedRollout()?.svg?.querySelector("#grid-fx") || document.getElementById("grid-fx");
+}
+
+function selectedDeadLayer() {
+  return selectedRollout()?.svg?.querySelector("#grid-dead") || document.getElementById("grid-dead");
+}
+
 function spawnCannonball(fx, fy, tx, ty) {
-  const layer = document.getElementById("grid-fx");
+  const layer = selectedFxLayer();
   if (!layer) return;
   const start = cannonballStart(fx, fy, tx, ty);
   if (!start) return;
@@ -1202,7 +1525,7 @@ function spawnCannonball(fx, fy, tx, ty) {
 }
 
 function spawnMortarShell(fx, fy, tx, ty, durationMs, radiusCells = 1.5) {
-  const layer = document.getElementById("grid-fx");
+  const layer = selectedFxLayer();
   if (!layer) return;
   const start = isoGrid(fx, fy);
   const end = isoGrid(tx, ty);
@@ -1265,7 +1588,7 @@ function spawnMortarShell(fx, fy, tx, ty, durationMs, radiusCells = 1.5) {
 }
 
 function spawnMortarImpact(tx, ty, radiusCells = 1.5) {
-  const layer = document.getElementById("grid-fx");
+  const layer = selectedFxLayer();
   if (!layer) return;
   const p = isoGrid(tx, ty);
   const impact = el("circle", {
@@ -1279,7 +1602,7 @@ function spawnMortarImpact(tx, ty, radiusCells = 1.5) {
 }
 
 function spawnImpactFlash(tx, ty, radiusCells = 0.3) {
-  const layer = document.getElementById("grid-fx");
+  const layer = selectedFxLayer();
   if (!layer) return;
   const p = isoGrid(tx, ty);
   const impact = el("circle", {
@@ -1293,7 +1616,7 @@ function spawnImpactFlash(tx, ty, radiusCells = 0.3) {
 }
 
 function spawnWizardImpact(tx, ty, radiusCells, seed) {
-  const layer = document.getElementById("grid-fx");
+  const layer = selectedFxLayer();
   if (!layer) return;
   const p = isoGrid(tx, ty);
   spawnWizardSplash(layer, p.x, p.y, radiusCells, seed);
@@ -1369,7 +1692,7 @@ function spawnWizardSplash(layer, cx, cy, radiusCells, seed) {
 }
 
 function spawnWizardZap(fx, fy, tx, ty, radiusCells, seed) {
-  const layer = document.getElementById("grid-fx");
+  const layer = selectedFxLayer();
   if (!layer) return;
   const start = isoGrid(fx, fy);
   const end = isoGrid(tx, ty);
@@ -1405,7 +1728,7 @@ function spawnWizardZap(fx, fy, tx, ty, radiusCells, seed) {
 }
 
 function spawnWallBreakerExplosion(x, y, radiusCells, seed) {
-  const layer = document.getElementById("grid-fx");
+  const layer = selectedFxLayer();
   if (!layer) return;
   const p = isoGrid(x, y);
   const radius = splashEllipseRadius(radiusCells);
@@ -1498,7 +1821,10 @@ function spawnWallBreakerExplosion(x, y, radiusCells, seed) {
 
 function maybeFireDefenseProjectiles() {
   if (!state) return;
-  const events = transientFxEvents();
+  playFxEvents(transientFxEvents());
+}
+
+function playFxEvents(events) {
   if (events.length === 0) return;
   const firstTick = events.reduce((minTick, event) => Math.min(minTick, fxEventTick(event)), fxEventTick(events[0]));
   const msPerTick = playing ? TICK_BASE_MS / Math.max(1, playSpeed) : 0;
@@ -1620,7 +1946,7 @@ const TROOP_HP_BAR_HEIGHT = 2.4;
 
 // Orthogonal-to-iso projection. The geometric overlay layer (#grid-rotated)
 // has this same transform applied as a single SVG transform attribute, so
-  // grid lines, frame, range circles, and deploy cells warp uniformly with
+  // grid lines, frame, and range circles warp uniformly with
 // the diamond. Sprites live in untransformed layers and are placed
 // at iso(centre) positions — keeps them upright and original-sized so the
 // already-iso-drawn art doesn't get double-rotated.
@@ -1705,7 +2031,7 @@ function debugTransformString() {
   return `matrix(${a} ${b} ${cc} ${d} ${e} ${f})`;
 }
 function applyDebugTransform() {
-  const r = document.getElementById("grid-rotated");
+  const r = activeGrid?.querySelector("#grid-rotated") || document.getElementById("grid-rotated");
   if (r) r.setAttribute("transform", debugTransformString());
 }
 function formatDebugValue(key, value) {
@@ -1727,15 +2053,17 @@ function setDebugValue(key, value) {
   if (!(key in DEFAULT_DEBUG) || !Number.isFinite(value)) return;
   DEBUG[key] = value;
   boardBuildingsKey = "";
+  for (const view of rollouts) view.boardBuildingsKey = "";
   saveDebugSettings();
   syncDebugControls();
   render();
 }
 loadDebugSettings();
 
-const grid = document.getElementById("grid");
+const rolloutGrid = document.getElementById("rollout-grid");
 const trace = document.getElementById("trace");
 const SVG_NS = "http://www.w3.org/2000/svg";
+let activeGrid = null;
 function el(tag, attrs = {}) {
   const e = document.createElementNS(SVG_NS, tag);
   setAttrs(e, attrs);
@@ -1934,22 +2262,29 @@ let troopFacing = new Map();      // troop id -> "left" | "right"; sprite face d
 let previousStars = 0;
 let boardGuideKey = "";
 let boardRangeKey = "";
-let boardDeployKey = "";
 let boardBuildingsKey = "";
 let actionStreamKeys = [];
 let traceNodes = null;
-let selectedTroopKind = "barbarian";
+let rollouts = [];
+let selectedRolloutIndex = 0;
+let replayFrameIndex = 0;
+let replayPlayhead = 0;
+let rolloutLoading = false;
+let rolloutError = "";
+let rolloutMessage = "";
+let rolloutProgress = [];
+let lastRolloutMs = 0;
+let availableProfiles = ["hard"];
 
 // playback state
 const TICK_BASE_MS = 250;          // 1× = real-time (matches TICK_SECONDS = 0.25s)
+const ROLLOUT_COUNT = 8;
 let playing = false;
 let playFrame = null;
-let playbackBusy = false;
 let playClockLast = 0;
-let tickAccumulator = 0;
 const DEFAULT_PROFILE = "hard";
 let playSpeed = 32;                // 1, 2, 4, 8, 32
-let agentMode = "random";          // "off" or "random"
+let agentMode = "random";
 
 async function api(method, path, body) {
   const r = await fetch(path, {
@@ -1961,8 +2296,358 @@ async function api(method, path, body) {
   return r.json();
 }
 
-async function reset() {
+async function streamRolloutBatch(body, onMessage) {
+  const response = await fetch("/rollouts/stream", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) throw new Error(`/rollouts/stream ${response.status}: ${await response.text()}`);
+
+  async function emitLine(rawLine) {
+    const line = rawLine.trim();
+    if (!line) return;
+    const message = JSON.parse(line);
+    await onMessage(message);
+    if (message.type === "error") throw new Error(message.error || "rollout stream failed");
+  }
+
+  if (!response.body) {
+    const text = await response.text();
+    for (const line of text.split("\n")) await emitLine(line);
+    return;
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    let newline = buffer.indexOf("\n");
+    while (newline !== -1) {
+      await emitLine(buffer.slice(0, newline));
+      buffer = buffer.slice(newline + 1);
+      newline = buffer.indexOf("\n");
+    }
+  }
+  buffer += decoder.decode();
+  await emitLine(buffer);
+}
+
+function staticBuildingMap(staticPayload) {
+  return new Map((staticPayload?.buildings || []).map(building => [building.id, building]));
+}
+
+function inflateReplayFrame(view, frame) {
+  if (!frame || !Object.prototype.hasOwnProperty.call(frame, "rubble_ids")) return frame;
+  const staticPayload = view.replay.static || {};
+  const previous = view.replay.frames[view.replay.frames.length - 1] || {};
+  const buildingMap = view.staticBuildings || new Map();
+  const fallbackBuilding = id => ({
+    id,
+    kind: "storage",
+    x: 0,
+    y: 0,
+    size: 1,
+    max_hp: 1,
+    is_defense: false,
+    blocks_movement: true,
+    counts_for_score: true,
+    attack_range: 0,
+    min_attack_range: 0,
+    splash_radius: 0,
+    is_trap: false,
+    dps: 0,
+  });
+
+  return {
+    tick: frame.tick,
+    max_ticks: staticPayload.max_ticks ?? previous.max_ticks ?? 0,
+    tick_seconds: staticPayload.tick_seconds ?? previous.tick_seconds ?? 0.25,
+    decision_interval: staticPayload.decision_interval ?? previous.decision_interval ?? 1,
+    grid_size: staticPayload.grid_size ?? previous.grid_size ?? GRID,
+    damage_pct: frame.damage_pct,
+    stars: frame.stars,
+    score: frame.score,
+    army_remaining: frame.army_remaining,
+    army_remaining_by_kind: frame.army_remaining_by_kind || previous.army_remaining_by_kind || {},
+    army_initial: staticPayload.army_initial ?? previous.army_initial ?? 0,
+    is_done: frame.is_done,
+    is_terminal: frame.is_terminal,
+    is_truncated: frame.is_truncated,
+    townhall_destroyed: frame.townhall_destroyed,
+    last_action: frame.last_action,
+    last_reward: frame.last_reward,
+    total_reward: frame.total_reward,
+    actions: frame.actions || previous.actions || [],
+    ticks_since_decision: frame.ticks_since_decision,
+    seed: view.replay.seed,
+    profile: view.replay.profile,
+    available_profiles: staticPayload.available_profiles || view.replay.available_profiles || availableProfiles,
+    buildings: (frame.buildings || []).map(parts => {
+      if (!Array.isArray(parts)) return parts;
+      const [id, hp, cooldownRemaining, triggered] = parts;
+      const base = buildingMap.get(id) || fallbackBuilding(id);
+      return {
+        ...base,
+        hp,
+        max_hp: base.max_hp ?? hp,
+        cooldown_remaining: cooldownRemaining,
+        triggered: Boolean(triggered),
+      };
+    }),
+    rubble: (frame.rubble_ids || [])
+      .map(id => buildingMap.get(id) || null)
+      .filter(Boolean)
+      .map(building => ({
+        id: building.id,
+        kind: building.kind,
+        x: building.x,
+        y: building.y,
+        size: building.size,
+      })),
+    troops: (frame.troops || []).map(parts => {
+      if (!Array.isArray(parts)) return parts;
+      const [id, kind, x, y, hp, maxHp] = parts;
+      return { id, kind, x, y, hp, max_hp: maxHp };
+    }),
+    engagements: frame.engagements || [],
+    event_stream: frame.event_stream || [],
+    path_predictions: frame.path_predictions || [],
+  };
+}
+
+function appendRolloutFrames(index, frames, staticPayload = null, frameCount = null) {
+  const view = rollouts[index];
+  if (!view) return;
+  if (staticPayload) {
+    view.replay.static = staticPayload;
+    view.staticBuildings = staticBuildingMap(staticPayload);
+  }
+  for (const frame of frames || []) {
+    view.replay.frames.push(inflateReplayFrame(view, frame));
+  }
+  if (Number.isInteger(frameCount)) view.replay.frame_count = frameCount;
+  if (!view.state && view.replay.frames.length) view.state = view.replay.frames[0];
+  const selected = selectedRollout();
+  if ((!selected || !selected.state) && view.state) selectedRolloutIndex = index;
+}
+
+function initRolloutProgress(count, seed) {
+  rolloutProgress = Array.from({ length: count }, (_, index) => ({
+    index,
+    seed: seed + index,
+    state: "queued",
+    tick: 0,
+    maxTicks: 0,
+    frames: 0,
+    frameCount: 0,
+    message: "queued",
+  }));
+  renderRolloutProgress();
+}
+
+function updateRolloutProgress(index, patch) {
+  if (!Number.isInteger(index) || index < 0) return;
+  if (!rolloutProgress[index]) {
+    rolloutProgress[index] = {
+      index,
+      seed: 0,
+      state: "queued",
+      tick: 0,
+      maxTicks: 0,
+      frames: 0,
+      frameCount: 0,
+      message: "queued",
+    };
+  }
+  rolloutProgress[index] = { ...rolloutProgress[index], ...patch };
+  renderRolloutProgress();
+}
+
+function rolloutProgressPercent(item) {
+  if (!item) return 0;
+  if (item.state === "done") return 100;
+  if (item.state === "error") return Math.max(6, Math.min(100, item.percent || 0));
+  if (item.maxTicks > 0) return Math.max(3, Math.min(96, (item.tick / item.maxTicks) * 100));
+  if (item.frameCount > 0) return Math.max(3, Math.min(96, (item.frames / item.frameCount) * 100));
+  if (item.frames > 0) return Math.min(92, Math.max(3, item.frames / 8));
+  return item.state === "computing" || item.state === "receiving" ? 3 : 0;
+}
+
+function rolloutProgressStatus(item) {
+  if (!item) return "queued";
+  if (item.state === "done") return `complete · ${item.frameCount || item.frames} frames`;
+  if (item.state === "error") return item.message || "failed";
+  if (item.tick > 0 && item.maxTicks > 0) return `tick ${item.tick} / ${item.maxTicks}`;
+  if (item.frames > 0) return `receiving · ${item.frames} frames`;
+  return item.message || item.state || "queued";
+}
+
+function renderRolloutProgress() {
+  const list = document.getElementById("rollout-progress-list");
+  if (!list) return;
+  const items = rolloutProgress.length ? rolloutProgress : [];
+  list.replaceChildren();
+  for (const item of items) {
+    const row = document.createElement("div");
+    row.className = `rollout-progress-row is-${item.state || "queued"}`;
+
+    const index = document.createElement("div");
+    index.className = "rollout-progress-index";
+    index.textContent = `#${item.index + 1}`;
+
+    const main = document.createElement("div");
+    main.className = "rollout-progress-main";
+    const meta = document.createElement("div");
+    meta.className = "rollout-progress-meta";
+    const seed = document.createElement("span");
+    seed.className = "rollout-progress-seed";
+    seed.textContent = item.seed ? `seed ${item.seed}` : "seed pending";
+    const status = document.createElement("span");
+    status.className = "rollout-progress-status";
+    status.textContent = rolloutProgressStatus(item);
+    meta.append(seed, status);
+
+    const bar = document.createElement("div");
+    bar.className = "rollout-progress-bar";
+    const fill = document.createElement("div");
+    fill.className = "rollout-progress-fill";
+    fill.style.width = `${rolloutProgressPercent(item).toFixed(1)}%`;
+    bar.appendChild(fill);
+    main.append(meta, bar);
+
+    const count = document.createElement("div");
+    count.className = "rollout-progress-count";
+    count.textContent = item.state === "done"
+      ? "ready"
+      : item.frames > 0
+        ? `${item.frames}`
+        : item.state;
+
+    row.append(index, main, count);
+    list.appendChild(row);
+  }
+}
+
+async function loadRollouts(options = {}) {
+  const shouldResume = Boolean(options.autoplay);
   pause();
+  rolloutError = "";
+  rolloutLoading = true;
+  lastRolloutMs = 0;
+  resetVisualState();
+  state = null;
+  rollouts = [];
+  selectedRolloutIndex = 0;
+  replayFrameIndex = 0;
+  replayPlayhead = 0;
+  renderRolloutShells();
+  const seed = Number.isInteger(options.seed) ? options.seed : Math.floor(Math.random() * 1e6);
+  rolloutMessage = `starting ${ROLLOUT_COUNT} rollouts`;
+  initRolloutProgress(ROLLOUT_COUNT, seed);
+  updateRolloutUi();
+  const started = performance.now();
+  let loadSucceeded = false;
+  try {
+    await streamRolloutBatch({
+      seed,
+      count: ROLLOUT_COUNT,
+      profile: selectedProfile(),
+      agent_mode: agentMode,
+      include_paths: pathsEnabled(),
+    }, message => {
+      if (message.type === "start") {
+        availableProfiles = message.available_profiles || availableProfiles;
+        initRolloutProgress(message.count, message.seed);
+        rollouts = Array.from({ length: message.count }, (_, index) => createRolloutView({
+          seed: message.seed + index,
+          profile: message.profile,
+          agent_mode: message.agent_mode,
+          available_profiles: message.available_profiles || availableProfiles,
+          frames: [],
+        }, index));
+        renderRolloutShells();
+        rolloutMessage = `queued 0 / ${message.count} rollouts`;
+      } else if (message.type === "progress") {
+        updateRolloutProgress(message.index, {
+          state: "computing",
+          tick: message.tick || 0,
+          maxTicks: message.max_ticks || 0,
+          message: message.message || "computing",
+        });
+        rolloutMessage = message.message || `computing rollout ${message.index + 1} / ${message.count}`;
+      } else if (message.type === "frames") {
+        appendRolloutFrames(message.index, message.frames, message.static, message.frame_count);
+        applyReplayPlayhead(replayPlayhead, false);
+        const view = rollouts[message.index];
+        const framesReceived = view?.replay.frames.length || 0;
+        const lastFrame = view?.replay.frames[framesReceived - 1] || null;
+        updateRolloutProgress(message.index, {
+          state: "receiving",
+          frames: framesReceived,
+          tick: lastFrame?.tick || 0,
+          maxTicks: lastFrame?.max_ticks || 0,
+          frameCount: Number.isInteger(message.frame_count) ? message.frame_count : 0,
+          message: "receiving frames",
+        });
+        if (Number.isInteger(message.start)) {
+          rolloutMessage = `receiving rollout ${message.index + 1} / ${message.count || ROLLOUT_COUNT}`;
+        }
+      } else if (message.type === "rollout_done") {
+        const view = rollouts[message.index];
+        if (view && Number.isInteger(message.frame_count)) view.replay.frame_count = message.frame_count;
+        updateRolloutProgress(message.index, {
+          state: "done",
+          frameCount: message.frame_count || view?.replay.frames.length || 0,
+          frames: view?.replay.frames.length || message.frame_count || 0,
+          tick: view?.replay.frames.at(-1)?.tick || 0,
+          maxTicks: view?.replay.frames.at(-1)?.max_ticks || 0,
+          message: "complete",
+        });
+        rolloutMessage = `finished ${message.completed} / ${message.count} rollouts`;
+      } else if (message.type === "rollout") {
+        const viewIndex = Number.isInteger(message.index) ? message.index : rollouts.length;
+        rollouts[viewIndex] = createRolloutView(message.rollout, viewIndex);
+        renderRolloutShells();
+        applyReplayPlayhead(replayPlayhead, false);
+        updateRolloutProgress(viewIndex, {
+          state: "done",
+          frames: message.rollout.frames?.length || 0,
+          frameCount: message.rollout.frame_count || message.rollout.frames?.length || 0,
+          tick: message.rollout.frames?.at(-1)?.tick || 0,
+          maxTicks: message.rollout.frames?.at(-1)?.max_ticks || 0,
+          message: "complete",
+        });
+        rolloutMessage = `generated ${message.completed} / ${message.count} rollouts`;
+      } else if (message.type === "done") {
+        rolloutMessage = `generated ${message.completed} / ${message.count} rollouts`;
+      } else if (message.type === "error") {
+        updateRolloutProgress(message.index, {
+          state: "error",
+          message: message.error || "failed",
+        });
+      }
+      updateRolloutUi();
+    });
+    lastRolloutMs = performance.now() - started;
+    loadSucceeded = rollouts.some(view => view?.replay?.frames?.length);
+  } catch (error) {
+    rolloutError = error instanceof Error ? error.message : String(error);
+    console.error(error);
+  } finally {
+    rolloutLoading = false;
+    rolloutMessage = !rolloutError && lastRolloutMs > 0
+      ? `ready: ${rollouts.length} rollouts in ${lastRolloutMs.toFixed(0)}ms`
+      : "";
+    updateRolloutUi();
+    if (loadSucceeded && shouldResume) play();
+  }
+}
+
+function resetVisualState() {
   damageHistory = [];
   livePrev = new Map();
   troopFacing = new Map();
@@ -1970,29 +2655,165 @@ async function reset() {
   cannonAim = new Map();
   mortarAim = new Map();
   pendingProjectileImpacts = new Set();
+  boardGuideKey = "";
+  boardRangeKey = "";
   boardBuildingsKey = "";
+  actionStreamKeys = [];
+  traceNodes = null;
   clearDeadLayer();
   clearFxLayer();
-  state = await api("POST", "/reset", {
-    seed: Math.floor(Math.random() * 1e6),
-    profile: selectedProfile(),
-    include_paths: pathsEnabled(),
-  });
-  afterUpdate();
 }
 
-function clearFxLayer() {
-  const f = document.getElementById("grid-fx");
+function createRolloutView(replay, index) {
+  return {
+    index,
+    replay,
+    state: replay.frames?.[0] || null,
+    frameIndex: 0,
+    playhead: 0,
+    damageHistory: [],
+    livePrev: new Map(),
+    troopFacing: new Map(),
+    cannonAim: new Map(),
+    mortarAim: new Map(),
+    pendingProjectileImpacts: new Set(),
+    boardGuideKey: "",
+    boardRangeKey: "",
+    boardBuildingsKey: "",
+    staticBuildings: staticBuildingMap(replay.static),
+    card: null,
+    svg: null,
+  };
+}
+
+function selectedRollout() {
+  return rollouts[selectedRolloutIndex] || rollouts.find(Boolean) || null;
+}
+
+function rolloutSummaryState(view) {
+  if (!view) return null;
+  const frames = view.replay?.frames || [];
+  return view.state || frames[frames.length - 1] || null;
+}
+
+function renderRolloutSummary() {
+  const host = document.getElementById("rollout-summary-grid");
+  if (!host) return;
+  host.replaceChildren();
+  const views = rollouts.filter(Boolean);
+  if (!views.length) {
+    const empty = document.createElement("div");
+    empty.className = "action-empty";
+    empty.textContent = "no rollouts";
+    host.appendChild(empty);
+    return;
+  }
+
+  for (const view of views) {
+    const snapshot = rolloutSummaryState(view);
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "rollout-summary-card";
+    card.classList.toggle("is-selected", view.index === selectedRolloutIndex);
+    card.disabled = !snapshot;
+    card.setAttribute("aria-pressed", view.index === selectedRolloutIndex ? "true" : "false");
+    card.setAttribute("aria-label", `select rollout ${view.index + 1}`);
+    card.addEventListener("click", () => selectRollout(view.index));
+
+    const top = document.createElement("span");
+    top.className = "rollout-summary-top";
+    const index = document.createElement("span");
+    index.className = "rollout-summary-index";
+    index.textContent = `#${view.index + 1}`;
+    const seed = document.createElement("span");
+    seed.textContent = `seed ${view.replay.seed}`;
+    top.append(index, seed);
+
+    const damage = document.createElement("span");
+    damage.className = "rollout-summary-damage";
+    damage.textContent = snapshot ? `${(snapshot.damage_pct * 100).toFixed(1)}%` : "--";
+
+    const stars = document.createElement("span");
+    stars.className = "rollout-summary-stars";
+    stars.textContent = snapshot ? `${snapshot.stars} stars` : "pending";
+
+    const meta = document.createElement("span");
+    meta.className = "rollout-summary-meta";
+    const tick = document.createElement("span");
+    tick.textContent = snapshot ? `t ${snapshot.tick}` : "t --";
+    const active = document.createElement("span");
+    active.textContent = snapshot ? `field ${snapshot.troops.length}` : "field --";
+    const reward = document.createElement("span");
+    reward.textContent = snapshot ? fmtReward(snapshot.total_reward) : "+0.000";
+    meta.append(tick, active, reward);
+
+    card.append(top, damage, stars, meta);
+    host.appendChild(card);
+  }
+}
+
+function renderRolloutShells() {
+  rolloutGrid.replaceChildren();
+  for (const view of rollouts) {
+    if (!view) continue;
+    const card = document.createElement("article");
+    card.className = "rollout-card";
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `select rollout ${view.index + 1}`);
+    card.innerHTML = `
+      <div class="rollout-card-head">
+        <strong>#${view.index + 1}</strong>
+        <span class="rollout-seed">seed ${view.replay.seed}</span>
+        <span class="rollout-damage">0.0%</span>
+      </div>
+    `;
+    const svg = el("svg", {
+      viewBox: `0 0 ${SVG_SIZE} ${SVG_SIZE}`,
+      preserveAspectRatio: "xMidYMid meet",
+      class: "rollout-svg",
+    });
+    card.appendChild(svg);
+    card.addEventListener("click", () => selectRollout(view.index));
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        selectRollout(view.index);
+      }
+    });
+    view.card = card;
+    view.svg = svg;
+    rolloutGrid.appendChild(card);
+  }
+}
+
+function selectRollout(index) {
+  if (index < 0 || index >= rollouts.length) return;
+  if (!rollouts[index]?.state) return;
+  selectedRolloutIndex = index;
+  actionStreamKeys = [];
+  syncSelectedState();
+  render();
+}
+
+function syncSelectedState() {
+  const view = selectedRollout();
+  state = view?.state || null;
+  damageHistory = view?.damageHistory || [];
+}
+
+function clearFxLayer(view = selectedRollout()) {
+  const f = view?.svg?.querySelector("#grid-fx");
   if (f) f.innerHTML = "";
 }
 
-function clearDeadLayer() {
-  const d = document.getElementById("grid-dead");
+function clearDeadLayer(view = selectedRollout()) {
+  const d = view?.svg?.querySelector("#grid-dead");
   if (d) d.innerHTML = "";
 }
 
 function spawnTombstone(x, y) {
-  const dead = document.getElementById("grid-dead");
+  const dead = selectedDeadLayer();
   if (!dead) return;
   const p = isoGrid(x, y);
   dead.appendChild(el("image", {
@@ -2007,7 +2828,7 @@ function spawnTombstone(x, y) {
 }
 
 function spawnDeath(x, y, facing, kind = "barbarian") {
-  const dead = document.getElementById("grid-dead");
+  const dead = selectedDeadLayer();
   if (!dead) return;
   if (kind === "wall_breaker") {
     setTimeout(() => spawnTombstone(x, y), WALL_BREAKER_TOMBSTONE_DELAY_MS);
@@ -2033,62 +2854,111 @@ function spawnDeath(x, y, facing, kind = "barbarian") {
   }, 1200);
 }
 
-function updateDeaths() {
-  if (!state) return;
-  const currentIds = new Set(state.troops.map(t => t.id));
-  for (const [id, info] of livePrev) {
-    if (!currentIds.has(id)) spawnDeath(info.x, info.y, troopFacing.get(id), info.kind);
-  }
-  // facing follows horizontal motion; sprites are drawn facing right by default
-  for (const t of state.troops) {
-    const prev = livePrev.get(t.id);
-    if (prev) {
-      const dx = t.x - prev.x;
-      if (Math.abs(dx) > 0.05) troopFacing.set(t.id, dx < 0 ? "left" : "right");
-    } else {
-      // first sighting: guess from spawn position relative to grid center
-      troopFacing.set(t.id, t.x > GRID / 2 ? "left" : "right");
+function updateDeaths(view = selectedRollout()) {
+  if (!view?.state) return;
+  const currentIds = new Set(view.state.troops.map(t => t.id));
+  for (const [id, info] of view.livePrev) {
+    if (!currentIds.has(id) && view.index === selectedRolloutIndex) {
+      spawnDeath(info.x, info.y, view.troopFacing.get(id), info.kind);
     }
   }
-  livePrev = new Map(state.troops.map(t => [t.id, { x: t.x, y: t.y, kind: t.kind }]));
-  for (const id of [...troopFacing.keys()]) {
-    if (!currentIds.has(id)) troopFacing.delete(id);
+  // facing follows horizontal motion; sprites are drawn facing right by default
+  for (const t of view.state.troops) {
+    const prev = view.livePrev.get(t.id);
+    if (prev) {
+      const dx = t.x - prev.x;
+      if (Math.abs(dx) > 0.05) view.troopFacing.set(t.id, dx < 0 ? "left" : "right");
+    } else {
+      // first sighting: guess from spawn position relative to grid center
+      view.troopFacing.set(t.id, t.x > GRID / 2 ? "left" : "right");
+    }
+  }
+  view.livePrev = new Map(view.state.troops.map(t => [t.id, { x: t.x, y: t.y, kind: t.kind }]));
+  for (const id of [...view.troopFacing.keys()]) {
+    if (!currentIds.has(id)) view.troopFacing.delete(id);
   }
 }
 
-async function tickOne() {
-  state = await api("POST", "/advance", { ticks: 1, agent_mode: "off", include_paths: pathsEnabled() });
-  afterUpdate();
-}
-async function deployTroop(action) {
-  state = await api("POST", "/deploy", { action, include_paths: pathsEnabled() });
-  afterUpdate();
-}
-async function agentRandom() {
-  state = await api("POST", "/agent_random", { include_paths: pathsEnabled() });
-  afterUpdate();
-}
-async function refreshState() {
-  state = await api("GET", `/state?include_paths=${pathsEnabled() ? 1 : 0}`);
-  afterUpdate();
+function syncDamageHistory(view, frameIndex) {
+  const frames = view?.replay?.frames || [];
+  view.damageHistory = frames.slice(0, frameIndex + 1).map(frame => [frame.tick, frame.damage_pct]);
 }
 
-function afterUpdate() {
-  if (state) {
-    const last = damageHistory[damageHistory.length - 1];
-    if (!last || last[0] !== state.tick) damageHistory.push([state.tick, state.damage_pct]);
-    updateDeaths();
-    maybeFireDefenseProjectiles();
+function replayStateAt(view, playhead) {
+  const frames = view?.replay?.frames || [];
+  if (frames.length === 0) return null;
+  const index = Math.max(0, Math.min(frames.length - 1, Math.floor(playhead)));
+  const base = frames[index];
+  const next = frames[index + 1];
+  if (!next) return base;
+  const alpha = Math.max(0, Math.min(1, playhead - index));
+  if (alpha <= 0) return base;
+  const nextTroops = new Map(next.troops.map(troop => [troop.id, troop]));
+  return {
+    ...base,
+    troops: base.troops.map(troop => {
+      const nextTroop = nextTroops.get(troop.id);
+      if (!nextTroop || nextTroop.kind !== troop.kind) return troop;
+      return {
+        ...troop,
+        x: troop.x + (nextTroop.x - troop.x) * alpha,
+        y: troop.y + (nextTroop.y - troop.y) * alpha,
+      };
+    }),
+  };
+}
+
+function emitReplayEvents(view, fromIndex, toIndex) {
+  const frames = view?.replay?.frames || [];
+  if (toIndex <= fromIndex) return;
+  const events = [];
+  for (let i = fromIndex + 1; i <= toIndex && i < frames.length; i++) {
+    events.push(...(frames[i].event_stream || []));
   }
+  if (view.index === selectedRolloutIndex) playFxEvents(events);
+}
+
+function applyReplayPlayhead(playhead, emitEvents = false) {
+  if (!rollouts.length) return;
+  const maxIndex = maxReplayIndex();
+  const clamped = Math.max(0, Math.min(maxIndex, playhead));
+  for (const view of rollouts) {
+    const viewMax = Math.max(0, (view.replay.frames?.length || 1) - 1);
+    const viewPlayhead = Math.min(clamped, viewMax);
+    const nextIndex = Math.floor(viewPlayhead);
+    if (emitEvents) emitReplayEvents(view, view.frameIndex, nextIndex);
+    view.frameIndex = nextIndex;
+    view.playhead = viewPlayhead;
+    view.state = replayStateAt(view, viewPlayhead);
+    syncDamageHistory(view, nextIndex);
+    updateDeaths(view);
+  }
+  replayFrameIndex = Math.floor(clamped);
+  replayPlayhead = clamped;
+  syncSelectedState();
   render();
-  if (state && state.is_done && playing) pause();
+  if (replayFrameIndex >= maxIndex && playing) pause();
+}
+
+function seekReplayFrame(frameIndex) {
+  if (rolloutLoading || !rollouts.length) return;
+  pause();
+  for (const view of rollouts) {
+    clearFxLayer(view);
+    clearDeadLayer(view);
+    view.livePrev = new Map();
+    view.troopFacing = new Map();
+    view.pendingProjectileImpacts = new Set();
+  }
+  pendingProjectileImpacts = new Set();
+  applyReplayPlayhead(frameIndex, false);
 }
 
 function play() {
-  if (playing || !state || state.is_done) return;
+  if (rolloutLoading || playing || !rollouts.length) return;
+  if (replayFrameIndex >= maxReplayIndex()) return;
   playing = true;
   playClockLast = performance.now();
-  tickAccumulator = 0;
   setPlayButton(true);
   scheduleTick();
 }
@@ -2099,53 +2969,38 @@ function pause() {
 }
 function setPlayButton(isPlaying) {
   const btn = document.getElementById("btn-play");
-  btn.textContent = isPlaying ? "■ pause" : "▸ play";
+  btn.textContent = rolloutLoading ? "loading" : (isPlaying ? "■ pause" : "▸ play");
 }
+
+function maxReplayIndex() {
+  return Math.max(0, ...rollouts.map(view => Math.max(0, (view.replay.frames?.length || 1) - 1)));
+}
+
 function scheduleTick() {
   if (!playing) return;
-  playFrame = requestAnimationFrame(async () => {
+  playFrame = requestAnimationFrame(() => {
     playFrame = null;
-    if (playbackBusy) {
-      scheduleTick();
-      return;
-    }
-    try {
-      const now = performance.now();
-      const elapsedMs = Math.max(0, now - playClockLast);
-      playClockLast = now;
-      tickAccumulator += (elapsedMs / TICK_BASE_MS) * playSpeed;
-      const ticks = Math.floor(tickAccumulator);
-      if (ticks > 0) {
-        tickAccumulator -= ticks;
-        playbackBusy = true;
-        state = await api("POST", "/advance", { ticks, agent_mode: agentMode, include_paths: pathsEnabled() });
-        playbackBusy = false;
-        afterUpdate();
-      }
-      if (playing) scheduleTick();
-    } catch (e) {
-      playbackBusy = false;
-      pause();
-      console.error(e);
-    }
+    const now = performance.now();
+    const elapsedMs = Math.max(0, now - playClockLast);
+    playClockLast = now;
+    applyReplayPlayhead(replayPlayhead + (elapsedMs / TICK_BASE_MS) * playSpeed, true);
+    if (playing) scheduleTick();
   });
 }
 
-document.getElementById("btn-reset").addEventListener("click", () => { reset(); });
+document.getElementById("btn-reset").addEventListener("click", () => { loadRollouts().catch(e => console.error(e)); });
 document.getElementById("btn-play").addEventListener("click", () => { playing ? pause() : play(); });
-document.getElementById("btn-tick").addEventListener("click", () => { tickOne(); });
-document.getElementById("profile-select").addEventListener("change", () => { reset(); });
-document.getElementById("troop-select").addEventListener("change", (event) => {
-  selectedTroopKind = event.target.value || "barbarian";
-  boardDeployKey = "";
-  render();
+document.getElementById("replay-scrub").addEventListener("input", (event) => {
+  seekReplayFrame(Number(event.target.value));
+});
+document.getElementById("profile-select").addEventListener("change", () => {
+  loadRollouts().catch(e => console.error(e));
 });
 
 document.querySelectorAll("#speed-chips .chip").forEach(b => {
   b.addEventListener("click", () => {
     playSpeed = parseInt(b.dataset.speed, 10);
     playClockLast = performance.now();
-    tickAccumulator = 0;
     document.querySelectorAll("#speed-chips .chip").forEach(x => x.classList.toggle("active", x === b));
   });
 });
@@ -2153,6 +3008,7 @@ document.querySelectorAll("#agent-chips .chip").forEach(b => {
   b.addEventListener("click", () => {
     agentMode = b.dataset.agent;
     document.querySelectorAll("#agent-chips .chip").forEach(x => x.classList.toggle("active", x === b));
+    loadRollouts().catch(e => console.error(e));
   });
 });
 
@@ -2163,16 +3019,18 @@ for (const id of ["t-ranges", "t-paths", "t-grid", "t-json"]) {
       render();
       return;
     }
-    const paths = document.getElementById("grid-paths");
     if (!input.checked) {
-      if (paths) {
+      for (const view of rollouts) {
+        const paths = view.svg?.querySelector("#grid-paths");
+        if (!paths) continue;
         paths.dataset.pathKey = "";
         paths.replaceChildren();
       }
       render();
       return;
     }
-    refreshState().catch(e => console.error(e));
+    const seed = state?.seed ?? Math.floor(Math.random() * 1e6);
+    loadRollouts({ seed, autoplay: playing }).catch(e => console.error(e));
   });
 }
 document.querySelectorAll("[data-debug]").forEach(input => {
@@ -2182,6 +3040,8 @@ document.querySelectorAll("[data-debug]").forEach(input => {
 });
 document.getElementById("btn-debug-reset").addEventListener("click", () => {
   DEBUG = { ...DEFAULT_DEBUG };
+  boardBuildingsKey = "";
+  for (const view of rollouts) view.boardBuildingsKey = "";
   saveDebugSettings();
   syncDebugControls();
   render();
@@ -2203,7 +3063,7 @@ function pathsEnabled() {
 
 function syncProfileSelect() {
   const select = document.getElementById("profile-select");
-  const profiles = state.available_profiles || [DEFAULT_PROFILE];
+  const profiles = availableProfiles.length ? availableProfiles : [DEFAULT_PROFILE];
   const current = state.profile || select.value || DEFAULT_PROFILE;
   if (profiles.join("|") !== Array.from(select.options).map(o => o.value).join("|")) {
     select.replaceChildren();
@@ -2217,32 +3077,6 @@ function syncProfileSelect() {
   select.value = profiles.includes(current) ? current : profiles[0];
 }
 
-function syncTroopSelect() {
-  const select = document.getElementById("troop-select");
-  const kinds = state.deploy_troop_kinds || ["barbarian"];
-  if (kinds.join("|") !== Array.from(select.options).map(o => o.value).join("|")) {
-    select.replaceChildren();
-    for (const kind of kinds) {
-      const option = document.createElement("option");
-      option.value = kind;
-      option.textContent = kind.replaceAll("_", " ");
-      select.appendChild(option);
-    }
-  }
-  if (!kinds.includes(selectedTroopKind)) selectedTroopKind = kinds[0] || "barbarian";
-  select.value = selectedTroopKind;
-}
-
-function selectedTroopIndex() {
-  const kinds = state?.deploy_troop_kinds || ["barbarian"];
-  const index = kinds.indexOf(selectedTroopKind);
-  return index >= 0 ? index : 0;
-}
-
-function deployActionForCell(cellIndex) {
-  return selectedTroopIndex() * GRID * GRID + cellIndex;
-}
-
 function formatArmyRemaining() {
   const byKind = state.army_remaining_by_kind || {};
   const kinds = state.deploy_troop_kinds || Object.keys(byKind);
@@ -2252,16 +3086,78 @@ function formatArmyRemaining() {
   return parts.length ? parts.join(" · ") : `${state.army_remaining} / ${state.army_initial}`;
 }
 
+function syncReplayScrub() {
+  const input = document.getElementById("replay-scrub");
+  const readout = document.getElementById("replay-frame-readout");
+  if (!input || !readout) return;
+  const maxIndex = maxReplayIndex();
+  input.max = String(maxIndex);
+  input.value = String(Math.min(replayFrameIndex, maxIndex));
+  input.disabled = rolloutLoading || maxIndex === 0;
+  readout.textContent = `${Math.min(replayFrameIndex, maxIndex)} / ${maxIndex}`;
+}
+
+function rolloutProgressSummary() {
+  if (!rolloutProgress.length) return rolloutMessage;
+  const done = rolloutProgress.filter(item => item.state === "done").length;
+  const active = rolloutProgress.filter(item => item.state === "computing" || item.state === "receiving").length;
+  const failed = rolloutProgress.filter(item => item.state === "error").length;
+  if (failed) return `${failed} failed · ${done} complete · ${active} active`;
+  if (rolloutLoading) return `${done} complete · ${active} active · ${rolloutProgress.length - done - active} queued`;
+  return rolloutMessage || `${done} complete`;
+}
+
+function updateRolloutUi() {
+  document.body.classList.toggle("is-rollout-loading", rolloutLoading);
+
+  const overlay = document.getElementById("rollout-overlay");
+  const title = document.getElementById("rollout-title");
+  const detail = document.getElementById("rollout-detail");
+  if (overlay && title && detail) {
+    const showOverlay = rolloutLoading || Boolean(rolloutError);
+    overlay.hidden = !showOverlay;
+    overlay.dataset.state = rolloutError ? "error" : "loading";
+    title.textContent = rolloutError ? "rollout failed" : "computing rollout";
+    detail.textContent = rolloutError || rolloutProgressSummary() || "server is simulating the full episode";
+  }
+  renderRolloutProgress();
+  renderRolloutSummary();
+
+  const status = document.getElementById("status");
+  const statusText = status?.querySelector(".status-text");
+  if (status && statusText) {
+    if (rolloutLoading) {
+      status.dataset.state = "loading";
+      statusText.textContent = "rolling out";
+    } else if (state) {
+      status.dataset.state = state.is_done ? "done" : "live";
+      statusText.textContent = state.is_done ? "halted" : "live";
+    }
+  }
+
+  const resetButton = document.getElementById("btn-reset");
+  const playButton = document.getElementById("btn-play");
+  const profileSelect = document.getElementById("profile-select");
+  const scrub = document.getElementById("replay-scrub");
+  if (resetButton) resetButton.disabled = rolloutLoading;
+  if (playButton) playButton.disabled = rolloutLoading || !rollouts.length;
+  if (profileSelect) profileSelect.disabled = rolloutLoading;
+  if (scrub) scrub.disabled = rolloutLoading || maxReplayIndex() === 0;
+  document.querySelectorAll(".overlays input, #agent-chips .chip").forEach(control => {
+    control.disabled = rolloutLoading;
+  });
+  setPlayButton(playing);
+}
+
 function render() {
   if (!state) return;
   syncProfileSelect();
-  syncTroopSelect();
+  syncReplayScrub();
 
   // header
   document.getElementById("seedReadout").textContent = state.seed ?? 0;
   document.getElementById("tick").textContent = `${state.tick} / ${state.max_ticks}`;
-  document.getElementById("status").dataset.state = state.is_done ? "done" : "live";
-  document.getElementById("status").querySelector(".status-text").textContent = state.is_done ? "halted" : "live";
+  updateRolloutUi();
 
   // hero
   document.getElementById("damage").textContent = (state.damage_pct * 100).toFixed(1);
@@ -2277,6 +3173,7 @@ function render() {
 
   renderStars(state.stars);
 
+  renderRolloutSummary();
   renderActionStream();
 
   // json debug
@@ -2284,13 +3181,10 @@ function render() {
   document.getElementById("jsonBox").hidden = !showJson;
   if (showJson) {
     const lite = { ...state };
-    delete lite.deploy_cells;
-    delete lite.perimeter;
-    delete lite.action_mask;
     document.getElementById("jsonOut").textContent = JSON.stringify(lite, null, 2);
   }
 
-  drawBoard();
+  drawRolloutGrid();
   drawTrace();
 }
 
@@ -2344,11 +3238,65 @@ function actionItem(action) {
   return item;
 }
 
+function drawRolloutGrid() {
+  for (const view of rollouts) {
+    drawRolloutBoard(view);
+    updateRolloutCard(view);
+  }
+}
+
+function drawRolloutBoard(view) {
+  if (!view?.svg || !view.state) return;
+  const previous = {
+    state,
+    troopFacing,
+    cannonAim,
+    mortarAim,
+    boardGuideKey,
+    boardRangeKey,
+    boardBuildingsKey,
+    activeGrid,
+  };
+  state = view.state;
+  troopFacing = view.troopFacing;
+  cannonAim = view.cannonAim;
+  mortarAim = view.mortarAim;
+  boardGuideKey = view.boardGuideKey;
+  boardRangeKey = view.boardRangeKey;
+  boardBuildingsKey = view.boardBuildingsKey;
+  activeGrid = view.svg;
+  drawBoard();
+  view.troopFacing = troopFacing;
+  view.cannonAim = cannonAim;
+  view.mortarAim = mortarAim;
+  view.boardGuideKey = boardGuideKey;
+  view.boardRangeKey = boardRangeKey;
+  view.boardBuildingsKey = boardBuildingsKey;
+  state = previous.state;
+  troopFacing = previous.troopFacing;
+  cannonAim = previous.cannonAim;
+  mortarAim = previous.mortarAim;
+  boardGuideKey = previous.boardGuideKey;
+  boardRangeKey = previous.boardRangeKey;
+  boardBuildingsKey = previous.boardBuildingsKey;
+  activeGrid = previous.activeGrid;
+}
+
+function updateRolloutCard(view) {
+  if (!view.card) return;
+  view.card.classList.toggle("is-selected", view.index === selectedRolloutIndex);
+  view.card.classList.toggle("is-pending", !view.state);
+  const damage = view.card.querySelector(".rollout-damage");
+  if (damage) damage.textContent = view.state ? `${(view.state.damage_pct * 100).toFixed(1)}%` : "pending";
+}
+
 function drawBoard() {
+  const grid = activeGrid;
+  if (!grid) return;
   // bg sits outside the rotation. Only grid geometry is wrapped in the
   // projection group; sprites are positioned with isoGrid() on unrotated
   // layers so already-projected art is not transformed a second time.
-  let main = document.getElementById("grid-main");
+  let main = grid.querySelector("#grid-main");
   if (!main) {
     const bg = el("image", {
       id: "grid-bg",
@@ -2364,7 +3312,6 @@ function drawBoard() {
     main = el("g", { id: "grid-main" });
     main.appendChild(el("g", { id: "grid-guides" }));
     main.appendChild(el("g", { id: "grid-ranges" }));
-    main.appendChild(el("g", { id: "grid-deploy" }));
     const paths = el("g", { id: "grid-paths" });
     const buildings = el("g", { id: "grid-buildings" });
     const combat = el("g", { id: "grid-combat" });
@@ -2382,14 +3329,13 @@ function drawBoard() {
     grid.appendChild(fx);
   }
   applyDebugTransform();
-  const guides = document.getElementById("grid-guides");
-  const ranges = document.getElementById("grid-ranges");
-  const deployLayer = document.getElementById("grid-deploy");
-  const paths = document.getElementById("grid-paths");
-  const buildings = document.getElementById("grid-buildings");
-  const combat = document.getElementById("grid-combat");
-  const troops = document.getElementById("grid-troops");
-  if (!guides || !ranges || !deployLayer || !paths || !buildings || !combat || !troops) return;
+  const guides = grid.querySelector("#grid-guides");
+  const ranges = grid.querySelector("#grid-ranges");
+  const paths = grid.querySelector("#grid-paths");
+  const buildings = grid.querySelector("#grid-buildings");
+  const combat = grid.querySelector("#grid-combat");
+  const troops = grid.querySelector("#grid-troops");
+  if (!guides || !ranges || !paths || !buildings || !combat || !troops) return;
   drawPathPredictions(paths);
   combat.innerHTML = "";
 
@@ -2469,31 +3415,6 @@ function drawBoard() {
         }
       }
     }
-  }
-
-  const deployCells = state.deploy_cells || state.perimeter || [];
-  const armyLeft = state.army_remaining > 0;
-  const troopKind = selectedTroopKind;
-  const deployKey = `${DEBUG.inset}|${troopKind}|${armyLeft ? 1 : 0}|${state.is_done ? 1 : 0}|${(state.action_mask || []).join("")}`;
-  if (deployKey !== boardDeployKey) {
-    deployLayer.replaceChildren();
-    for (let i = 0; i < deployCells.length; i++) {
-      const [cx, cy] = deployCells[i];
-      const action = deployActionForCell(i);
-      const enabled = armyLeft && state.action_mask[action] && !state.is_done;
-      const r = el("rect", {
-        x: gridCoord(cx), y: gridCoord(cy), width: cell, height: cell,
-        class: "perim" + (enabled ? "" : " disabled"),
-      });
-      if (enabled) {
-        r.addEventListener("click", () => deployTroop(action));
-        const t = el("title", {});
-        t.textContent = `deploy ${troopKind.replaceAll("_", " ")} @ (${cx}, ${cy})`;
-        r.appendChild(t);
-      }
-      deployLayer.appendChild(r);
-    }
-    boardDeployKey = deployKey;
   }
 
   const depthItems = buildingsDirty ? [
@@ -2641,6 +3562,37 @@ function drawBoard() {
       }));
     }
   }
+
+  for (const e of state.event_stream || []) {
+    if (e.kind === "defense_fire") {
+      const from = isoGrid(e.from_x, e.from_y);
+      const to = isoGrid(e.to_x, e.to_y);
+      combat.appendChild(el("line", {
+        x1: from.x, y1: from.y,
+        x2: to.x, y2: to.y,
+        class: e.source_kind === "wizard_tower" ? "engage-wizard-guide" : "engage-defense",
+      }));
+    } else if (e.kind === "impact") {
+      const to = isoGrid(e.to_x, e.to_y);
+      combat.appendChild(el("circle", {
+        cx: to.x,
+        cy: to.y,
+        r: Math.max(2, gridUnits(e.radius || 0.3) * 0.25),
+        class: "engage-impact",
+      }));
+    } else if (e.kind === "wall_breaker_explosion") {
+      const to = isoGrid(e.to_x, e.to_y);
+      const radius = splashEllipseRadius(Number(e.radius || 1.6));
+      combat.appendChild(el("ellipse", {
+        cx: to.x,
+        cy: to.y,
+        rx: radius.rx,
+        ry: radius.ry,
+        class: "engage-wizard-impact",
+        transform: `rotate(${DEBUG.rotation} ${to.x} ${to.y})`,
+      }));
+    }
+  }
 }
 
 function drawTrace() {
@@ -2704,7 +3656,7 @@ function drawTrace() {
   }
 }
 
-reset();
+loadRollouts().catch(e => console.error(e));
 </script>
 </body>
 </html>
