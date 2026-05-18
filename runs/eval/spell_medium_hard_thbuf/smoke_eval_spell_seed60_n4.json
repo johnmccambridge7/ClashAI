@@ -1,0 +1,110 @@
+{
+  "config": {
+    "army_composition": {
+      "barbarian": 40,
+      "wall_breaker": 10
+    },
+    "checkpoint": "checkpoints/maskable_ppo/spell_medium_hard_thbuf_seed60_gpu0_20260517_202807/final_model.zip",
+    "deterministic": true,
+    "device": "cpu",
+    "episodes": 4,
+    "max_buildings": 257,
+    "max_ticks": 900,
+    "profiles": [
+      "medium",
+      "hard"
+    ],
+    "seed_start": 300000,
+    "spell_composition": {
+      "freeze": 2,
+      "rage": 2
+    },
+    "wandb": {
+      "enabled": false,
+      "entity": "jmc314-lumenary-com",
+      "group": null,
+      "mode": "online",
+      "project": "ClashAI",
+      "run_id": null,
+      "tags": []
+    },
+    "workers": 2
+  },
+  "episodes": [
+    {
+      "damage_pct": 0.6728971962616822,
+      "profile": "medium",
+      "score": 2.6728971962616823,
+      "seed": 300000,
+      "stars": 2,
+      "steps": 72,
+      "terminated": true,
+      "ticks": 715,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.2601830663615561,
+      "profile": "hard",
+      "score": 0.2601830663615561,
+      "seed": 300001,
+      "stars": 0,
+      "steps": 58,
+      "terminated": true,
+      "ticks": 573,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.7975077881619937,
+      "profile": "medium",
+      "score": 2.797507788161994,
+      "seed": 300002,
+      "stars": 2,
+      "steps": 63,
+      "terminated": true,
+      "ticks": 630,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.22168192219679633,
+      "profile": "hard",
+      "score": 0.22168192219679633,
+      "seed": 300003,
+      "stars": 0,
+      "steps": 55,
+      "terminated": true,
+      "ticks": 543,
+      "truncated": false
+    }
+  ],
+  "summary": {
+    "damage_max": 0.7975077881619937,
+    "damage_mean": 0.4880674932455071,
+    "damage_median": 0.46654013131161914,
+    "damage_min": 0.22168192219679633,
+    "damage_std": 0.25140002969084163,
+    "decisions_per_sec": 17.28566210516398,
+    "elapsed_seconds": 14.347150747897103,
+    "episodes": 4,
+    "maps_per_min": 16.728060101771593,
+    "p_damage_eq_100": 0.0,
+    "p_damage_ge_25": 0.75,
+    "p_damage_ge_50": 0.5,
+    "p_damage_ge_75": 0.25,
+    "p_damage_ge_90": 0.0,
+    "p_stars_ge_2": 0.5,
+    "score_max": 2.797507788161994,
+    "score_mean": 1.4880674932455071,
+    "score_median": 1.466540131311619,
+    "score_min": 0.22168192219679633,
+    "sim_ticks_per_sec": 171.53231629358288,
+    "stars_0": 2,
+    "stars_1": 0,
+    "stars_2": 2,
+    "stars_3": 0,
+    "stars_mean": 1.0,
+    "steps_mean": 62.0,
+    "terminated": 4,
+    "ticks_mean": 615.25,
+    "truncated": 0
+  }
+}

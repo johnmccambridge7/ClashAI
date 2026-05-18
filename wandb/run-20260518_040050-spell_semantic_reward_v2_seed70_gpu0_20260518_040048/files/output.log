@@ -1,0 +1,5 @@
+Using cuda device
+training profiles=medium,hard eval_profiles=medium,hard workers=96 device=cuda timesteps=12000000 run=spell_semantic_reward_v2_seed70_gpu0_20260518_040048
+Logging to runs/maskable_ppo/spell_semantic_reward_v2_seed70_gpu0_20260518_040048_1
+timesteps=1152 | env_steps/sec=218.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.6/47.8GB
+timesteps=2304 | env_steps/sec=218.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.6/47.8GB

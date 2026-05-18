@@ -1,0 +1,48 @@
+{
+  "checkpoint": "checkpoints/maskable_ppo/spell_medium_hard_thbuf_seed60_gpu0_20260517_202807/final_model.zip",
+  "profiles": [
+    "medium",
+    "hard"
+  ],
+  "episodes": 1000,
+  "seed_start": 300000,
+  "army_composition": {
+    "barbarian": 40,
+    "wall_breaker": 10
+  },
+  "spell_composition": {
+    "rage": 2,
+    "freeze": 2
+  },
+  "max_ticks": 900,
+  "max_buildings": 257,
+  "deterministic": true,
+  "device": "cpu",
+  "workers": 8,
+  "wandb": {
+    "enabled": true,
+    "project": "ClashAI",
+    "entity": "jmc314-lumenary-com",
+    "group": "spell_townhall_buffer_v1",
+    "tags": [
+      "eval",
+      "holdout",
+      "spell",
+      "townhall_buffer",
+      "medium_hard",
+      "seed60",
+      "final",
+      "w8"
+    ],
+    "mode": "online",
+    "run_id": null
+  }
+}
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from WANDB_API_KEY.
+wandb: Currently logged in as: jmc314 (jmc314-lumenary-com) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.27.0
+wandb: Run data is saved locally in /workspace/ClashAI/wandb/run-20260518_021423-xitlmfyr
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run eval-holdout_spell_medium_hard_seed60_n1000_seed300000_w8
+wandb: ⭐️ View project at https://wandb.ai/jmc314-lumenary-com/ClashAI
+wandb: 🚀 View run at https://wandb.ai/jmc314-lumenary-com/ClashAI/runs/xitlmfyr

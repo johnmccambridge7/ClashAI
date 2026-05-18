@@ -1,0 +1,67 @@
+_wandb:
+    value:
+        cli_version: 0.27.0
+        e:
+            sshdpv9ma4sfrdfv578kfd8vy8gv1215:
+                cpu_count: 192
+                cpu_count_logical: 384
+                cudaVersion: "13.0"
+                disk:
+                    /:
+                        total: "68719476736"
+                        used: "15599202304"
+                email: john@lumenary.com
+                executable: /workspace/ClashAI/.venv/bin/python
+                git:
+                    commit: 72be3d47aa34e6119c58fd4202279326f6c074ed
+                    remote: https://github.com/johnmccambridge7/ClashAI
+                gpu: NVIDIA RTX PRO 5000 Blackwell
+                gpu_count: 2
+                gpu_nvidia:
+                    - architecture: Blackwell
+                      cudaCores: 14080
+                      memoryTotal: "51312066560"
+                      name: NVIDIA RTX PRO 5000 Blackwell
+                      uuid: GPU-071138fc-ce7b-5544-2219-f0476262ad3e
+                    - architecture: Blackwell
+                      cudaCores: 14080
+                      memoryTotal: "51312066560"
+                      name: NVIDIA RTX PRO 5000 Blackwell
+                      uuid: GPU-dbde3035-a6b5-3a2b-3b64-c7a6af6d02f8
+                host: 800f0fbd3e15
+                memory:
+                    total: "540499230720"
+                os: Linux-6.8.0-111-lowlatency-x86_64-with-glibc2.39
+                program: <stdin>
+                python: CPython 3.12.13
+                root: /workspace/ClashAI
+                startedAt: "2026-05-18T03:09:44.251172Z"
+                writerId: sshdpv9ma4sfrdfv578kfd8vy8gv1215
+        m: []
+        python_version: 3.12.13
+        t:
+            "3":
+                - 2
+                - 13
+                - 15
+                - 16
+            "4": 3.12.13
+            "5": 0.27.0
+            "12": 0.27.0
+            "13": linux-x86_64
+checkpoint:
+    value: checkpoints/maskable_ppo/spell_medium_hard_thbuf_seed60_gpu0_20260517_202807/final_model.zip
+grid:
+    value: 4x4
+profile:
+    value: medium
+run_dir:
+    value: checkpoints/maskable_ppo/spell_medium_hard_thbuf_seed60_gpu0_20260517_202807
+sample_every_ticks:
+    value: 1
+seed_start:
+    value: 300000
+spell_composition:
+    value:
+        freeze: 2
+        rage: 2

@@ -1,0 +1,242 @@
+{
+  "config": {
+    "army_composition": {
+      "barbarian": 40,
+      "wall_breaker": 10
+    },
+    "checkpoint": "checkpoints/maskable_ppo/spell_medium_hard_thbuf_seed60_gpu0_20260517_202807/final_model.zip",
+    "deterministic": true,
+    "device": "cpu",
+    "episodes": 16,
+    "max_buildings": 257,
+    "max_ticks": 900,
+    "profiles": [
+      "medium",
+      "hard"
+    ],
+    "seed_start": 300000,
+    "spell_composition": {
+      "freeze": 2,
+      "rage": 2
+    },
+    "wandb": {
+      "enabled": false,
+      "entity": "jmc314-lumenary-com",
+      "group": null,
+      "mode": "online",
+      "project": "ClashAI",
+      "run_id": null,
+      "tags": []
+    },
+    "workers": 8
+  },
+  "episodes": [
+    {
+      "damage_pct": 0.6728971962616822,
+      "profile": "medium",
+      "score": 2.6728971962616823,
+      "seed": 300000,
+      "stars": 2,
+      "steps": 72,
+      "terminated": true,
+      "ticks": 715,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.2601830663615561,
+      "profile": "hard",
+      "score": 0.2601830663615561,
+      "seed": 300001,
+      "stars": 0,
+      "steps": 58,
+      "terminated": true,
+      "ticks": 573,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.7975077881619937,
+      "profile": "medium",
+      "score": 2.797507788161994,
+      "seed": 300002,
+      "stars": 2,
+      "steps": 63,
+      "terminated": true,
+      "ticks": 630,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.22168192219679633,
+      "profile": "hard",
+      "score": 0.22168192219679633,
+      "seed": 300003,
+      "stars": 0,
+      "steps": 55,
+      "terminated": true,
+      "ticks": 543,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.7276479750778816,
+      "profile": "medium",
+      "score": 2.7276479750778817,
+      "seed": 300004,
+      "stars": 2,
+      "steps": 57,
+      "terminated": true,
+      "ticks": 561,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.1919908466819222,
+      "profile": "hard",
+      "score": 0.1919908466819222,
+      "seed": 300005,
+      "stars": 0,
+      "steps": 57,
+      "terminated": true,
+      "ticks": 566,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.7204049844236761,
+      "profile": "medium",
+      "score": 2.720404984423676,
+      "seed": 300006,
+      "stars": 2,
+      "steps": 53,
+      "terminated": true,
+      "ticks": 522,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.1438787185354691,
+      "profile": "hard",
+      "score": 0.1438787185354691,
+      "seed": 300007,
+      "stars": 0,
+      "steps": 57,
+      "terminated": true,
+      "ticks": 566,
+      "truncated": false
+    },
+    {
+      "damage_pct": 1.0,
+      "profile": "medium",
+      "score": 4.0,
+      "seed": 300008,
+      "stars": 3,
+      "steps": 71,
+      "terminated": true,
+      "ticks": 708,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.21962242562929063,
+      "profile": "hard",
+      "score": 0.21962242562929063,
+      "seed": 300009,
+      "stars": 0,
+      "steps": 59,
+      "terminated": true,
+      "ticks": 585,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.7975077881619937,
+      "profile": "medium",
+      "score": 2.797507788161994,
+      "seed": 300010,
+      "stars": 2,
+      "steps": 65,
+      "terminated": true,
+      "ticks": 645,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.08100686498855836,
+      "profile": "hard",
+      "score": 0.08100686498855836,
+      "seed": 300011,
+      "stars": 0,
+      "steps": 58,
+      "terminated": true,
+      "ticks": 577,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.8411214953271028,
+      "profile": "medium",
+      "score": 2.8411214953271027,
+      "seed": 300012,
+      "stars": 2,
+      "steps": 66,
+      "terminated": true,
+      "ticks": 656,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.14874141876430205,
+      "profile": "hard",
+      "score": 0.14874141876430205,
+      "seed": 300013,
+      "stars": 0,
+      "steps": 64,
+      "terminated": true,
+      "ticks": 633,
+      "truncated": false
+    },
+    {
+      "damage_pct": 1.0,
+      "profile": "medium",
+      "score": 4.0,
+      "seed": 300014,
+      "stars": 3,
+      "steps": 67,
+      "terminated": true,
+      "ticks": 666,
+      "truncated": false
+    },
+    {
+      "damage_pct": 0.14874141876430205,
+      "profile": "hard",
+      "score": 0.14874141876430205,
+      "seed": 300015,
+      "stars": 0,
+      "steps": 58,
+      "terminated": true,
+      "ticks": 576,
+      "truncated": false
+    }
+  ],
+  "summary": {
+    "damage_max": 1.0,
+    "damage_mean": 0.49830836933353295,
+    "damage_median": 0.46654013131161914,
+    "damage_min": 0.08100686498855836,
+    "damage_std": 0.33365704584591144,
+    "decisions_per_sec": 72.12516237209141,
+    "elapsed_seconds": 13.587491074809805,
+    "episodes": 16,
+    "maps_per_min": 70.65322028286506,
+    "p_damage_eq_100": 0.125,
+    "p_damage_ge_25": 0.5625,
+    "p_damage_ge_50": 0.5,
+    "p_damage_ge_75": 0.3125,
+    "p_damage_ge_90": 0.125,
+    "p_stars_ge_2": 0.5,
+    "score_max": 4.0,
+    "score_mean": 1.623308369333533,
+    "score_median": 1.466540131311619,
+    "score_min": 0.08100686498855836,
+    "sim_ticks_per_sec": 715.5110495729314,
+    "stars_0": 8,
+    "stars_1": 0,
+    "stars_2": 6,
+    "stars_3": 2,
+    "stars_mean": 1.125,
+    "steps_mean": 61.25,
+    "terminated": 16,
+    "ticks_mean": 607.625,
+    "truncated": 0
+  }
+}

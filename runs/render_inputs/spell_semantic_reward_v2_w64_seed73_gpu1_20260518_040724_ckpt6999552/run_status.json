@@ -1,0 +1,5 @@
+{
+  "status": "render_checkpoint",
+  "num_timesteps": 6999552,
+  "source_checkpoint": "checkpoints/maskable_ppo/spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724/checkpoint_6999552_steps.zip"
+}

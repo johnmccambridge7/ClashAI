@@ -1,0 +1,85 @@
+{
+  "army_composition": {
+    "barbarian": 40,
+    "wall_breaker": 10
+  },
+  "batch_size": 2048,
+  "checkpoint_freq": 250000,
+  "clip_range": 0.2,
+  "device": "auto",
+  "ent_coef": 0.01,
+  "eval_episodes": 20,
+  "eval_freq": 0,
+  "eval_profiles": [
+    "medium"
+  ],
+  "eval_seed_start": 100000,
+  "gae_lambda": 0.95,
+  "gamma": 0.995,
+  "keep_loaded_hparams": false,
+  "learning_rate": 0.0003,
+  "linear_lr": false,
+  "load_path": null,
+  "max_buildings": 257,
+  "max_grad_norm": 0.5,
+  "max_ticks": 720,
+  "metadata": {
+    "argv": [
+      "scripts/train_maskable_ppo.py",
+      "--dry-run",
+      "--profile",
+      "medium",
+      "--workers",
+      "2",
+      "--total-timesteps",
+      "1024",
+      "--spell-composition",
+      "rage=2,freeze=2",
+      "--army-composition",
+      "barbarian=40,wall_breaker=10",
+      "--run-name",
+      "smoke_spell_config"
+    ],
+    "cpu_count": 384,
+    "cwd": "/workspace/ClashAI",
+    "host": "800f0fbd3e15",
+    "platform": "Linux-6.8.0-111-lowlatency-x86_64-with-glibc2.39",
+    "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]"
+  },
+  "n_epochs": 10,
+  "n_steps": 512,
+  "paths": {
+    "monitor_dir": null,
+    "save_dir": "checkpoints/maskable_ppo/smoke_spell_config",
+    "tensorboard_log": "runs/maskable_ppo/smoke_spell_config"
+  },
+  "run_name": "smoke_spell_config",
+  "seed": 42,
+  "spell_composition": {
+    "freeze": 2,
+    "rage": 2
+  },
+  "start_method": "forkserver",
+  "stochastic_eval": false,
+  "target_kl": null,
+  "torch_threads": 1,
+  "total_timesteps": 1024,
+  "train_profiles": [
+    "medium"
+  ],
+  "vec_env": "auto",
+  "vf_coef": 0.5,
+  "wandb": {
+    "enabled": false,
+    "entity": "jmc314-lumenary-com",
+    "group": null,
+    "log_code": false,
+    "log_model": false,
+    "mode": "online",
+    "project": "ClashAI",
+    "run_id": "smoke_spell_config",
+    "sync_tensorboard": true,
+    "tags": []
+  },
+  "workers": 2
+}

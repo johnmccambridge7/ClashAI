@@ -1,0 +1,1 @@
+wandb: WARNING `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.

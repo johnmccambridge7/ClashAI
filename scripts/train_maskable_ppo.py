@@ -32,6 +32,7 @@ from scripts.wandb_support import (
 
 
 DEFAULT_ARMY_COMPOSITION: dict[str, int] = {"barbarian": 40, "wall_breaker": 10}
+DEFAULT_SPELL_COMPOSITION: dict[str, int] = {"rage": 2, "freeze": 2}
 DEFAULT_EVAL_SEED_START = 100_000
 
 
@@ -125,22 +126,37 @@ def profile_sequence(profile: str) -> list[str]:
 
 
 def parse_army_composition(value: str) -> dict[str, int]:
+    return parse_composition(value, kind_label="army")
+
+
+def parse_spell_composition(value: str) -> dict[str, int]:
+    normalized = value.strip().lower()
+    if normalized in {"", "none", "no", "false", "0"}:
+        return {}
+    return parse_composition(value, kind_label="spell")
+
+
+def format_composition(composition: dict[str, int]) -> str:
+    return ",".join(f"{kind}={count}" for kind, count in composition.items())
+
+
+def parse_composition(value: str, *, kind_label: str) -> dict[str, int]:
     out: dict[str, int] = {}
     for part in value.split(","):
         part = part.strip()
         if not part:
             continue
         if "=" not in part:
-            raise ValueError("army composition entries must look like kind=count")
+            raise ValueError(f"{kind_label} composition entries must look like kind=count")
         kind, count_text = [piece.strip() for piece in part.split("=", 1)]
         if not kind:
-            raise ValueError("army composition contains an empty troop kind")
+            raise ValueError(f"{kind_label} composition contains an empty kind")
         count = int(count_text)
         if count < 0:
             raise ValueError(f"{kind} count must be non-negative")
         out[kind] = count
     if not out:
-        raise ValueError("army composition must contain at least one troop kind")
+        raise ValueError(f"{kind_label} composition must contain at least one kind")
     return out
 
 
@@ -249,6 +265,7 @@ def make_env_factory(
     seed: int,
     max_buildings: int,
     army_composition: dict[str, int],
+    spell_composition: dict[str, int],
     max_ticks: int,
     monitor_cls: Any,
     monitor_file: Path | None,
@@ -258,6 +275,7 @@ def make_env_factory(
             layout_profile=profile,
             max_buildings=max_buildings,
             army_composition=army_composition,
+            spell_composition=spell_composition,
             max_ticks=max_ticks,
         )
         env.reset(seed=seed)
@@ -265,7 +283,29 @@ def make_env_factory(
         return monitor_cls(
             env,
             filename=filename,
-            info_keywords=("profile", "damage_pct", "score", "stars", "ticks_elapsed"),
+            info_keywords=(
+                "profile",
+                "damage_pct",
+                "score",
+                "stars",
+                "ticks_elapsed",
+                "spell_casts",
+                "rage_casts",
+                "freeze_casts",
+                "useful_rage_casts",
+                "useful_freeze_casts",
+                "wasted_spell_casts",
+                "wasted_rage_casts",
+                "wasted_freeze_casts",
+                "spells_remaining",
+                "rage_bonus_damage_pct",
+                "frozen_threat_ticks",
+                "spell_shaping_reward_total",
+                "rage_effect_reward_total",
+                "freeze_effect_reward_total",
+                "wasted_spell_penalty_total",
+                "unused_spell_penalty_total",
+            ),
         )
 
     return _factory
@@ -279,6 +319,7 @@ def evaluate_model(
     episodes: int,
     max_buildings: int,
     army_composition: dict[str, int],
+    spell_composition: dict[str, int],
     max_ticks: int,
     deterministic: bool,
 ) -> tuple[list[EpisodeResult], float]:
@@ -289,6 +330,7 @@ def evaluate_model(
         layout_profile=profiles[0],
         max_buildings=max_buildings,
         army_composition=army_composition,
+        spell_composition=spell_composition,
         max_ticks=max_ticks,
     )
     results: list[EpisodeResult] = []
@@ -390,7 +432,12 @@ def _profile_metric_name(profile: str) -> str:
     return profile.replace("/", "_").replace(" ", "_")
 
 
-def make_throughput_callback(base_callback_cls: Any, *, wandb_run: Any | None = None) -> type:
+def make_throughput_callback(
+    base_callback_cls: Any,
+    *,
+    wandb_run: Any | None = None,
+    log_gpu: bool = True,
+) -> type:
     class ThroughputCallback(base_callback_cls):  # type: ignore[misc, valid-type]
         def __init__(self, *, interval_seconds: float, window_size: int = 200, verbose: int = 0) -> None:
             super().__init__(verbose=verbose)
@@ -436,7 +483,7 @@ def make_throughput_callback(base_callback_cls: Any, *, wandb_run: Any | None = 
                 f"env_steps/sec={env_steps_per_sec:.1f}",
                 f"episodes/sec={episodes_per_sec:.2f}",
             ]
-            gpu = gpu_snapshot()
+            gpu = gpu_snapshot() if log_gpu else None
             if gpu is not None:
                 for key, value in gpu.items():
                     self.logger.record(f"gpu/{key}", value)
@@ -476,6 +523,22 @@ def make_throughput_callback(base_callback_cls: Any, *, wandb_run: Any | None = 
                     "score": float(episode.get("score", info.get("score", 0.0))),
                     "stars": float(episode.get("stars", info.get("stars", 0))),
                     "ticks_elapsed": float(episode.get("ticks_elapsed", info.get("ticks_elapsed", 0))),
+                    "spell_casts": float(episode.get("spell_casts", info.get("spell_casts", 0))),
+                    "rage_casts": float(episode.get("rage_casts", info.get("rage_casts", 0))),
+                    "freeze_casts": float(episode.get("freeze_casts", info.get("freeze_casts", 0))),
+                    "useful_rage_casts": float(episode.get("useful_rage_casts", info.get("useful_rage_casts", 0))),
+                    "useful_freeze_casts": float(episode.get("useful_freeze_casts", info.get("useful_freeze_casts", 0))),
+                    "wasted_spell_casts": float(episode.get("wasted_spell_casts", info.get("wasted_spell_casts", 0))),
+                    "wasted_rage_casts": float(episode.get("wasted_rage_casts", info.get("wasted_rage_casts", 0))),
+                    "wasted_freeze_casts": float(episode.get("wasted_freeze_casts", info.get("wasted_freeze_casts", 0))),
+                    "spells_remaining": float(episode.get("spells_remaining", info.get("spells_remaining", 0))),
+                    "rage_bonus_damage_pct": float(episode.get("rage_bonus_damage_pct", info.get("rage_bonus_damage_pct", 0.0))),
+                    "frozen_threat_ticks": float(episode.get("frozen_threat_ticks", info.get("frozen_threat_ticks", 0))),
+                    "spell_shaping_reward_total": float(episode.get("spell_shaping_reward_total", info.get("spell_shaping_reward_total", 0.0))),
+                    "rage_effect_reward_total": float(episode.get("rage_effect_reward_total", info.get("rage_effect_reward_total", 0.0))),
+                    "freeze_effect_reward_total": float(episode.get("freeze_effect_reward_total", info.get("freeze_effect_reward_total", 0.0))),
+                    "wasted_spell_penalty_total": float(episode.get("wasted_spell_penalty_total", info.get("wasted_spell_penalty_total", 0.0))),
+                    "unused_spell_penalty_total": float(episode.get("unused_spell_penalty_total", info.get("unused_spell_penalty_total", 0.0))),
                     "truncated": float(bool(info.get("TimeLimit.truncated") or info.get("is_truncated"))),
                 })
 
@@ -492,8 +555,23 @@ def make_throughput_callback(base_callback_cls: Any, *, wandb_run: Any | None = 
                     "damage_mean": _window_mean(records, "damage_pct"),
                     "stars_mean": _window_mean(records, "stars"),
                     "ticks_mean": _window_mean(records, "ticks_elapsed"),
+                    "spell_casts_mean": _window_mean(records, "spell_casts"),
+                    "rage_casts_mean": _window_mean(records, "rage_casts"),
+                    "freeze_casts_mean": _window_mean(records, "freeze_casts"),
+                    "useful_rage_casts_mean": _window_mean(records, "useful_rage_casts"),
+                    "useful_freeze_casts_mean": _window_mean(records, "useful_freeze_casts"),
+                    "wasted_spell_casts_mean": _window_mean(records, "wasted_spell_casts"),
+                    "spells_remaining_mean": _window_mean(records, "spells_remaining"),
+                    "rage_bonus_damage_pct_mean": _window_mean(records, "rage_bonus_damage_pct"),
+                    "frozen_threat_ticks_mean": _window_mean(records, "frozen_threat_ticks"),
+                    "spell_shaping_reward_mean": _window_mean(records, "spell_shaping_reward_total"),
+                    "rage_effect_reward_mean": _window_mean(records, "rage_effect_reward_total"),
+                    "freeze_effect_reward_mean": _window_mean(records, "freeze_effect_reward_total"),
+                    "wasted_spell_penalty_mean": _window_mean(records, "wasted_spell_penalty_total"),
+                    "unused_spell_penalty_mean": _window_mean(records, "unused_spell_penalty_total"),
                     "p_stars_ge_2": _window_rate_at_least(records, "stars", 2.0),
                     "p_damage_ge_90": _window_rate_at_least(records, "damage_pct", 0.90),
+                    "p_all_spells_used": float(np.mean(np.asarray([r["spells_remaining"] for r in records], dtype=np.float64) <= 0.0)),
                     "truncated_rate": _window_rate_at_least(records, "truncated", 1.0),
                 }
                 for key, value in metrics.items():
@@ -515,6 +593,7 @@ def make_holdout_eval_callback(base_callback_cls: Any) -> type:
             episodes: int,
             max_buildings: int,
             army_composition: dict[str, int],
+            spell_composition: dict[str, int],
             max_ticks: int,
             deterministic: bool,
             best_model_path: Path | None,
@@ -528,6 +607,7 @@ def make_holdout_eval_callback(base_callback_cls: Any) -> type:
             self.episodes = episodes
             self.max_buildings = max_buildings
             self.army_composition = army_composition
+            self.spell_composition = spell_composition
             self.max_ticks = max_ticks
             self.deterministic = deterministic
             self.best_model_path = best_model_path
@@ -549,6 +629,7 @@ def make_holdout_eval_callback(base_callback_cls: Any) -> type:
                 episodes=self.episodes,
                 max_buildings=self.max_buildings,
                 army_composition=self.army_composition,
+                spell_composition=self.spell_composition,
                 max_ticks=self.max_ticks,
                 deterministic=self.deterministic,
             )
@@ -613,7 +694,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--workers", type=int, default=min(16, os.cpu_count() or 1))
     parser.add_argument("--profile", default="hard", help="Preset profile, comma-list, or 'all'.")
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--army-composition", default="barbarian=40,wall_breaker=10")
+    parser.add_argument("--army-composition", default=format_composition(DEFAULT_ARMY_COMPOSITION))
+    parser.add_argument(
+        "--spell-composition",
+        default=format_composition(DEFAULT_SPELL_COMPOSITION),
+        help="Comma list like rage=2,freeze=2; use 'none' for no spells.",
+    )
     parser.add_argument("--max-ticks", type=int, default=720)
 
     parser.add_argument("--n-steps", type=int, default=512)
@@ -691,6 +777,7 @@ def main() -> None:
     train_profiles = profile_sequence(args.profile)
     eval_profiles = profile_sequence(args.eval_profile or args.profile)
     army_composition = parse_army_composition(args.army_composition)
+    spell_composition = parse_spell_composition(args.spell_composition)
     max_buildings = max_preset_buildings()
 
     run_name = args.run_name or (
@@ -712,6 +799,7 @@ def main() -> None:
         "train_profiles": train_profiles,
         "eval_profiles": eval_profiles,
         "army_composition": army_composition,
+        "spell_composition": spell_composition,
         "max_ticks": args.max_ticks,
         "max_buildings": max_buildings,
         "total_timesteps": args.total_timesteps,
@@ -801,6 +889,7 @@ def main() -> None:
             seed=seed,
             max_buildings=max_buildings,
             army_composition=army_composition,
+            spell_composition=spell_composition,
             max_ticks=args.max_ticks,
             monitor_cls=deps.Monitor,
             monitor_file=monitor_file,
@@ -854,7 +943,11 @@ def main() -> None:
         reset_num_timesteps = True
 
     callbacks = []
-    ThroughputCallback = make_throughput_callback(deps.BaseCallback, wandb_run=wandb_run)
+    ThroughputCallback = make_throughput_callback(
+        deps.BaseCallback,
+        wandb_run=wandb_run,
+        log_gpu=args.device.lower() != "cpu",
+    )
     if args.status_interval > 0:
         callbacks.append(ThroughputCallback(interval_seconds=args.status_interval))
 
@@ -876,6 +969,7 @@ def main() -> None:
             episodes=args.eval_episodes,
             max_buildings=max_buildings,
             army_composition=army_composition,
+            spell_composition=spell_composition,
             max_ticks=args.max_ticks,
             deterministic=not args.stochastic_eval,
             best_model_path=save_dir / "best_model",

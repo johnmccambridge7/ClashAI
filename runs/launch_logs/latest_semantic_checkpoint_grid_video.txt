@@ -1,0 +1,2 @@
+runs/videos/semantic_reward_v2_seed73_ckpt6999552_medium_4x4_rollouts.mp4
+runs/videos/semantic_reward_v2_seed73_ckpt6999552_medium_4x4_rollouts.json

@@ -5,7 +5,9 @@ import math
 
 from .entities import (
     Building,
+    SpellSpec,
     Troop,
+    SPELL_SPECS,
     TROOP_SPECS,
     GRID_SIZE,
     TICK_SECONDS,
@@ -33,6 +35,15 @@ class PendingImpact:
     impact_tick: int
 
 
+@dataclass
+class ActiveSpell:
+    kind: str
+    spec: SpellSpec
+    x: float
+    y: float
+    remaining: float
+
+
 class Simulator:
     """Deterministic battle simulator.
 
@@ -52,6 +63,7 @@ class Simulator:
         army_size: int,
         seed: int = 0,
         army_composition: dict[str, int] | None = None,
+        spell_composition: dict[str, int] | None = None,
         max_ticks: int = MAX_TICKS,
     ):
         if army_size < 0:
@@ -68,13 +80,21 @@ class Simulator:
                 raise ValueError(f"unknown troop kind {kind!r}")
             if count < 0:
                 raise ValueError(f"{kind} count must be non-negative")
+        spells = {} if spell_composition is None else {kind: int(count) for kind, count in spell_composition.items()}
+        for kind, count in spells.items():
+            if kind not in SPELL_SPECS:
+                raise ValueError(f"unknown spell kind {kind!r}")
+            if count < 0:
+                raise ValueError(f"{kind} count must be non-negative")
         self.buildings: list[Building] = [
             Building(id=b.id, spec=b.spec, x=b.x, y=b.y) for b in layout
         ]
         self.army_remaining_by_kind: dict[str, int] = composition
+        self.spells_remaining_by_kind: dict[str, int] = spells
         self.army_size: int = sum(composition.values())
         self.max_ticks: int = int(max_ticks)
         self.troops: list[Troop] = []
+        self.active_spells: list[ActiveSpell] = []
         self.tick_count: int = 0
         self.next_troop_id: int = 0
         self.pending_impacts: list[PendingImpact] = []
@@ -86,10 +106,32 @@ class Simulator:
         self.original_total_hp: float = float(sum(
             b.spec.hp for b in self.buildings if b.spec.counts_for_score
         ))
+        self.rage_bonus_scored_damage: float = 0.0
+        self.frozen_defense_ticks: int = 0
+        self.frozen_threat_ticks: int = 0
+        self.spell_casts_by_kind: dict[str, int] = {kind: 0 for kind in SPELL_SPECS}
+        self.useful_spell_casts_by_kind: dict[str, int] = {kind: 0 for kind in SPELL_SPECS}
+        self.wasted_spell_casts_by_kind: dict[str, int] = {kind: 0 for kind in SPELL_SPECS}
 
     @property
     def army_remaining(self) -> int:
         return sum(self.army_remaining_by_kind.values())
+
+    @property
+    def spells_remaining(self) -> int:
+        return sum(self.spells_remaining_by_kind.values())
+
+    @property
+    def spell_casts(self) -> int:
+        return sum(self.spell_casts_by_kind.values())
+
+    @property
+    def useful_spell_casts(self) -> int:
+        return sum(self.useful_spell_casts_by_kind.values())
+
+    @property
+    def wasted_spell_casts(self) -> int:
+        return sum(self.wasted_spell_casts_by_kind.values())
 
     # ── view helpers ─────────────────────────────────────────────────────
     @property
@@ -126,12 +168,50 @@ class Simulator:
         self.next_troop_id += 1
         return True
 
+    def cast_spell(self, x: float, y: float, spell_kind: str) -> bool:
+        if spell_kind not in SPELL_SPECS:
+            raise ValueError(f"unknown spell kind {spell_kind!r}")
+        if self.spells_remaining_by_kind.get(spell_kind, 0) <= 0:
+            return False
+        if not (0.0 <= x < GRID_SIZE and 0.0 <= y < GRID_SIZE):
+            return False
+        spec = SPELL_SPECS[spell_kind]
+        useful = self._spell_cast_has_target(x, y, spell_kind)
+        self.spell_casts_by_kind[spell_kind] = self.spell_casts_by_kind.get(spell_kind, 0) + 1
+        if useful:
+            self.useful_spell_casts_by_kind[spell_kind] = self.useful_spell_casts_by_kind.get(spell_kind, 0) + 1
+        else:
+            self.wasted_spell_casts_by_kind[spell_kind] = self.wasted_spell_casts_by_kind.get(spell_kind, 0) + 1
+        self.spells_remaining_by_kind[spell_kind] -= 1
+        self.active_spells.append(ActiveSpell(
+            kind=spell_kind,
+            spec=spec,
+            x=float(x),
+            y=float(y),
+            remaining=spec.duration,
+        ))
+        self._emit_visual_event({
+            "kind": "spell_cast",
+            "source_kind": spell_kind,
+            "attacker_id": -1,
+            "target_id": -1,
+            "from_x": x,
+            "from_y": y,
+            "to_x": x,
+            "to_y": y,
+            "radius": spec.radius,
+            "duration": spec.duration,
+            "useful": int(useful),
+        })
+        return True
+
     # ── single tick ──────────────────────────────────────────────────────
     def tick(self) -> None:
         if self.is_done:
             return
         self.visual_events = []
         self.tick_count += 1
+        self._drop_expired_spells()
 
         self._advance_impacts()
         self._update_traps()
@@ -155,11 +235,18 @@ class Simulator:
                 self._explode_wall_breaker(t, target)
                 continue
             if d <= t.spec.attack_range + 0.7:
-                self._damage_building(target, t.spec.dps * TICK_SECONDS)
+                base_damage = t.spec.dps * TICK_SECONDS
+                multiplier = self._troop_damage_multiplier(t)
+                self._damage_building(
+                    target,
+                    base_damage * multiplier,
+                    rage_bonus=max(0.0, base_damage * (multiplier - 1.0)),
+                )
             else:
                 self._move_toward(t, target)
 
         self._update_defenses()
+        self._advance_spell_durations()
 
     # ── targeting / motion ───────────────────────────────────────────────
     def _pick_target_id(self, troop: Troop) -> int | None:
@@ -262,7 +349,13 @@ class Simulator:
                     self._explode_wall_breaker(troop, cell_blocker)
                     return
                 troop.target_id = cell_blocker.id
-                self._damage_building(cell_blocker, troop.spec.dps * TICK_SECONDS)
+                base_damage = troop.spec.dps * TICK_SECONDS
+                multiplier = self._troop_damage_multiplier(troop)
+                self._damage_building(
+                    cell_blocker,
+                    base_damage * multiplier,
+                    rage_bonus=max(0.0, base_damage * (multiplier - 1.0)),
+                )
                 return
             if cell_blocker is not None:
                 return
@@ -282,7 +375,7 @@ class Simulator:
                 self._explode_wall_breaker(troop, blocker)
                 return
             troop.target_id = blocker.id
-            self._damage_building(blocker, troop.spec.dps * TICK_SECONDS)
+            self._damage_building(blocker, troop.spec.dps * TICK_SECONDS * self._troop_damage_multiplier(troop))
             return
         if blocker is not None:
             return
@@ -376,9 +469,15 @@ class Simulator:
             and building.y + eps < py < building.y + building.spec.size - eps
         )
 
-    def _damage_building(self, building: Building, amount: float) -> None:
+    def _damage_building(self, building: Building, amount: float, *, rage_bonus: float = 0.0) -> None:
         was_alive = building.alive
+        hp_before = max(0.0, building.hp)
+        base_amount = max(0.0, amount - max(0.0, rage_bonus))
         building.hp = max(0.0, building.hp - amount)
+        actual_damage = hp_before - max(0.0, building.hp)
+        if building.spec.counts_for_score and rage_bonus > 0.0 and actual_damage > 0.0:
+            base_actual = min(hp_before, base_amount)
+            self.rage_bonus_scored_damage += max(0.0, actual_damage - base_actual)
         if was_alive and not building.alive:
             self.terrain_version += 1
             self._flow_cache.clear()
@@ -399,8 +498,9 @@ class Simulator:
             return
         wall_count = max(0, troop.spec.wall_damage_count)
         if wall_count > 0 and troop.spec.wall_damage_fraction > 0.0:
+            multiplier = self._troop_damage_multiplier(troop)
             for wall in self._connected_walls(target, wall_count):
-                self._damage_building(wall, wall.spec.hp * troop.spec.wall_damage_fraction)
+                self._damage_building(wall, wall.spec.hp * troop.spec.wall_damage_fraction * multiplier)
         self._emit_visual_event({
             "kind": "wall_breaker_explosion",
             "source_kind": troop.spec.kind,
@@ -562,9 +662,54 @@ class Simulator:
         cooldown = max(TICK_SECONDS, building.spec.attack_cooldown)
         return building.spec.dps * cooldown
 
+    def _active_spell_at(self, spell_kind: str, x: float, y: float) -> ActiveSpell | None:
+        best: ActiveSpell | None = None
+        best_remaining = -math.inf
+        for spell in self.active_spells:
+            if spell.kind != spell_kind:
+                continue
+            if math.hypot(spell.x - x, spell.y - y) > spell.spec.radius:
+                continue
+            if spell.remaining > best_remaining:
+                best = spell
+                best_remaining = spell.remaining
+        return best
+
+    def _spell_cast_has_target(self, x: float, y: float, spell_kind: str) -> bool:
+        spec = SPELL_SPECS[spell_kind]
+        if spell_kind == "rage":
+            return any(math.hypot(t.x - x, t.y - y) <= spec.radius for t in self.active_troops)
+        if spell_kind == "freeze":
+            return any(
+                b.alive and b.spec.is_defense and math.hypot(b.center[0] - x, b.center[1] - y) <= spec.radius
+                for b in self.buildings
+            )
+        return True
+
+    def _troop_damage_multiplier(self, troop: Troop) -> float:
+        spell = self._active_spell_at("rage", troop.x, troop.y)
+        return 1.0 if spell is None else max(1.0, spell.spec.damage_multiplier)
+
+    def _defense_frozen(self, defense: Building) -> bool:
+        cx, cy = defense.center
+        return self._active_spell_at("freeze", cx, cy) is not None
+
+    def _drop_expired_spells(self) -> None:
+        self.active_spells = [spell for spell in self.active_spells if spell.remaining > 1e-9]
+
+    def _advance_spell_durations(self) -> None:
+        for spell in self.active_spells:
+            spell.remaining -= TICK_SECONDS
+        self._drop_expired_spells()
+
     def _update_defenses(self) -> None:
         for b in self.buildings:
             if not b.alive or not b.spec.is_defense:
+                continue
+            if self._defense_frozen(b):
+                self.frozen_defense_ticks += 1
+                if self._nearest_troop_in_range(b) is not None:
+                    self.frozen_threat_ticks += 1
                 continue
             b.cooldown_remaining -= TICK_SECONDS
             if b.cooldown_remaining > 1e-9:
@@ -700,6 +845,19 @@ class Simulator:
     # ── visualisation helper ─────────────────────────────────────────────
     def current_engagements(self) -> list[Engagement]:
         out: list[Engagement] = []
+        for spell in self.active_spells:
+            out.append({
+                "kind": "spell",
+                "source_kind": spell.kind,
+                "attacker_id": -1,
+                "target_id": -1,
+                "from_x": spell.x,
+                "from_y": spell.y,
+                "to_x": spell.x,
+                "to_y": spell.y,
+                "radius": spell.spec.radius,
+                "duration_remaining": spell.remaining,
+            })
         for b in self.buildings:
             if not b.alive or not b.spec.is_defense:
                 continue

@@ -1,0 +1,80 @@
+{
+  "os": "Linux-6.8.0-111-lowlatency-x86_64-with-glibc2.39",
+  "python": "CPython 3.12.13",
+  "startedAt": "2026-05-18T02:05:22.611513Z",
+  "args": [
+    "--wandb",
+    "--wandb-project",
+    "ClashAI",
+    "--wandb-entity",
+    "jmc314-lumenary-com",
+    "--wandb-group",
+    "spell_townhall_buffer_v1",
+    "--wandb-tags",
+    "eval,holdout,spell,townhall_buffer,medium_hard,seed61,final,w24",
+    "--checkpoint",
+    "checkpoints/maskable_ppo/spell_medium_hard_thbuf_seed61_gpu1_20260517_202807/final_model.zip",
+    "--profile",
+    "medium,hard",
+    "--episodes",
+    "1000",
+    "--seed-start",
+    "300000",
+    "--army-composition",
+    "barbarian=40,wall_breaker=10",
+    "--spell-composition",
+    "rage=2,freeze=2",
+    "--max-ticks",
+    "900",
+    "--workers",
+    "24",
+    "--device",
+    "cpu",
+    "--output-dir",
+    "runs/eval/spell_medium_hard_thbuf",
+    "--name",
+    "holdout_spell_medium_hard_seed61_n1000_seed300000_w24"
+  ],
+  "program": "/workspace/ClashAI/scripts/evaluate_maskable_ppo.py",
+  "codePath": "scripts/evaluate_maskable_ppo.py",
+  "codePathLocal": "scripts/evaluate_maskable_ppo.py",
+  "git": {
+    "remote": "https://github.com/johnmccambridge7/ClashAI",
+    "commit": "72be3d47aa34e6119c58fd4202279326f6c074ed"
+  },
+  "email": "john@lumenary.com",
+  "root": "/workspace/ClashAI",
+  "host": "800f0fbd3e15",
+  "executable": "/workspace/ClashAI/.venv/bin/python",
+  "cpu_count": 192,
+  "cpu_count_logical": 384,
+  "gpu": "NVIDIA RTX PRO 5000 Blackwell",
+  "gpu_count": 2,
+  "disk": {
+    "/": {
+      "total": "68719476736",
+      "used": "15599054848"
+    }
+  },
+  "memory": {
+    "total": "540499230720"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA RTX PRO 5000 Blackwell",
+      "memoryTotal": "51312066560",
+      "cudaCores": 14080,
+      "architecture": "Blackwell",
+      "uuid": "GPU-071138fc-ce7b-5544-2219-f0476262ad3e"
+    },
+    {
+      "name": "NVIDIA RTX PRO 5000 Blackwell",
+      "memoryTotal": "51312066560",
+      "cudaCores": 14080,
+      "architecture": "Blackwell",
+      "uuid": "GPU-dbde3035-a6b5-3a2b-3b64-c7a6af6d02f8"
+    }
+  ],
+  "cudaVersion": "13.0",
+  "writerId": "tesaj1mck8z2qjy948rzen6ulzao7wk3"
+}

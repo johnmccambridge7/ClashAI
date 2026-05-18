@@ -1,0 +1,24 @@
+2026-05-18 03:14:35,377 INFO    MainThread:156522 [wandb_setup.py:_flush():81] Current SDK version is 0.27.0
+2026-05-18 03:14:35,377 INFO    MainThread:156522 [wandb_setup.py:_flush():81] Configure stats pid to 156522
+2026-05-18 03:14:35,377 INFO    MainThread:156522 [wandb_setup.py:_flush():81] Loading settings from environment variables
+2026-05-18 03:14:35,378 INFO    MainThread:156522 [wandb_init.py:setup_run_log_directory():723] Logging user logs to /workspace/ClashAI/wandb/run-20260518_031435-wsm726c2/logs/debug.log
+2026-05-18 03:14:35,378 INFO    MainThread:156522 [wandb_init.py:setup_run_log_directory():724] Logging internal logs to /workspace/ClashAI/wandb/run-20260518_031435-wsm726c2/logs/debug-internal.log
+2026-05-18 03:14:35,378 INFO    MainThread:156522 [wandb_init.py:init():851] calling init triggers
+2026-05-18 03:14:35,378 INFO    MainThread:156522 [wandb_init.py:init():856] wandb.init called with sweep_config: {}
+config: {'army_composition': {'barbarian': 40, 'wall_breaker': 10}, 'checkpoint': 'checkpoints/maskable_ppo/spell_medium_hard_thbuf_seed60_gpu0_20260517_202807/final_model.zip', 'deterministic': True, 'device': 'cpu', 'episodes': 1000, 'max_buildings': 257, 'max_ticks': 900, 'profiles': ['medium', 'hard'], 'seed_start': 300000, 'spell_composition': {'freeze': 2, 'rage': 2}, 'wandb': {'enabled': False, 'entity': 'jmc314-lumenary-com', 'group': None, 'mode': 'online', 'project': 'ClashAI', 'run_id': None, 'tags': []}, 'workers': 8, '_wandb': {}}
+2026-05-18 03:14:35,378 INFO    MainThread:156522 [wandb_init.py:init():899] starting backend
+2026-05-18 03:14:35,593 INFO    MainThread:156522 [wandb_init.py:init():914] sending inform_init request
+2026-05-18 03:14:35,861 INFO    MainThread:156522 [wandb_init.py:init():919] backend started and connected
+2026-05-18 03:14:35,882 INFO    MainThread:156522 [wandb_init.py:init():989] updated telemetry
+2026-05-18 03:14:35,888 INFO    MainThread:156522 [wandb_init.py:init():1012] communicating run to backend with 90.0 second timeout
+2026-05-18 03:14:36,136 INFO    MainThread:156522 [wandb_init.py:init():1057] starting run threads in backend
+2026-05-18 03:14:36,209 INFO    MainThread:156522 [wandb_run.py:_console_start():2509] atexit reg
+2026-05-18 03:14:36,209 INFO    MainThread:156522 [wandb_run.py:_redirect():2359] redirect: wrap_raw
+2026-05-18 03:14:36,209 INFO    MainThread:156522 [wandb_run.py:_redirect():2428] Wrapping output streams.
+2026-05-18 03:14:36,209 INFO    MainThread:156522 [wandb_run.py:_redirect():2451] Redirects installed.
+2026-05-18 03:14:36,212 INFO    MainThread:156522 [wandb_init.py:init():1095] run started, returning control to user process
+2026-05-18 03:14:36,721 INFO    MainThread:156522 [wandb_run.py:_finish():2271] finishing run jmc314-lumenary-com/ClashAI/wsm726c2
+2026-05-18 03:14:36,721 INFO    MainThread:156522 [wandb_run.py:_atexit_cleanup():2476] got exitcode: 0
+2026-05-18 03:14:36,722 INFO    MainThread:156522 [wandb_run.py:_restore():2458] restore
+2026-05-18 03:14:36,722 INFO    MainThread:156522 [wandb_run.py:_restore():2464] restore done
+2026-05-18 03:14:38,630 INFO    MainThread:156522 [wandb_run.py:_footer_sync_info():3877] logging synced files

@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 18258.769987494918,
+  "final_model": "checkpoints/maskable_ppo/spell_medium_hard_thbuf_seed61_gpu1_20260517_202807/final_model.zip",
+  "finished_at_unix": 1779067962.7569063,
+  "num_timesteps": 5013504,
+  "run_name": "spell_medium_hard_thbuf_seed61_gpu1_20260517_202807",
+  "started_at_unix": 1779049703.9869206,
+  "status": "completed"
+}

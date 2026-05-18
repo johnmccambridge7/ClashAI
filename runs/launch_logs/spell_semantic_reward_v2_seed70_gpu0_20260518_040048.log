@@ -1,0 +1,14 @@
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from WANDB_API_KEY.
+wandb: Currently logged in as: jmc314 (jmc314-lumenary-com) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run spell_semantic_reward_v2_seed70_gpu0_20260518_040048
+wandb: Tracking run with wandb version 0.27.0
+wandb: Run data is saved locally in /workspace/ClashAI/wandb/run-20260518_040050-spell_semantic_reward_v2_seed70_gpu0_20260518_040048
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run spell_semantic_reward_v2_seed70_gpu0_20260518_040048
+wandb: ⭐️ View project at https://wandb.ai/jmc314-lumenary-com/ClashAI
+wandb: 🚀 View run at https://wandb.ai/jmc314-lumenary-com/ClashAI/runs/spell_semantic_reward_v2_seed70_gpu0_20260518_040048
+Using cuda device
+training profiles=medium,hard eval_profiles=medium,hard workers=96 device=cuda timesteps=12000000 run=spell_semantic_reward_v2_seed70_gpu0_20260518_040048
+Logging to runs/maskable_ppo/spell_semantic_reward_v2_seed70_gpu0_20260518_040048_1
+timesteps=1152 | env_steps/sec=218.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.6/47.8GB
+timesteps=2304 | env_steps/sec=218.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.6/47.8GB

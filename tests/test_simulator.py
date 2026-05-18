@@ -190,6 +190,20 @@ def test_walls_do_not_count_for_score_or_terminal() -> None:
     assert any(b.alive and b.spec.kind == "wall" for b in sim.buildings)
 
 
+def test_destroying_only_walls_does_not_reward_score() -> None:
+    layout = [
+        Building(0, BUILDING_SPECS["townhall"], 20, 20),
+        Building(1, BUILDING_SPECS["wall"], 18, 22),
+    ]
+    sim = Simulator(layout=layout, army_size=0)
+    wall = next(b for b in sim.buildings if b.spec.kind == "wall")
+    wall.hp = 0.0
+
+    assert sim.damage_pct == 0.0
+    assert sim.stars == 0
+    assert sim.score == 0.0
+
+
 def test_wall_blocks_troop_and_becomes_target() -> None:
     sim = Simulator(layout=default_layout(), army_size=1)
     assert sim.deploy(17.5, 22.5)
@@ -437,3 +451,44 @@ def test_wall_breaker_explodes_on_nearest_connected_walls() -> None:
     assert len(explosion_events) == 1
     assert explosion_events[0]["source_kind"] == "wall_breaker"
     assert not sim.active_troops
+
+
+def test_rage_spell_multiplies_troop_damage_for_18_seconds() -> None:
+    layout = [Building(0, BUILDING_SPECS["storage"], 10, 10)]
+    normal = Simulator(layout=layout, army_size=1)
+    raged = Simulator(layout=layout, army_size=1, spell_composition={"rage": 1})
+
+    assert normal.deploy(9.5, 11.5)
+    assert raged.deploy(9.5, 11.5)
+    assert raged.cast_spell(9.5, 11.5, "rage")
+    normal.troops[0].target_id = 0
+    raged.troops[0].target_id = 0
+
+    normal.tick()
+    raged.tick()
+
+    normal_damage = BUILDING_SPECS["storage"].hp - normal.buildings[0].hp
+    raged_damage = BUILDING_SPECS["storage"].hp - raged.buildings[0].hp
+    assert math.isclose(raged_damage, normal_damage * 1.3, rel_tol=1e-6)
+
+    for _ in range(math.ceil(18.0 / TICK_SECONDS)):
+        raged.tick()
+    assert not raged.active_spells
+
+
+def test_freeze_spell_only_stops_defenses_for_6_seconds() -> None:
+    layout = [Building(0, BUILDING_SPECS["cannon"], 10, 10)]
+    sim = Simulator(layout=layout, army_size=1, spell_composition={"freeze": 1})
+
+    assert sim.deploy(15.5, 11.5)
+    assert sim.cast_spell(*sim.buildings[0].center, "freeze")
+    troop = sim.troops[0]
+
+    for _ in range(math.ceil(6.0 / TICK_SECONDS)):
+        sim.tick()
+        assert troop.hp == troop.spec.hp
+
+    assert not sim.active_spells
+    sim.tick()
+    assert troop.hp < troop.spec.hp
+    assert sim.buildings[0].hp < sim.buildings[0].spec.hp

@@ -20,11 +20,14 @@ import numpy as np
 from scripts.random_baseline import EpisodeResult, summarize
 from scripts.train_maskable_ppo import (
     DEFAULT_ARMY_COMPOSITION,
+    DEFAULT_SPELL_COMPOSITION,
     DEFAULT_EVAL_SEED_START,
     evaluate_model,
+    format_composition,
     import_training_deps,
     max_preset_buildings,
     parse_army_composition,
+    parse_spell_composition,
     profile_sequence,
     resolve_model_path,
     result_metrics,
@@ -74,8 +77,8 @@ def _rotated_profiles(profiles: list[str], offset: int) -> list[str]:
     return profiles[i:] + profiles[:i]
 
 
-def _eval_worker(task: tuple[str, list[str], int, int, int, dict[str, int], int, bool, str, int]) -> tuple[int, list[EpisodeResult], float]:
-    checkpoint, profiles, seed_start, episodes, max_buildings, army_composition, max_ticks, deterministic, device, episode_offset = task
+def _eval_worker(task: tuple[str, list[str], int, int, int, dict[str, int], dict[str, int], int, bool, str, int]) -> tuple[int, list[EpisodeResult], float]:
+    checkpoint, profiles, seed_start, episodes, max_buildings, army_composition, spell_composition, max_ticks, deterministic, device, episode_offset = task
     deps = import_training_deps()
     model = deps.MaskablePPO.load(checkpoint, device=device)
     worker_profiles = _rotated_profiles(profiles, episode_offset)
@@ -86,6 +89,7 @@ def _eval_worker(task: tuple[str, list[str], int, int, int, dict[str, int], int,
         episodes=episodes,
         max_buildings=max_buildings,
         army_composition=army_composition,
+        spell_composition=spell_composition,
         max_ticks=max_ticks,
         deterministic=deterministic,
     )
@@ -100,6 +104,7 @@ def evaluate_parallel(
     episodes: int,
     max_buildings: int,
     army_composition: dict[str, int],
+    spell_composition: dict[str, int],
     max_ticks: int,
     deterministic: bool,
     device: str,
@@ -115,6 +120,7 @@ def evaluate_parallel(
             episodes=episodes,
             max_buildings=max_buildings,
             army_composition=army_composition,
+            spell_composition=spell_composition,
             max_ticks=max_ticks,
             deterministic=deterministic,
         )
@@ -135,6 +141,7 @@ def evaluate_parallel(
             count,
             max_buildings,
             army_composition,
+            spell_composition,
             max_ticks,
             deterministic,
             device,
@@ -160,7 +167,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--profile", default="medium", help="Preset profile, comma-list, or 'all'.")
     parser.add_argument("--episodes", type=int, default=200)
     parser.add_argument("--seed-start", type=int, default=DEFAULT_EVAL_SEED_START)
-    parser.add_argument("--army-composition", default=",".join(f"{k}={v}" for k, v in DEFAULT_ARMY_COMPOSITION.items()))
+    parser.add_argument("--army-composition", default=format_composition(DEFAULT_ARMY_COMPOSITION))
+    parser.add_argument("--spell-composition", default=format_composition(DEFAULT_SPELL_COMPOSITION))
     parser.add_argument("--max-ticks", type=int, default=720)
     parser.add_argument("--device", default="cpu", help="Use cpu for parallel eval unless there is a reason to share cuda.")
     parser.add_argument("--workers", type=int, default=1)
@@ -189,6 +197,7 @@ def main() -> None:
     checkpoint = resolve_model_path(args.checkpoint)
     profiles = profile_sequence(args.profile)
     army_composition = parse_army_composition(args.army_composition)
+    spell_composition = parse_spell_composition(args.spell_composition)
     max_buildings = max_preset_buildings()
     name = args.name or f"{'-'.join(profiles)}_n{args.episodes}_seed{args.seed_start}"
 
@@ -198,6 +207,7 @@ def main() -> None:
         "episodes": args.episodes,
         "seed_start": args.seed_start,
         "army_composition": army_composition,
+        "spell_composition": spell_composition,
         "max_ticks": args.max_ticks,
         "max_buildings": max_buildings,
         "deterministic": not args.stochastic,
@@ -237,6 +247,7 @@ def main() -> None:
             episodes=args.episodes,
             max_buildings=max_buildings,
             army_composition=army_composition,
+            spell_composition=spell_composition,
             max_ticks=args.max_ticks,
             deterministic=not args.stochastic,
             device=args.device,

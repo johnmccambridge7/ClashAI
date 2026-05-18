@@ -4,12 +4,16 @@ import pytest
 
 from coc_env.env import (
     CoCEnv,
+    DEPLOY_SPELL_KINDS,
     DEPLOY_TROOP_KINDS,
     N_DEPLOY_ACTIONS,
     N_DEPLOY_CELLS,
+    N_SPELL_ACTIONS,
+    SPELL_KIND_INDEX,
     WAIT_ACTION,
     TIME_COST_PER_TICK,
     cell_to_action,
+    spell_to_action,
 )
 from coc_env.entities import BUILDING_SPECS, GRID_SIZE, MAX_TICKS, Building
 from coc_env.generation import preset_layout_profile
@@ -179,6 +183,17 @@ def test_action_mask_blocks_buildings_and_defense_ranges() -> None:
     assert mask[cell_to_action(0, 0)]
 
 
+def test_action_mask_blocks_townhall_buffer() -> None:
+    env = CoCEnv(army_size=1)
+    env.reset(seed=0)
+    env.sim = Simulator([Building(0, BUILDING_SPECS["townhall"], 20, 20)], army_size=1)
+    env._mask_cache_key = None
+
+    mask = env.action_masks()
+    assert not mask[cell_to_action(19, 21)]  # adjacent to townhall footprint
+    assert mask[cell_to_action(16, 21)]      # outside the small townhall buffer
+
+
 def test_action_mask_honors_mortar_blind_spot() -> None:
     env = CoCEnv(army_size=1)
     env.reset(seed=0)
@@ -224,6 +239,110 @@ def test_action_space_covers_the_whole_grid() -> None:
     assert WAIT_ACTION == GRID_SIZE * GRID_SIZE * len(DEPLOY_TROOP_KINDS)
     assert cell_to_action(GRID_SIZE - 1, GRID_SIZE - 1) == N_DEPLOY_CELLS - 1
     assert cell_to_action(GRID_SIZE - 1, GRID_SIZE - 1, "wall_breaker") == N_DEPLOY_ACTIONS - 1
+
+
+def test_spell_actions_are_optional_extra_layers() -> None:
+    plain = CoCEnv()
+    spell_env = CoCEnv(army_size=1, spell_composition={"rage": 2, "freeze": 2})
+    assert plain.action_space.n == N_DEPLOY_ACTIONS + 1
+    assert spell_env.action_space.n == N_DEPLOY_ACTIONS + N_SPELL_ACTIONS + 1
+    assert spell_env.wait_action == WAIT_ACTION
+
+    obs, _ = spell_env.reset(seed=0)
+    before = spell_env.sim.spells_remaining if spell_env.sim is not None else 0
+    spell_env.step(WAIT_ACTION)
+    assert spell_env.sim is not None
+    assert spell_env.sim.spells_remaining == before
+    assert not spell_env.action_masks()[spell_to_action(20, 20, "rage")]
+
+    deploy_action = int(np.where(spell_env.action_masks()[:N_DEPLOY_ACTIONS])[0][0])
+    spell_env.step(deploy_action)
+    troop = spell_env.sim.active_troops[0]
+    action = spell_to_action(int(troop.x), int(troop.y), "rage")
+    assert spell_env.action_masks()[action]
+    obs, _, _, _, info = spell_env.step(action)
+
+    assert "spells_remaining" in obs
+    assert obs["active_spells_present"].sum() == 1
+    assert info["spells_remaining_by_kind"]["rage"] == 1
+    assert info["active_spells"] == 1
+    assert DEPLOY_SPELL_KINDS == ("rage", "freeze")
+
+
+def test_spell_action_masks_are_semantic() -> None:
+    env = CoCEnv(army_size=1, spell_composition={"rage": 2, "freeze": 2})
+    env.reset(seed=0)
+    rage_offset = WAIT_ACTION + 1 + SPELL_KIND_INDEX["rage"] * N_DEPLOY_CELLS
+    freeze_offset = WAIT_ACTION + 1 + SPELL_KIND_INDEX["freeze"] * N_DEPLOY_CELLS
+
+    mask = env.action_masks()
+    assert not mask[rage_offset:rage_offset + N_DEPLOY_CELLS].any()
+    assert not mask[freeze_offset:freeze_offset + N_DEPLOY_CELLS].any()
+
+    env.sim = Simulator([Building(0, BUILDING_SPECS["storage"], 10, 10)], army_size=1, spell_composition={"rage": 2, "freeze": 2})
+    assert env.sim.deploy(8.5, 8.5)
+    env._mask_cache_key = None
+    mask = env.action_masks()
+    assert 0 < int(mask[rage_offset:rage_offset + N_DEPLOY_CELLS].sum()) <= 32
+    assert not mask[freeze_offset:freeze_offset + N_DEPLOY_CELLS].any()
+
+    env.sim = Simulator([Building(0, BUILDING_SPECS["cannon"], 10, 10)], army_size=1, spell_composition={"rage": 2, "freeze": 2})
+    assert env.sim.deploy(15.5, 11.5)
+    env._mask_cache_key = None
+    mask = env.action_masks()
+    assert 0 < int(mask[freeze_offset:freeze_offset + N_DEPLOY_CELLS].sum()) <= 24
+    assert mask[spell_to_action(11, 11, "freeze")]
+
+
+def test_terminal_unused_spell_penalty() -> None:
+    env = CoCEnv(army_size=1, spell_composition={"rage": 2, "freeze": 2})
+    env.reset(seed=0)
+    assert env.sim is not None
+    env.sim.army_remaining_by_kind["barbarian"] = 0
+
+    _, reward, terminated, truncated, info = env.step(WAIT_ACTION)
+
+    assert terminated and not truncated
+    assert reward == pytest.approx(-0.12)
+    assert info["unused_spell_penalty_total"] == pytest.approx(0.12)
+    assert info["spells_remaining"] == 4
+
+
+def test_wasted_spell_cast_is_penalized_when_forced() -> None:
+    env = CoCEnv(army_size=1, spell_composition={"rage": 1})
+    env.reset(seed=0)
+
+    _, reward, terminated, truncated, info = env.step(spell_to_action(0, 0, "rage"))
+
+    assert not terminated and not truncated
+    assert reward < -0.02
+    assert info["wasted_spell_casts"] == 1
+    assert info["wasted_spell_penalty_total"] == pytest.approx(0.02)
+
+
+def test_useful_spell_shaping_rewards_effective_rage_and_freeze() -> None:
+    rage_env = CoCEnv(army_size=1, spell_composition={"rage": 1})
+    rage_env.reset(seed=0)
+    rage_env.sim = Simulator([Building(0, BUILDING_SPECS["storage"], 10, 10)], army_size=1, spell_composition={"rage": 1})
+    assert rage_env.sim.deploy(9.5, 11.5)
+    rage_env._mask_cache_key = None
+    _, _, _, _, rage_info = rage_env.step(spell_to_action(9, 11, "rage"))
+
+    assert rage_info["useful_rage_casts"] == 1
+    assert rage_info["wasted_spell_casts"] == 0
+    assert rage_info["reward_rage_effect"] > 0.0
+    assert rage_info["rage_bonus_damage_pct"] > 0.0
+
+    freeze_env = CoCEnv(army_size=1, spell_composition={"freeze": 1})
+    freeze_env.reset(seed=0)
+    freeze_env.sim = Simulator([Building(0, BUILDING_SPECS["cannon"], 10, 10)], army_size=1, spell_composition={"freeze": 1})
+    assert freeze_env.sim.deploy(15.5, 11.5)
+    freeze_env._mask_cache_key = None
+    _, _, _, _, freeze_info = freeze_env.step(spell_to_action(11, 11, "freeze"))
+
+    assert freeze_info["useful_freeze_casts"] == 1
+    assert freeze_info["reward_freeze_effect"] > 0.0
+    assert freeze_info["frozen_threat_ticks"] > 0
 
 
 def test_last_grid_cell_can_deploy_when_unmasked() -> None:

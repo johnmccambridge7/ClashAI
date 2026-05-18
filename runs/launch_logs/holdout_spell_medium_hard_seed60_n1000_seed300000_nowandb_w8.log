@@ -1,0 +1,31 @@
+{
+  "checkpoint": "checkpoints/maskable_ppo/spell_medium_hard_thbuf_seed60_gpu0_20260517_202807/final_model.zip",
+  "profiles": [
+    "medium",
+    "hard"
+  ],
+  "episodes": 1000,
+  "seed_start": 300000,
+  "army_composition": {
+    "barbarian": 40,
+    "wall_breaker": 10
+  },
+  "spell_composition": {
+    "rage": 2,
+    "freeze": 2
+  },
+  "max_ticks": 900,
+  "max_buildings": 257,
+  "deterministic": true,
+  "device": "cpu",
+  "workers": 8,
+  "wandb": {
+    "enabled": false,
+    "project": "ClashAI",
+    "entity": "jmc314-lumenary-com",
+    "group": null,
+    "tags": [],
+    "mode": "online",
+    "run_id": null
+  }
+}

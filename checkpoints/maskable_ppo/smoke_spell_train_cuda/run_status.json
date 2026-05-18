@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 60.9774580958765,
+  "final_model": "checkpoints/maskable_ppo/smoke_spell_train_cuda/final_model.zip",
+  "finished_at_unix": 1779049142.8348877,
+  "num_timesteps": 1024,
+  "run_name": "smoke_spell_train_cuda",
+  "started_at_unix": 1779049081.8574314,
+  "status": "completed"
+}

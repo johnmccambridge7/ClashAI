@@ -1,0 +1,14 @@
+{"time":"2026-05-18T04:00:50.745480311Z","level":"INFO","msg":"wandb-core"}
+{"time":"2026-05-18T04:00:50.745954492Z","level":"INFO","msg":"stream: starting","core version":"0.27.0"}
+{"time":"2026-05-18T04:00:51.009792172Z","level":"INFO","msg":"stream: created new stream","id":"spell_semantic_reward_v2_seed70_gpu0_20260518_040048"}
+{"time":"2026-05-18T04:00:51.00986759Z","level":"INFO","msg":"handler: started"}
+{"time":"2026-05-18T04:00:51.009993288Z","level":"INFO","msg":"stream: started"}
+{"time":"2026-05-18T04:00:51.010012367Z","level":"INFO","msg":"writer: started","stream_id":"spell_semantic_reward_v2_seed70_gpu0_20260518_040048"}
+{"time":"2026-05-18T04:00:51.010060826Z","level":"INFO","msg":"sender: started"}
+{"time":"2026-05-18T04:00:56.911952268Z","level":"INFO","msg":"filestream: sending request","total_files":0,"uploaded_len":1}
+{"time":"2026-05-18T04:00:57.069631669Z","level":"INFO","msg":"filestream: request sent","status":"200 OK"}
+{"time":"2026-05-18T04:01:08.430416041Z","level":"WARN","msg":"tensorboard: no root directory","error":"timed out after 10s"}
+{"time":"2026-05-18T04:01:08.430626137Z","level":"INFO","msg":"tensorboard: tracking new log directory","rootDir":{},"logDir":"LocalOrCloudPath(LocalPath=\"/workspace/ClashAI/runs/maskable_ppo/spell_semantic_reward_v2_seed70_gpu0_20260518_040048_1\")","namespace":""}
+{"time":"2026-05-18T04:01:08.431113878Z","level":"INFO","msg":"tensorboard: saving file","fileLocation":"/workspace/ClashAI/runs/maskable_ppo/spell_semantic_reward_v2_seed70_gpu0_20260518_040048_1/events.out.tfevents.1779076858.800f0fbd3e15.158696.0","runPath":"runs/maskable_ppo/spell_semantic_reward_v2_seed70_gpu0_20260518_040048_1/events.out.tfevents.1779076858.800f0fbd3e15.158696.0"}
+{"time":"2026-05-18T04:01:11.912373962Z","level":"INFO","msg":"filestream: sending request","total_files":4,"history_offset":0,"history_lines":2,"events_offset":0,"events_lines":2,"console_offset":0,"console_lines":5,"uploaded_len":1}
+{"time":"2026-05-18T04:01:12.049834056Z","level":"INFO","msg":"filestream: request sent","status":"200 OK"}

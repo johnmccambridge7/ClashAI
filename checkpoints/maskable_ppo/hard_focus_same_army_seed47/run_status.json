@@ -1,5 +1,9 @@
 {
+  "elapsed_seconds": 19518.120100975037,
+  "final_model": "checkpoints/maskable_ppo/hard_focus_same_army_seed47/final_model.zip",
+  "finished_at_unix": 1779046853.1975787,
+  "num_timesteps": 15040512,
   "run_name": "hard_focus_same_army_seed47",
   "started_at_unix": 1779027335.0774791,
-  "status": "running"
+  "status": "completed"
 }

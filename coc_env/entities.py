@@ -73,6 +73,15 @@ class TroopSpec:
     explosion_trigger_range: float = 0.7
 
 
+@dataclass(frozen=True)
+class SpellSpec:
+    kind: str
+    radius: float
+    duration: float
+    damage_multiplier: float = 1.0
+    freezes_defenses: bool = False
+
+
 TROOP_SPECS: dict[str, TroopSpec] = {
     "barbarian": TroopSpec("barbarian", hp=65, dps=14.0, attack_range=0.0, speed=2.0),
     "wall_breaker": TroopSpec(
@@ -87,6 +96,12 @@ TROOP_SPECS: dict[str, TroopSpec] = {
         wall_damage_count=5,
         explosion_trigger_range=0.7,
     ),
+}
+
+
+SPELL_SPECS: dict[str, SpellSpec] = {
+    "rage": SpellSpec("rage", radius=5.0, duration=18.0, damage_multiplier=1.3),
+    "freeze": SpellSpec("freeze", radius=5.0, duration=6.0, freezes_defenses=True),
 }
 
 

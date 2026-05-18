@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 31.00595596805215,
+  "final_model": "checkpoints/maskable_ppo/smoke_spell_reward_v2/final_model.zip",
+  "finished_at_unix": 1779076701.3747187,
+  "num_timesteps": 512,
+  "run_name": "smoke_spell_reward_v2",
+  "started_at_unix": 1779076670.3687642,
+  "status": "completed"
+}
