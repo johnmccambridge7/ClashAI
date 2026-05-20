@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/workspace/ClashAI/scripts/train_maskable_ppo.py", line 1082, in <module>
+    main()
+  File "/workspace/ClashAI/scripts/train_maskable_ppo.py", line 892, in main
+    wandb_run = init_wandb_run(
+                ^^^^^^^^^^^^^^^
+  File "/workspace/ClashAI/scripts/wandb_support.py", line 46, in init_wandb_run
+    raise RuntimeError("W&B logging requested but WANDB_API_KEY is not set in the environment.")
+RuntimeError: W&B logging requested but WANDB_API_KEY is not set in the environment.

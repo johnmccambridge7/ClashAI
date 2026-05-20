@@ -1,5 +1,9 @@
 {
+  "elapsed_seconds": 37644.820666084066,
+  "final_model": "checkpoints/maskable_ppo/spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724/final_model.zip",
+  "finished_at_unix": 1779114896.5467324,
+  "num_timesteps": 8028160,
   "run_name": "spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724",
   "started_at_unix": 1779077251.7260683,
-  "status": "running"
+  "status": "completed"
 }

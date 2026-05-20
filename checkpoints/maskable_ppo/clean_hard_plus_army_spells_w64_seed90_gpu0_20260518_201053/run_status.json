@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 54234.84421811486,
+  "final_model": "checkpoints/maskable_ppo/clean_hard_plus_army_spells_w64_seed90_gpu0_20260518_201053/final_model.zip",
+  "finished_at_unix": 1779189296.5129793,
+  "num_timesteps": 10027008,
+  "run_name": "clean_hard_plus_army_spells_w64_seed90_gpu0_20260518_201053",
+  "started_at_unix": 1779135061.6687632,
+  "status": "completed"
+}

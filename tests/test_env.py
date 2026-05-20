@@ -255,10 +255,14 @@ def test_spell_actions_are_optional_extra_layers() -> None:
     assert spell_env.sim.spells_remaining == before
     assert not spell_env.action_masks()[spell_to_action(20, 20, "rage")]
 
-    deploy_action = int(np.where(spell_env.action_masks()[:N_DEPLOY_ACTIONS])[0][0])
-    spell_env.step(deploy_action)
-    troop = spell_env.sim.active_troops[0]
-    action = spell_to_action(int(troop.x), int(troop.y), "rage")
+    spell_env.sim = Simulator(
+        [Building(0, BUILDING_SPECS["storage"], 10, 10)],
+        army_size=1,
+        spell_composition={"rage": 2, "freeze": 2},
+    )
+    assert spell_env.sim.deploy(9.5, 11.5)
+    spell_env._mask_cache_key = None
+    action = spell_to_action(9, 11, "rage")
     assert spell_env.action_masks()[action]
     obs, _, _, _, info = spell_env.step(action)
 
@@ -281,6 +285,13 @@ def test_spell_action_masks_are_semantic() -> None:
 
     env.sim = Simulator([Building(0, BUILDING_SPECS["storage"], 10, 10)], army_size=1, spell_composition={"rage": 2, "freeze": 2})
     assert env.sim.deploy(8.5, 8.5)
+    env._mask_cache_key = None
+    mask = env.action_masks()
+    assert not mask[rage_offset:rage_offset + N_DEPLOY_CELLS].any()
+    assert not mask[freeze_offset:freeze_offset + N_DEPLOY_CELLS].any()
+
+    env.sim = Simulator([Building(0, BUILDING_SPECS["storage"], 10, 10)], army_size=1, spell_composition={"rage": 2, "freeze": 2})
+    assert env.sim.deploy(9.5, 11.5)
     env._mask_cache_key = None
     mask = env.action_masks()
     assert 0 < int(mask[rage_offset:rage_offset + N_DEPLOY_CELLS].sum()) <= 32
@@ -343,6 +354,75 @@ def test_useful_spell_shaping_rewards_effective_rage_and_freeze() -> None:
     assert freeze_info["useful_freeze_casts"] == 1
     assert freeze_info["reward_freeze_effect"] > 0.0
     assert freeze_info["frozen_threat_ticks"] > 0
+    assert freeze_info["frozen_threat_damage_pct"] > 0.0
+
+
+def test_reward_v3_objective_shaping_tracks_defense_and_townhall_damage() -> None:
+    env = CoCEnv(army_size=1)
+    env.reset(seed=0)
+    env.sim = Simulator([
+        Building(0, BUILDING_SPECS["cannon"], 10, 10),
+        Building(1, BUILDING_SPECS["townhall"], 14, 10),
+    ], army_size=1)
+    assert env.sim.deploy(9.5, 11.5)
+    env._mask_cache_key = None
+
+    for _ in range(20):
+        _, reward, terminated, truncated, info = env.step(WAIT_ACTION)
+        if info["defense_damage_pct"] > 0.0:
+            assert reward > info["reward_base"]
+            assert info["reward_defense_damage"] > 0.0
+            assert info["objective_shaping_reward_total"] > 0.0
+            break
+        if terminated or truncated:
+            break
+    else:
+        raise AssertionError("troop did not damage defense")
+
+
+def test_freeze_reward_requires_threatened_defense_not_troop_in_radius() -> None:
+    env = CoCEnv(army_size=1, spell_composition={"freeze": 1})
+    env.reset(seed=0)
+    env.sim = Simulator([Building(0, BUILDING_SPECS["cannon"], 10, 10)], army_size=1, spell_composition={"freeze": 1})
+    assert env.sim.deploy(35.5, 35.5)
+    env._mask_cache_key = None
+
+    _, _, _, _, info = env.step(spell_to_action(11, 11, "freeze"))
+
+    assert info["useful_freeze_casts"] == 0
+    assert info["wasted_freeze_casts"] == 1
+    assert info["frozen_defense_ticks"] > 0
+    assert info["frozen_threat_ticks"] == 0
+    assert info["frozen_threat_damage_pct"] == 0.0
+    assert info["reward_freeze_effect"] == 0.0
+
+
+def test_deployment_and_splash_risk_diagnostics_are_reported() -> None:
+    env = CoCEnv(army_size=2)
+    env.reset(seed=0)
+    env.sim = Simulator([Building(0, BUILDING_SPECS["wizard_tower"], 10, 10)], army_size=2)
+    assert env.sim.deploy(15.0, 11.5)
+    assert env.sim.deploy(15.6, 11.5)
+    env._mask_cache_key = None
+
+    _, reward, _, _, info = env.step(WAIT_ACTION)
+
+    assert info["deployments"] == 2
+    assert info["deployment_unique_cells"] == 1
+    assert info["deployment_top_cell_fraction"] == pytest.approx(1.0)
+    assert info["deployment_quadrant_entropy"] == pytest.approx(0.0)
+    assert info["splash_cluster_risk_pct"] > 0.0
+    assert info["splash_damage_taken_pct"] > 0.0
+    assert info["multi_hit_splash_damage_pct"] > 0.0
+    assert info["multi_hit_splash_events"] > 0
+    assert info["reward_splash_risk_penalty"] > 0.0
+    assert info["reward_multi_hit_splash_penalty"] > 0.0
+    assert reward < (
+        info["reward_base"]
+        + info["reward_rage_effect"]
+        + info["reward_freeze_effect"]
+        + info["reward_objective_shaping"]
+    )
 
 
 def test_last_grid_cell_can_deploy_when_unmasked() -> None:
@@ -373,6 +453,20 @@ def test_wall_breaker_actions_use_second_deploy_layer() -> None:
     assert info["army_remaining_by_kind"]["wall_breaker"] == 0
 
 
+def test_repeated_barbarian_deployments_are_mildly_penalized() -> None:
+    env = CoCEnv(army_size=2)
+    env.reset(seed=0)
+    env.sim = Simulator([Building(0, BUILDING_SPECS["storage"], 10, 10)], army_size=2)
+    env._mask_cache_key = None
+
+    env.step(cell_to_action(0, 0))
+    _, _, _, _, info = env.step(cell_to_action(0, 0))
+
+    assert info["deploy_crowding_count"] == 1.0
+    assert info["reward_deploy_crowding_penalty"] > 0.0
+    assert info["deploy_crowding_penalty_total"] == info["reward_deploy_crowding_penalty"]
+
+
 def test_target_observation_uses_building_slot_not_id() -> None:
     env = CoCEnv(army_size=1)
     env.reset(seed=0)
@@ -384,8 +478,8 @@ def test_target_observation_uses_building_slot_not_id() -> None:
     assert obs["troops_target"][0] == 0.0
 
 
-def test_reward_equals_score_delta_minus_time_cost() -> None:
-    """Per-step reward must equal Δscore − time_cost × ticks_advanced."""
+def test_reward_components_sum_to_step_reward() -> None:
+    """Per-step reward must equal base score delta plus explicit shaping terms."""
     env = CoCEnv()
     env.reset(seed=0)
     sim = env.sim
@@ -395,7 +489,17 @@ def test_reward_equals_score_delta_minus_time_cost() -> None:
         prev_ticks = sim.tick_count
         _, reward, term, trunc, info = env.step(0)
         ticks_advanced = sim.tick_count - prev_ticks
-        expected = info["score"] - prev_score - TIME_COST_PER_TICK * ticks_advanced
+        expected_base = info["score"] - prev_score - TIME_COST_PER_TICK * ticks_advanced
+        expected = (
+            info["reward_base"]
+            + info["reward_rage_effect"]
+            + info["reward_freeze_effect"]
+            + info["reward_objective_shaping"]
+            + info["reward_tactical_shaping"]
+            - info["reward_wasted_spell_penalty"]
+            - info["reward_unused_spell_penalty"]
+        )
+        assert info["reward_base"] == pytest.approx(expected_base)
         assert abs(reward - expected) < 1e-6
         prev_score = info["score"]
         if term or trunc:

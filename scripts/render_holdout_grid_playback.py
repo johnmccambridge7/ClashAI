@@ -52,9 +52,6 @@ TILE = int(min(
     (CANVAS_W - 2 * MARGIN - 3 * GAP) / 4,
     (CANVAS_H - HEADER_H - MARGIN - 3 * GAP) / 4,
 ))
-GRID_W = 4 * TILE + 3 * GAP
-GRID_X = int((CANVAS_W - GRID_W) / 2)
-GRID_Y = HEADER_H
 MAP_PAD = 10
 MAP = TILE - 2 * MAP_PAD - 34
 BG = (16, 18, 21)
@@ -72,6 +69,30 @@ RANGE = (224, 72, 72)
 FIRE = (255, 105, 82)
 RAGE = (174, 91, 232)
 FREEZE = (96, 204, 244)
+
+
+@dataclass(frozen=True)
+class GridLayout:
+    grid_size: int
+    tile: int
+    map_size: int
+    x: int
+    y: int
+
+
+def make_grid_layout(grid_size: int) -> GridLayout:
+    tile = int(min(
+        (CANVAS_W - 2 * MARGIN - (grid_size - 1) * GAP) / grid_size,
+        (CANVAS_H - HEADER_H - MARGIN - (grid_size - 1) * GAP) / grid_size,
+    ))
+    grid_w = grid_size * tile + (grid_size - 1) * GAP
+    return GridLayout(
+        grid_size=grid_size,
+        tile=tile,
+        map_size=tile - 2 * MAP_PAD - 34,
+        x=int((CANVAS_W - grid_w) / 2),
+        y=HEADER_H,
+    )
 
 
 @dataclass
@@ -317,6 +338,25 @@ def resolved_spell_composition(args: argparse.Namespace) -> dict[str, int]:
     return dict(DEFAULT_SPELL_COMPOSITION)
 
 
+def parse_seeds(value: str | None) -> list[int] | None:
+    if value is None or not value.strip():
+        return None
+    seeds = [int(part.strip()) for part in value.split(",") if part.strip()]
+    if not seeds:
+        return None
+    return seeds
+
+
+def resolved_seeds(args: argparse.Namespace) -> list[int]:
+    explicit = parse_seeds(args.seeds)
+    needed = args.grid_size * args.grid_size
+    if explicit is not None:
+        if len(explicit) < needed:
+            raise ValueError(f"--seeds supplied {len(explicit)} seeds, but grid needs {needed}")
+        return explicit[:needed]
+    return [args.seed_start + i for i in range(needed)]
+
+
 def simulate_or_load(args: argparse.Namespace) -> list[PlaybackStage]:
     if args.cache_path.exists() and not args.refresh_cache:
         print(f"loading cached trajectories: {args.cache_path}", flush=True)
@@ -327,10 +367,10 @@ def simulate_or_load(args: argparse.Namespace) -> list[PlaybackStage]:
         stages = [stages[-1]]
     elif args.stage_limit is not None:
         stages = [stages[0], *stages[1:1 + args.stage_limit]]
-    seeds = [args.seed_start + i for i in range(16)]
+    seeds = resolved_seeds(args)
     spell_composition = resolved_spell_composition(args)
     print(
-        f"simulating trajectories stages={len(stages)} seeds={seeds[0]}..{seeds[-1]} "
+        f"simulating trajectories stages={len(stages)} seeds={','.join(str(seed) for seed in seeds)} "
         f"workers={args.workers} spells={spell_composition} cache={args.cache_path}",
         flush=True,
     )
@@ -372,7 +412,8 @@ def write_manifest(path: Path, stages: list[PlaybackStage], args: argparse.Names
         "run_dir": str(args.run_dir),
         "profile": args.profile,
         "seed_start": args.seed_start,
-        "grid": "4x4",
+        "seeds": resolved_seeds(args),
+        "grid": f"{args.grid_size}x{args.grid_size}",
         "sample_every_ticks": args.sample_every_ticks,
         "spell_composition": resolved_spell_composition(args),
         "stages": [
@@ -406,17 +447,18 @@ def draw_tile(
     *,
     ox: int,
     oy: int,
+    layout: GridLayout,
 ) -> None:
-    scale = MAP / GRID_SIZE
-    draw.rounded_rectangle((ox, oy, ox + TILE, oy + TILE), radius=10, fill=TILE_BG)
+    scale = layout.map_size / GRID_SIZE
+    draw.rounded_rectangle((ox, oy, ox + layout.tile, oy + layout.tile), radius=10, fill=TILE_BG)
     mx = ox + MAP_PAD
     my = oy + MAP_PAD
-    draw.rectangle((mx, my, mx + MAP, my + MAP), fill=MAP_BG, outline=(79, 86, 94), width=1)
+    draw.rectangle((mx, my, mx + layout.map_size, my + layout.map_size), fill=MAP_BG, outline=(79, 86, 94), width=1)
     for i in range(0, GRID_SIZE + 1, 4):
         x = int(round(mx + i * scale))
         y = int(round(my + i * scale))
-        draw.line((x, my, x, my + MAP), fill=GRID_LINE, width=1)
-        draw.line((mx, y, mx + MAP, y), fill=GRID_LINE, width=1)
+        draw.line((x, my, x, my + layout.map_size), fill=GRID_LINE, width=1)
+        draw.line((mx, y, mx + layout.map_size, y), fill=GRID_LINE, width=1)
 
     for i, b in enumerate(rollout.buildings):
         if not frame.building_revealed[i]:
@@ -507,7 +549,7 @@ def draw_tile(
         cx, cy = px(x, y, mx, my, scale)
         draw.ellipse((cx - 4, cy - 4, cx + 4, cy + 4), fill=color, outline=(10, 12, 15), width=1)
 
-    caption_y = oy + MAP_PAD + MAP + 8
+    caption_y = oy + MAP_PAD + layout.map_size + 8
     casts = [cast for cast in getattr(rollout, "spell_casts", []) if cast[0] <= frame.tick]
     rage_casts = sum(1 for _, kind, _, _, _ in casts if kind == "rage")
     freeze_casts = sum(1 for _, kind, _, _, _ in casts if kind == "freeze")
@@ -519,7 +561,7 @@ def draw_header(draw: ImageDraw.ImageDraw, stage: PlaybackStage, stage_index: in
     s = stage.summary
     draw.rectangle((0, 0, CANVAS_W, HEADER_H), fill=BG)
     stage_color = YELLOW if stage.stage.checkpoint is None else (108, 196, 255)
-    prefix = f"ClashAI medium holdouts | {stage_index + 1}/{total_stages} | "
+    prefix = f"ClashAI holdouts | {stage_index + 1}/{total_stages} | "
     text(draw, (28, 18), prefix, FONT_20, TEXT_DIM)
     x = 28 + int(draw.textlength(prefix, font=FONT_20))
     text(draw, (x, 18), stage.stage.label, FONT_20, stage_color)
@@ -533,17 +575,25 @@ def draw_header(draw: ImageDraw.ImageDraw, stage: PlaybackStage, stage_index: in
     draw.rectangle((0, HEADER_H - 5, int(CANVAS_W * ((stage_index + progress) / total_stages)), HEADER_H - 1), fill=(83, 169, 238))
 
 
-def render_playback_frame(stage: PlaybackStage, *, stage_index: int, total_stages: int, progress: float) -> Image.Image:
+def render_playback_frame(
+    stage: PlaybackStage,
+    *,
+    stage_index: int,
+    total_stages: int,
+    progress: float,
+    grid_size: int,
+) -> Image.Image:
     image = Image.new("RGB", (CANVAS_W, CANVAS_H), BG)
     draw = ImageDraw.Draw(image)
+    layout = make_grid_layout(grid_size)
     draw_header(draw, stage, stage_index, total_stages, progress)
-    for i, rollout in enumerate(stage.rollouts):
-        col = i % 4
-        row = i // 4
-        ox = GRID_X + col * (TILE + GAP)
-        oy = GRID_Y + row * (TILE + GAP)
+    for i, rollout in enumerate(stage.rollouts[:grid_size * grid_size]):
+        col = i % grid_size
+        row = i // grid_size
+        ox = layout.x + col * (layout.tile + GAP)
+        oy = layout.y + row * (layout.tile + GAP)
         idx, frame = frame_at(rollout, progress)
-        draw_tile(draw, rollout, idx, frame, ox=ox, oy=oy)
+        draw_tile(draw, rollout, idx, frame, ox=ox, oy=oy, layout=layout)
     return image
 
 
@@ -551,7 +601,8 @@ def render_summary_frame(stages: list[PlaybackStage]) -> Image.Image:
     image = Image.new("RGB", (CANVAS_W, CANVAS_H), BG)
     draw = ImageDraw.Draw(image)
     text(draw, (96, 150), "Production Snapshot Summary", FONT_48)
-    text(draw, (98, 218), "The same 16 medium holdout bases replayed for random baseline and every production snapshot.", FONT_24, TEXT_DIM)
+    episodes = stages[0].summary["episodes"] if stages else 0
+    text(draw, (98, 218), f"The same {episodes} holdout bases replayed for random baseline and every production snapshot.", FONT_24, TEXT_DIM)
     values = [(s.stage.label, float(s.summary["score_mean"]), float(s.summary["damage_mean"]), float(s.summary["p_stars_ge_2"])) for s in stages]
     best = max(values, key=lambda row: row[1])
     text(draw, (98, 292), f"Best mean score in this slice: {best[0]} | score {best[1]:.2f} | damage {best[2] * 100:.1f}% | 2+★ {best[3] * 100:.0f}%", FONT_30, TEXT)
@@ -575,12 +626,25 @@ def render_summary_frame(stages: list[PlaybackStage]) -> Image.Image:
     return image
 
 
-def video_frames(stages: list[PlaybackStage], *, fps: int, seconds_per_stage: float, summary_seconds: float) -> Iterable[Image.Image]:
+def video_frames(
+    stages: list[PlaybackStage],
+    *,
+    fps: int,
+    seconds_per_stage: float,
+    summary_seconds: float,
+    grid_size: int,
+) -> Iterable[Image.Image]:
     frames_per_stage = max(1, int(fps * seconds_per_stage))
     for stage_index, stage in enumerate(stages):
         for frame_idx in range(frames_per_stage):
             progress = frame_idx / max(1, frames_per_stage - 1)
-            yield render_playback_frame(stage, stage_index=stage_index, total_stages=len(stages), progress=progress)
+            yield render_playback_frame(
+                stage,
+                stage_index=stage_index,
+                total_stages=len(stages),
+                progress=progress,
+                grid_size=grid_size,
+            )
 
     if summary_seconds > 0:
         summary = render_summary_frame(stages)
@@ -629,13 +693,14 @@ def write_video(frames: Iterable[Image.Image], output: Path, *, fps: int, crf: i
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Render animated 4x4 holdout playback over all production snapshots.")
+    parser = argparse.ArgumentParser(description="Render animated holdout playback over production snapshots.")
     parser.add_argument("--run-dir", type=Path, default=Path("checkpoints/maskable_ppo/prod_medium_hard_v1_gpu1_seed46"))
     parser.add_argument("--output", type=Path, default=Path("runs/videos/prod_10m_medium_holdout_4x4_playback.mp4"))
     parser.add_argument("--cache-path", type=Path, default=Path("runs/videos/cache/prod_10m_medium_holdout_4x4_playback.pkl.gz"))
     parser.add_argument("--refresh-cache", action="store_true")
     parser.add_argument("--profile", default="medium")
     parser.add_argument("--seed-start", type=int, default=210000)
+    parser.add_argument("--seeds", default=None, help="Comma-separated explicit seeds. Overrides --seed-start for the grid.")
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--stochastic", action="store_true")
@@ -647,6 +712,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--crf", type=int, default=18)
     parser.add_argument("--stage-limit", type=int, default=None)
     parser.add_argument("--final-only", action="store_true")
+    parser.add_argument("--grid-size", type=int, default=4, help="Render an NxN grid of holdout bases.")
     return parser
 
 
@@ -657,6 +723,8 @@ def main() -> None:
         raise ValueError("--workers must be positive")
     if args.sample_every_ticks <= 0:
         raise ValueError("--sample-every-ticks must be positive")
+    if args.grid_size <= 0:
+        raise ValueError("--grid-size must be positive")
     stages = simulate_or_load(args)
     write_manifest(args.output.with_suffix(".json"), stages, args)
     print(f"encoding playback video: {args.output}", flush=True)
@@ -666,6 +734,7 @@ def main() -> None:
             fps=args.fps,
             seconds_per_stage=args.seconds_per_stage,
             summary_seconds=args.summary_seconds,
+            grid_size=args.grid_size,
         ),
         args.output,
         fps=args.fps,

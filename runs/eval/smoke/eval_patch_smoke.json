@@ -1,0 +1,76 @@
+{
+  "config": {
+    "army_composition": {
+      "barbarian": 40,
+      "wall_breaker": 10
+    },
+    "checkpoint": "checkpoints/maskable_ppo/spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724/final_model.zip",
+    "deterministic": true,
+    "device": "cpu",
+    "episodes": 1,
+    "max_buildings": 257,
+    "max_ticks": 900,
+    "profiles": [
+      "easy"
+    ],
+    "seed_start": 1,
+    "spell_composition": {
+      "freeze": 2,
+      "rage": 2
+    },
+    "wandb": {
+      "enabled": false,
+      "entity": "jmc314-lumenary-com",
+      "group": null,
+      "mode": "online",
+      "project": "ClashAI",
+      "run_id": null,
+      "tags": []
+    },
+    "workers": 1
+  },
+  "episodes": [
+    {
+      "damage_pct": 1.0,
+      "profile": "easy",
+      "score": 4.0,
+      "seed": 1,
+      "stars": 3,
+      "steps": 41,
+      "terminated": true,
+      "ticks": 405,
+      "truncated": false
+    }
+  ],
+  "summary": {
+    "damage_max": 1.0,
+    "damage_mean": 1.0,
+    "damage_median": 1.0,
+    "damage_min": 1.0,
+    "damage_std": 0.0,
+    "decisions_per_sec": 13.999568343342675,
+    "elapsed_seconds": 2.9286617268808186,
+    "episodes": 1,
+    "maps_per_min": 20.487173185379525,
+    "p_damage_eq_100": 1.0,
+    "p_damage_ge_25": 1.0,
+    "p_damage_ge_50": 1.0,
+    "p_damage_ge_75": 1.0,
+    "p_damage_ge_90": 1.0,
+    "p_stars_ge_2": 1.0,
+    "score_max": 4.0,
+    "score_mean": 4.0,
+    "score_median": 4.0,
+    "score_min": 4.0,
+    "sim_ticks_per_sec": 138.28841900131178,
+    "stars_0": 0,
+    "stars_1": 0,
+    "stars_2": 0,
+    "stars_3": 1,
+    "stars_mean": 3.0,
+    "steps_mean": 41.0,
+    "terminated": 1,
+    "ticks_mean": 405.0,
+    "truncated": 0
+  }
+}

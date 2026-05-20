@@ -1,0 +1,65 @@
+{
+  "summary": {
+    "episodes": 200,
+    "score_mean": 2.969224143302181,
+    "damage_mean": 0.8142241433021807,
+    "stars_mean": 2.155,
+    "wall_breakers_deployed_mean": 9.29,
+    "wall_breaker_explosions_mean": 8.775,
+    "wall_breakers_dead_without_explosion_mean": 0.395,
+    "wb_unique_walls_damaged_mean": 21.155,
+    "wb_unique_walls_destroyed_mean": 18.555,
+    "final_walls_destroyed_mean": 30.285,
+    "episodes_with_wb_deployed_rate": 0.985,
+    "episodes_with_wb_explosion_rate": 0.96,
+    "episodes_with_wb_wall_destroy_rate": 0.95,
+    "explosions_per_deployed_wb": 0.9445640473627557,
+    "destroyed_walls_per_deployed_wb": 1.997308934337998,
+    "destroyed_walls_per_wb_explosion": 2.1145299145299146,
+    "wb_wall_damage_fraction_of_total_wall_damage": 0.6195772028939232,
+    "wb_fresh_walls_destroyed_total": 0,
+    "wb_predamaged_walls_destroyed_total": 3711,
+    "elapsed_seconds": 56.072884891182184,
+    "episodes_per_min": 214.00718053454526,
+    "checkpoint": "checkpoints/maskable_ppo/spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724/final_model.zip",
+    "profiles": [
+      "medium"
+    ],
+    "seed_start": 210000,
+    "army_composition": {
+      "barbarian": 40,
+      "wall_breaker": 10
+    },
+    "spell_composition": {
+      "rage": 2,
+      "freeze": 2
+    },
+    "max_ticks": 900,
+    "workers": 24
+  },
+  "by_profile": {
+    "medium": {
+      "episodes": 200,
+      "score_mean": 2.969224143302181,
+      "damage_mean": 0.8142241433021807,
+      "stars_mean": 2.155,
+      "wall_breakers_deployed_mean": 9.29,
+      "wall_breaker_explosions_mean": 8.775,
+      "wall_breakers_dead_without_explosion_mean": 0.395,
+      "wb_unique_walls_damaged_mean": 21.155,
+      "wb_unique_walls_destroyed_mean": 18.555,
+      "final_walls_destroyed_mean": 30.285,
+      "episodes_with_wb_deployed_rate": 0.985,
+      "episodes_with_wb_explosion_rate": 0.96,
+      "episodes_with_wb_wall_destroy_rate": 0.95,
+      "explosions_per_deployed_wb": 0.9445640473627557,
+      "destroyed_walls_per_deployed_wb": 1.997308934337998,
+      "destroyed_walls_per_wb_explosion": 2.1145299145299146,
+      "wb_wall_damage_fraction_of_total_wall_damage": 0.6195772028939232,
+      "wb_fresh_walls_destroyed_total": 0,
+      "wb_predamaged_walls_destroyed_total": 3711
+    }
+  },
+  "json": "runs/analysis/wall_breakers/seed72_medium_n200.json",
+  "csv": "runs/analysis/wall_breakers/seed72_medium_n200.csv"
+}

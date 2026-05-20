@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 164.91225969791412,
+  "final_model": "checkpoints/maskable_ppo_smoke/smoke_reward_v3_finetune/final_model.zip",
+  "finished_at_unix": 1779123444.8066223,
+  "num_timesteps": 8032256,
+  "run_name": "smoke_reward_v3_finetune",
+  "started_at_unix": 1779123279.894364,
+  "status": "completed"
+}

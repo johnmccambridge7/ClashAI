@@ -224,20 +224,7 @@ def main() -> None:
         },
     }
     print(json.dumps({k: str(v) if isinstance(v, Path) else v for k, v in config.items()}, indent=2), flush=True)
-    wandb_run = init_wandb_run(
-        enabled=args.wandb,
-        project=config["wandb"]["project"],
-        entity=config["wandb"]["entity"],
-        name=f"eval-{name}",
-        config={k: str(v) if isinstance(v, Path) else v for k, v in config.items()},
-        group=args.wandb_group,
-        job_type="eval",
-        tags=parse_wandb_tags(args.wandb_tags),
-        mode=config["wandb"]["mode"],
-        run_id=args.wandb_run_id,
-        step_metric="eval/episodes",
-    )
-
+    wandb_run = None
     wandb_status = "failed"
     try:
         results, elapsed = evaluate_parallel(
@@ -257,7 +244,23 @@ def main() -> None:
         json_path, csv_path, summary = write_results(args.output_dir, name, results, elapsed, config)
         print(f"wrote: {json_path}", flush=True)
 
-        if wandb_run is not None:
+        if args.wandb:
+            # Initialize W&B only after ProcessPool evaluation completes. W&B
+            # starts background threads/processes, and forking workers after
+            # that can leave parallel eval workers idle.
+            wandb_run = init_wandb_run(
+                enabled=True,
+                project=config["wandb"]["project"],
+                entity=config["wandb"]["entity"],
+                name=f"eval-{name}",
+                config={k: str(v) if isinstance(v, Path) else v for k, v in config.items()},
+                group=args.wandb_group,
+                job_type="eval",
+                tags=parse_wandb_tags(args.wandb_tags),
+                mode=config["wandb"]["mode"],
+                run_id=args.wandb_run_id,
+                step_metric="eval/episodes",
+            )
             records = [asdict(result) for result in results]
             payload: dict[str, Any] = {f"eval/{key}": value for key, value in summary.items()}
             for profile in sorted({result.profile for result in results}):

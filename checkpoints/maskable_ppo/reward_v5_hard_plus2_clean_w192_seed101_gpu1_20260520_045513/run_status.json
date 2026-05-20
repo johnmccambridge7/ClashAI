@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 32327.000930018025,
+  "final_model": "checkpoints/maskable_ppo/reward_v5_hard_plus2_clean_w192_seed101_gpu1_20260520_045513/final_model.zip",
+  "finished_at_unix": 1779285252.655198,
+  "num_timesteps": 12091392,
+  "run_name": "reward_v5_hard_plus2_clean_w192_seed101_gpu1_20260520_045513",
+  "started_at_unix": 1779252925.6542704,
+  "status": "completed"
+}

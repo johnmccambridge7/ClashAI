@@ -30,17 +30,39 @@ _RANGE_NORM: float = float(GRID_SIZE)
 _SECONDS_NORM: float = 5.0
 TIME_COST_PER_TICK: float = 1e-4
 TOWNHALL_DEPLOY_BUFFER: float = 2.0
-RAGE_EFFECT_REWARD_COEF: float = 0.15
-FREEZE_THREAT_TICK_REWARD: float = 0.002
+RAGE_EFFECT_REWARD_COEF: float = 0.35
+FREEZE_THREAT_TICK_REWARD: float = 0.0005
+FREEZE_THREAT_DAMAGE_REWARD_COEF: float = 0.75
+DEFENSE_DAMAGE_REWARD_COEF: float = 0.12
+TOWNHALL_DAMAGE_REWARD_COEF: float = 0.10
+DEFENSE_DESTROY_REWARD: float = 0.005
+TOWNHALL_DESTROY_REWARD: float = 0.05
 WASTED_SPELL_CAST_PENALTY: float = 0.02
 UNUSED_SPELL_TERMINAL_PENALTY: float = 0.03
-MAX_RAGE_EFFECT_REWARD: float = 0.10
+SPLASH_CLUSTER_RISK_PENALTY_COEF: float = 0.05
+MULTI_HIT_SPLASH_DAMAGE_PENALTY_COEF: float = 0.18
+DEPLOY_CROWDING_PENALTY_COEF: float = 0.003
+FRONT_DAMAGE_REWARD_COEF: float = 0.12
+WALL_BREAKER_OPENING_REWARD: float = 0.004
+WALL_BREAKER_DEATH_PENALTY: float = 0.006
+SURVIVAL_REWARD_COEF: float = 0.06
+MAX_RAGE_EFFECT_REWARD: float = 0.15
 MAX_FREEZE_EFFECT_REWARD: float = 0.10
+MAX_DEFENSE_DAMAGE_REWARD: float = 0.15
+MAX_TOWNHALL_DAMAGE_REWARD: float = 0.10
+MAX_DEFENSE_DESTROY_REWARD: float = 0.08
+MAX_TOWNHALL_DESTROY_REWARD: float = 0.05
 MAX_WASTED_SPELL_PENALTY: float = 0.08
 MAX_UNUSED_SPELL_TERMINAL_PENALTY: float = 0.12
+MAX_SPLASH_CLUSTER_RISK_PENALTY: float = 0.03
+MAX_MULTI_HIT_SPLASH_DAMAGE_PENALTY: float = 0.12
+MAX_DEPLOY_CROWDING_PENALTY: float = 0.10
+MAX_FRONT_DAMAGE_REWARD: float = 0.12
+MAX_WALL_BREAKER_OPENING_REWARD: float = 0.10
+MAX_WALL_BREAKER_DEATH_PENALTY: float = 0.10
+MAX_SURVIVAL_REWARD: float = 0.08
 RAGE_MASK_TOP_K: int = 32
 FREEZE_MASK_TOP_K: int = 24
-FREEZE_THREAT_BUFFER: float = 2.0
 
 
 N_DEPLOY_CELLS: int = GRID_SIZE * GRID_SIZE
@@ -217,8 +239,19 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
         self._prev_score: float = 0.0
         self._rage_effect_reward_total: float = 0.0
         self._freeze_effect_reward_total: float = 0.0
+        self._defense_damage_reward_total: float = 0.0
+        self._townhall_damage_reward_total: float = 0.0
+        self._defense_destroy_reward_total: float = 0.0
+        self._townhall_destroy_reward_total: float = 0.0
         self._wasted_spell_penalty_total: float = 0.0
         self._unused_spell_penalty_total: float = 0.0
+        self._splash_risk_penalty_total: float = 0.0
+        self._multi_hit_splash_penalty_total: float = 0.0
+        self._deploy_crowding_penalty_total: float = 0.0
+        self._front_damage_reward_total: float = 0.0
+        self._wall_breaker_reward_total: float = 0.0
+        self._wall_breaker_death_penalty_total: float = 0.0
+        self._survival_reward_total: float = 0.0
         self._last_reward_components: dict[str, float] = {}
         self._mask_cache_key: tuple[Any, ...] | None = None
         self._mask_cache: np.ndarray | None = None
@@ -242,8 +275,19 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
         self._prev_score = 0.0
         self._rage_effect_reward_total = 0.0
         self._freeze_effect_reward_total = 0.0
+        self._defense_damage_reward_total = 0.0
+        self._townhall_damage_reward_total = 0.0
+        self._defense_destroy_reward_total = 0.0
+        self._townhall_destroy_reward_total = 0.0
         self._wasted_spell_penalty_total = 0.0
         self._unused_spell_penalty_total = 0.0
+        self._splash_risk_penalty_total = 0.0
+        self._multi_hit_splash_penalty_total = 0.0
+        self._deploy_crowding_penalty_total = 0.0
+        self._front_damage_reward_total = 0.0
+        self._wall_breaker_reward_total = 0.0
+        self._wall_breaker_death_penalty_total = 0.0
+        self._survival_reward_total = 0.0
         self._last_reward_components = {}
         self._mask_cache_key = None
         self._mask_cache = None
@@ -260,12 +304,25 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
 
         prev_rage_bonus_damage = self.sim.rage_bonus_scored_damage
         prev_frozen_threat_ticks = self.sim.frozen_threat_ticks
+        prev_frozen_threat_damage = self.sim.frozen_threat_damage_prevented
+        prev_defense_damage = self.sim.defense_damage
+        prev_townhall_damage = self.sim.townhall_damage
+        prev_defenses_destroyed = self.sim.defenses_destroyed
+        prev_townhall_destroyed = self.sim.townhall_destroyed
         prev_wasted_spell_casts = self.sim.wasted_spell_casts
+        prev_splash_cluster_risk = self.sim.splash_cluster_risk
+        prev_multi_hit_splash_damage = self.sim.multi_hit_splash_damage_taken
+        prev_origin_damage = tuple(self.sim.scored_damage_by_origin_quadrant)
+        prev_wall_breaker_openings = self.sim.wall_breaker_destroyed_wall_segments
+        prev_wall_breaker_deaths = self.sim.wall_breakers_dead_without_explosion
+        deploy_crowding_count = 0.0
+        deployed_troop = False
 
         if 0 <= action < N_DEPLOY_ACTIONS:
             troop_kind, x, y = decode_deploy_action(action)
             if self._can_deploy_cell(x, y):
-                self.sim.deploy(x + 0.5, y + 0.5, troop_kind=troop_kind)
+                deploy_crowding_count = self._deployment_crowding_at(x, y, troop_kind)
+                deployed_troop = self.sim.deploy(x + 0.5, y + 0.5, troop_kind=troop_kind)
         elif self.spells_enabled and WAIT_ACTION < action < self.n_actions:
             spell_kind, x, y = decode_spell_action(action)
             if self._can_cast_spell_cell(x, y, spell_kind):
@@ -280,6 +337,7 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
             ticks_advanced += 1
 
         score = self.sim.score
+        score_delta = max(0.0, score - self._prev_score)
         base_reward = float(score - self._prev_score - TIME_COST_PER_TICK * ticks_advanced)
         self._prev_score = score
 
@@ -295,12 +353,113 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
         self._rage_effect_reward_total += rage_reward
 
         frozen_threat_delta = max(0, self.sim.frozen_threat_ticks - prev_frozen_threat_ticks)
+        frozen_threat_damage_delta = max(
+            0.0,
+            self.sim.frozen_threat_damage_prevented - prev_frozen_threat_damage,
+        )
+        frozen_threat_damage_pct_delta = frozen_threat_damage_delta / max(1e-9, self.sim.original_army_hp)
         freeze_reward = self._consume_reward_cap(
-            FREEZE_THREAT_TICK_REWARD * frozen_threat_delta,
+            FREEZE_THREAT_TICK_REWARD * frozen_threat_delta
+            + FREEZE_THREAT_DAMAGE_REWARD_COEF * frozen_threat_damage_pct_delta,
             current=self._freeze_effect_reward_total,
             cap=MAX_FREEZE_EFFECT_REWARD,
         )
         self._freeze_effect_reward_total += freeze_reward
+
+        defense_damage_delta = max(0.0, self.sim.defense_damage - prev_defense_damage)
+        defense_damage_pct_delta = defense_damage_delta / max(1e-9, self.sim.original_defense_hp)
+        defense_damage_reward = self._consume_reward_cap(
+            DEFENSE_DAMAGE_REWARD_COEF * defense_damage_pct_delta,
+            current=self._defense_damage_reward_total,
+            cap=MAX_DEFENSE_DAMAGE_REWARD,
+        )
+        self._defense_damage_reward_total += defense_damage_reward
+
+        townhall_damage_delta = max(0.0, self.sim.townhall_damage - prev_townhall_damage)
+        townhall_damage_pct_delta = townhall_damage_delta / max(1e-9, self.sim.original_townhall_hp)
+        townhall_damage_reward = self._consume_reward_cap(
+            TOWNHALL_DAMAGE_REWARD_COEF * townhall_damage_pct_delta,
+            current=self._townhall_damage_reward_total,
+            cap=MAX_TOWNHALL_DAMAGE_REWARD,
+        )
+        self._townhall_damage_reward_total += townhall_damage_reward
+
+        defenses_destroyed_delta = max(0, self.sim.defenses_destroyed - prev_defenses_destroyed)
+        defense_destroy_reward = self._consume_reward_cap(
+            DEFENSE_DESTROY_REWARD * defenses_destroyed_delta,
+            current=self._defense_destroy_reward_total,
+            cap=MAX_DEFENSE_DESTROY_REWARD,
+        )
+        self._defense_destroy_reward_total += defense_destroy_reward
+
+        townhall_destroyed_delta = max(0, self.sim.townhall_destroyed - prev_townhall_destroyed)
+        townhall_destroy_reward = self._consume_reward_cap(
+            TOWNHALL_DESTROY_REWARD * townhall_destroyed_delta,
+            current=self._townhall_destroy_reward_total,
+            cap=MAX_TOWNHALL_DESTROY_REWARD,
+        )
+        self._townhall_destroy_reward_total += townhall_destroy_reward
+
+        splash_cluster_risk_delta = max(0.0, self.sim.splash_cluster_risk - prev_splash_cluster_risk)
+        splash_cluster_risk_pct_delta = splash_cluster_risk_delta / max(1e-9, self.sim.original_army_hp)
+        splash_risk_penalty = self._consume_reward_cap(
+            SPLASH_CLUSTER_RISK_PENALTY_COEF * splash_cluster_risk_pct_delta,
+            current=self._splash_risk_penalty_total,
+            cap=MAX_SPLASH_CLUSTER_RISK_PENALTY,
+        )
+        self._splash_risk_penalty_total += splash_risk_penalty
+
+        multi_hit_splash_delta = max(
+            0.0,
+            self.sim.multi_hit_splash_damage_taken - prev_multi_hit_splash_damage,
+        )
+        multi_hit_splash_pct_delta = multi_hit_splash_delta / max(1e-9, self.sim.original_army_hp)
+        # Splash is not inherently bad if it buys objective progress; this term
+        # mainly punishes clustered damage when no score changed in the same step.
+        inefficient_splash_pct_delta = multi_hit_splash_pct_delta * (0.35 if score_delta > 0.005 else 1.0)
+        multi_hit_splash_penalty = self._consume_reward_cap(
+            MULTI_HIT_SPLASH_DAMAGE_PENALTY_COEF * inefficient_splash_pct_delta,
+            current=self._multi_hit_splash_penalty_total,
+            cap=MAX_MULTI_HIT_SPLASH_DAMAGE_PENALTY,
+        )
+        self._multi_hit_splash_penalty_total += multi_hit_splash_penalty
+
+        deploy_crowding_penalty = 0.0
+        if deployed_troop and deploy_crowding_count > 0.0:
+            deploy_crowding_penalty = self._consume_reward_cap(
+                DEPLOY_CROWDING_PENALTY_COEF * deploy_crowding_count,
+                current=self._deploy_crowding_penalty_total,
+                cap=MAX_DEPLOY_CROWDING_PENALTY,
+            )
+            self._deploy_crowding_penalty_total += deploy_crowding_penalty
+
+        front_damage_pct_delta = max(
+            0.0,
+            self._second_origin_damage_pct(self.sim.scored_damage_by_origin_quadrant)
+            - self._second_origin_damage_pct(prev_origin_damage),
+        )
+        front_damage_reward = self._consume_reward_cap(
+            FRONT_DAMAGE_REWARD_COEF * front_damage_pct_delta,
+            current=self._front_damage_reward_total,
+            cap=MAX_FRONT_DAMAGE_REWARD,
+        )
+        self._front_damage_reward_total += front_damage_reward
+
+        wall_breaker_opening_delta = max(0, self.sim.wall_breaker_destroyed_wall_segments - prev_wall_breaker_openings)
+        wall_breaker_reward = self._consume_reward_cap(
+            WALL_BREAKER_OPENING_REWARD * wall_breaker_opening_delta,
+            current=self._wall_breaker_reward_total,
+            cap=MAX_WALL_BREAKER_OPENING_REWARD,
+        )
+        self._wall_breaker_reward_total += wall_breaker_reward
+
+        wall_breaker_death_delta = max(0, self.sim.wall_breakers_dead_without_explosion - prev_wall_breaker_deaths)
+        wall_breaker_death_penalty = self._consume_reward_cap(
+            WALL_BREAKER_DEATH_PENALTY * wall_breaker_death_delta,
+            current=self._wall_breaker_death_penalty_total,
+            cap=MAX_WALL_BREAKER_DEATH_PENALTY,
+        )
+        self._wall_breaker_death_penalty_total += wall_breaker_death_penalty
 
         wasted_delta = max(0, self.sim.wasted_spell_casts - prev_wasted_spell_casts)
         wasted_penalty = self._consume_reward_cap(
@@ -318,16 +477,75 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
             )
             self._unused_spell_penalty_total += unused_penalty
 
-        reward = float(base_reward + rage_reward + freeze_reward - wasted_penalty - unused_penalty)
+        survival_reward = 0.0
+        if terminated or truncated:
+            attack_connected = score >= 1.0 or self.sim.damage_pct >= 0.5 or self.sim.townhall_destroyed
+            if attack_connected:
+                alive_hp = sum(max(0.0, troop.hp) for troop in self.sim.troops if troop.alive)
+                survival_reward = self._consume_reward_cap(
+                    SURVIVAL_REWARD_COEF * alive_hp / max(1e-9, self.sim.original_army_hp),
+                    current=self._survival_reward_total,
+                    cap=MAX_SURVIVAL_REWARD,
+                )
+                self._survival_reward_total += survival_reward
+
+        objective_reward = (
+            defense_damage_reward
+            + townhall_damage_reward
+            + defense_destroy_reward
+            + townhall_destroy_reward
+        )
+        tactical_reward = (
+            front_damage_reward
+            + wall_breaker_reward
+            + survival_reward
+            - splash_risk_penalty
+            - multi_hit_splash_penalty
+            - deploy_crowding_penalty
+            - wall_breaker_death_penalty
+        )
+        reward = float(
+            base_reward
+            + rage_reward
+            + freeze_reward
+            + objective_reward
+            + tactical_reward
+            - wasted_penalty
+            - unused_penalty
+        )
         self._last_reward_components = {
             "reward_base": base_reward,
             "reward_rage_effect": rage_reward,
             "reward_freeze_effect": freeze_reward,
+            "reward_defense_damage": defense_damage_reward,
+            "reward_townhall_damage": townhall_damage_reward,
+            "reward_defense_destroy": defense_destroy_reward,
+            "reward_townhall_destroy": townhall_destroy_reward,
+            "reward_objective_shaping": objective_reward,
+            "reward_front_damage": front_damage_reward,
+            "reward_wall_breaker_opening": wall_breaker_reward,
+            "reward_survival": survival_reward,
+            "reward_splash_risk_penalty": splash_risk_penalty,
+            "reward_multi_hit_splash_penalty": multi_hit_splash_penalty,
+            "reward_deploy_crowding_penalty": deploy_crowding_penalty,
+            "reward_wall_breaker_death_penalty": wall_breaker_death_penalty,
+            "reward_tactical_shaping": tactical_reward,
             "reward_wasted_spell_penalty": wasted_penalty,
             "reward_unused_spell_penalty": unused_penalty,
             "reward_spell_shaping": rage_reward + freeze_reward - wasted_penalty - unused_penalty,
             "rage_bonus_damage_pct_delta": rage_damage_pct_delta,
             "frozen_threat_ticks_delta": float(frozen_threat_delta),
+            "frozen_threat_damage_pct_delta": frozen_threat_damage_pct_delta,
+            "defense_damage_pct_delta": defense_damage_pct_delta,
+            "townhall_damage_pct_delta": townhall_damage_pct_delta,
+            "defenses_destroyed_delta": float(defenses_destroyed_delta),
+            "townhall_destroyed_delta": float(townhall_destroyed_delta),
+            "splash_cluster_risk_pct_delta": splash_cluster_risk_pct_delta,
+            "multi_hit_splash_damage_pct_delta": multi_hit_splash_pct_delta,
+            "front_damage_second_pct_delta": front_damage_pct_delta,
+            "wall_breaker_opening_delta": float(wall_breaker_opening_delta),
+            "wall_breaker_death_delta": float(wall_breaker_death_delta),
+            "deploy_crowding_count": float(deploy_crowding_count if deployed_troop else 0.0),
             "wasted_spell_casts_delta": float(wasted_delta),
         }
         return self._obs(), reward, terminated, truncated, self._info()
@@ -378,6 +596,34 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
             return 0.0
         return min(value, max(0.0, cap - current))
 
+    def _deployment_crowding_at(self, x: int, y: int, troop_kind: str) -> float:
+        assert self.sim is not None
+        if troop_kind != "barbarian":
+            return 0.0
+        return float(sum(
+            1
+            for px, py, kind in self.sim.deployment_cells
+            if kind == troop_kind and abs(px - x) <= 1 and abs(py - y) <= 1
+        ))
+
+    def _second_origin_damage_pct(self, damage_by_quadrant: list[float] | tuple[float, ...]) -> float:
+        assert self.sim is not None
+        if len(damage_by_quadrant) < 2:
+            return 0.0
+        ranked = sorted((max(0.0, float(value)) for value in damage_by_quadrant), reverse=True)
+        return ranked[1] / max(1e-9, self.sim.original_total_hp)
+
+    @staticmethod
+    def _float_entropy(values: list[float]) -> float:
+        total = sum(max(0.0, value) for value in values)
+        if total <= 1e-9:
+            return 0.0
+        probs = [max(0.0, value) / total for value in values if value > 0.0]
+        if len(probs) <= 1:
+            return 0.0
+        entropy = -sum(p * math.log(p) for p in probs)
+        return float(entropy / max(1e-9, math.log(len(values))))
+
     def _semantic_spell_cell_mask(self, spell_kind: str) -> np.ndarray:
         assert self.sim is not None
         if not self._can_cast_spell_kind(spell_kind):
@@ -418,7 +664,7 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
         assert self.sim is not None
         spec = SPELL_SPECS["rage"]
         scores = np.zeros(N_DEPLOY_CELLS, dtype=np.float32)
-        troops = self.sim.active_troops
+        troops = [troop for troop in self.sim.active_troops if self.sim.troop_has_attack_opportunity(troop)]
         if not troops:
             return scores
         active_rages = [spell for spell in self.sim.active_spells if spell.kind == "rage"]
@@ -467,23 +713,22 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
     def _defense_threat_weight(self, defense: Building) -> float:
         assert self.sim is not None
         cx, cy = defense.center
-        nearest_margin: float | None = None
+        nearest_score: float | None = None
+        span = max(1.0, defense.spec.attack_range - defense.spec.min_attack_range)
         for troop in self.sim.active_troops:
             d = math.hypot(troop.x - cx, troop.y - cy)
-            if d < defense.spec.min_attack_range:
+            if d < defense.spec.min_attack_range or d > defense.spec.attack_range:
                 continue
-            margin = defense.spec.attack_range + FREEZE_THREAT_BUFFER - d
-            if margin < 0.0:
-                continue
-            nearest_margin = margin if nearest_margin is None else max(nearest_margin, margin)
-        if nearest_margin is None:
+            score = 1.0 + (defense.spec.attack_range - d) / span
+            nearest_score = score if nearest_score is None else max(nearest_score, score)
+        if nearest_score is None:
             return 0.0
         attack_rate = (
             defense.spec.damage / max(1e-9, defense.spec.attack_cooldown)
             if defense.spec.damage > 0.0
             else defense.spec.dps
         )
-        return max(1.0, attack_rate) * (1.0 + nearest_margin / max(1.0, FREEZE_THREAT_BUFFER))
+        return max(1.0, attack_rate) * nearest_score
 
     def _can_deploy_cell(self, x: int, y: int) -> bool:
         assert self.sim is not None
@@ -510,6 +755,51 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
             and 0 <= y < GRID_SIZE
             and self.sim.spells_remaining_by_kind.get(spell_kind, 0) > 0
         )
+
+    @staticmethod
+    def _normalized_entropy(counts: list[int]) -> float:
+        total = sum(counts)
+        if total <= 1:
+            return 0.0
+        probs = [count / total for count in counts if count > 0]
+        entropy = -sum(p * math.log(p) for p in probs)
+        return float(entropy / max(1e-9, math.log(min(total, len(counts)))))
+
+    def _deployment_metrics(self) -> dict[str, float]:
+        assert self.sim is not None
+        cells = [(x, y) for x, y, _ in self.sim.deployment_cells]
+        total = len(cells)
+        if total == 0:
+            return {
+                "deployments": 0.0,
+                "deployment_unique_cells": 0.0,
+                "deployment_top_cell_fraction": 0.0,
+                "deployment_top3_cell_fraction": 0.0,
+                "deployment_quadrant_entropy": 0.0,
+            }
+        counts: dict[tuple[int, int], int] = {}
+        quadrants = [0, 0, 0, 0]
+        for x, y in cells:
+            counts[(x, y)] = counts.get((x, y), 0) + 1
+            quadrants[int(x >= GRID_SIZE / 2) + 2 * int(y >= GRID_SIZE / 2)] += 1
+        ranked = sorted(counts.values(), reverse=True)
+        return {
+            "deployments": float(total),
+            "deployment_unique_cells": float(len(counts)),
+            "deployment_top_cell_fraction": ranked[0] / total,
+            "deployment_top3_cell_fraction": sum(ranked[:3]) / total,
+            "deployment_quadrant_entropy": self._normalized_entropy(quadrants),
+        }
+
+    def _front_damage_metrics(self) -> dict[str, float]:
+        assert self.sim is not None
+        values = self.sim.scored_damage_by_origin_quadrant
+        total = sum(values)
+        return {
+            "front_damage_total_pct": total / max(1e-9, self.sim.original_total_hp),
+            "front_damage_second_pct": self._second_origin_damage_pct(values),
+            "front_damage_quadrant_entropy": self._float_entropy(values),
+        }
 
     def _make_layout(self, options: dict[str, Any] | None) -> list[Building]:
         profile = self.layout_profile
@@ -642,6 +932,8 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
 
     def _info(self) -> dict[str, Any]:
         assert self.sim is not None
+        deployment_metrics = self._deployment_metrics()
+        front_damage_metrics = self._front_damage_metrics()
         return {
             "profile":        self._current_profile_name,
             "damage_pct":     self.sim.damage_pct,
@@ -665,12 +957,56 @@ class CoCEnv(gym.Env[dict[str, np.ndarray], int]):
             "wasted_rage_casts": self.sim.wasted_spell_casts_by_kind.get("rage", 0),
             "wasted_freeze_casts": self.sim.wasted_spell_casts_by_kind.get("freeze", 0),
             "rage_bonus_damage_pct": self.sim.rage_bonus_scored_damage / max(1e-9, self.sim.original_total_hp),
+            "rage_bonus_defense_damage_pct": self.sim.rage_bonus_defense_damage / max(1e-9, self.sim.original_defense_hp),
+            "rage_bonus_townhall_damage_pct": self.sim.rage_bonus_townhall_damage / max(1e-9, self.sim.original_townhall_hp),
+            "defense_damage_pct": self.sim.defense_damage / max(1e-9, self.sim.original_defense_hp),
+            "townhall_damage_pct": self.sim.townhall_damage / max(1e-9, self.sim.original_townhall_hp),
+            "defenses_destroyed": self.sim.defenses_destroyed,
+            "townhall_destroyed": self.sim.townhall_destroyed,
             "frozen_defense_ticks": self.sim.frozen_defense_ticks,
             "frozen_threat_ticks": self.sim.frozen_threat_ticks,
+            "frozen_threat_damage_pct": self.sim.frozen_threat_damage_prevented / max(1e-9, self.sim.original_army_hp),
+            "troop_damage_taken_pct": self.sim.troop_damage_taken / max(1e-9, self.sim.original_army_hp),
+            "splash_damage_taken_pct": self.sim.splash_damage_taken / max(1e-9, self.sim.original_army_hp),
+            "multi_hit_splash_damage_pct": self.sim.multi_hit_splash_damage_taken / max(1e-9, self.sim.original_army_hp),
+            "splash_cluster_risk_pct": self.sim.splash_cluster_risk / max(1e-9, self.sim.original_army_hp),
+            "multi_hit_splash_events": self.sim.multi_hit_splash_events,
+            "wall_breaker_explosions": self.sim.wall_breaker_explosions,
+            "wall_breaker_damaged_wall_segments": self.sim.wall_breaker_damaged_wall_segments,
+            "wall_breaker_destroyed_wall_segments": self.sim.wall_breaker_destroyed_wall_segments,
+            "wall_breakers_dead_without_explosion": self.sim.wall_breakers_dead_without_explosion,
+            **deployment_metrics,
+            **front_damage_metrics,
             "rage_effect_reward_total": self._rage_effect_reward_total,
             "freeze_effect_reward_total": self._freeze_effect_reward_total,
+            "defense_damage_reward_total": self._defense_damage_reward_total,
+            "townhall_damage_reward_total": self._townhall_damage_reward_total,
+            "defense_destroy_reward_total": self._defense_destroy_reward_total,
+            "townhall_destroy_reward_total": self._townhall_destroy_reward_total,
+            "objective_shaping_reward_total": (
+                self._defense_damage_reward_total
+                + self._townhall_damage_reward_total
+                + self._defense_destroy_reward_total
+                + self._townhall_destroy_reward_total
+            ),
             "wasted_spell_penalty_total": self._wasted_spell_penalty_total,
             "unused_spell_penalty_total": self._unused_spell_penalty_total,
+            "splash_risk_penalty_total": self._splash_risk_penalty_total,
+            "multi_hit_splash_penalty_total": self._multi_hit_splash_penalty_total,
+            "deploy_crowding_penalty_total": self._deploy_crowding_penalty_total,
+            "front_damage_reward_total": self._front_damage_reward_total,
+            "wall_breaker_reward_total": self._wall_breaker_reward_total,
+            "wall_breaker_death_penalty_total": self._wall_breaker_death_penalty_total,
+            "survival_reward_total": self._survival_reward_total,
+            "tactical_shaping_reward_total": (
+                self._front_damage_reward_total
+                + self._wall_breaker_reward_total
+                + self._survival_reward_total
+                - self._splash_risk_penalty_total
+                - self._multi_hit_splash_penalty_total
+                - self._deploy_crowding_penalty_total
+                - self._wall_breaker_death_penalty_total
+            ),
             "spell_shaping_reward_total": (
                 self._rage_effect_reward_total
                 + self._freeze_effect_reward_total

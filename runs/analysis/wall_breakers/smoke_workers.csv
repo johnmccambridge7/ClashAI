@@ -1,0 +1,5 @@
+profile,seed,steps,ticks,score,damage_pct,stars,terminated,truncated,wall_breakers_deployed,wall_breakers_alive_final,wall_breaker_explosions,wall_breakers_dead_without_explosion,wb_wall_damage,wb_unique_walls_damaged,wb_unique_walls_destroyed,wb_fresh_walls_destroyed,wb_predamaged_walls_destroyed,final_walls_damaged,final_walls_destroyed,total_wall_damage
+easy,11,65,645,2.874750830564784,0.8747508305647841,2,True,False,10,0,7,3,5100.0,22,12,0,12,28,20,7099.0
+easy,12,52,518,4.0,1.0,3,True,False,10,0,7,3,5186.5,26,10,0,10,35,27,9283.0
+easy,13,60,591,4.0,1.0,3,True,False,10,0,5,5,3750.0,15,10,0,10,26,18,6377.5
+easy,14,60,597,2.598031561461794,0.5980315614617939,2,True,False,10,0,6,4,4500.0,20,10,0,10,24,15,5924.5

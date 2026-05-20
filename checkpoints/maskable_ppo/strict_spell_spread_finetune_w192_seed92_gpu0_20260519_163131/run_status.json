@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 31673.365185579984,
+  "final_model": "checkpoints/maskable_ppo/strict_spell_spread_finetune_w192_seed92_gpu0_20260519_163131/final_model.zip",
+  "finished_at_unix": 1779239976.0632408,
+  "num_timesteps": 22118400,
+  "run_name": "strict_spell_spread_finetune_w192_seed92_gpu0_20260519_163131",
+  "started_at_unix": 1779208302.6980567,
+  "status": "completed"
+}

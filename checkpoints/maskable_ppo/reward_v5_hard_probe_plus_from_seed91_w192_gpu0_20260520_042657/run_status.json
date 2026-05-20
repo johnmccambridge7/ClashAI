@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 1673.5189353979658,
+  "final_model": "checkpoints/maskable_ppo/reward_v5_hard_probe_plus_from_seed91_w192_gpu0_20260520_042657/final_model.zip",
+  "finished_at_unix": 1779252902.7675269,
+  "num_timesteps": 10616832,
+  "run_name": "reward_v5_hard_probe_plus_from_seed91_w192_gpu0_20260520_042657",
+  "started_at_unix": 1779251229.248593,
+  "status": "completed"
+}

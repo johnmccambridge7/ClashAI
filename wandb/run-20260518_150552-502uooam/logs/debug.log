@@ -1,0 +1,19 @@
+2026-05-18 15:05:52,011 INFO    MainThread:207109 [wandb_setup.py:_flush():81] Current SDK version is 0.27.0
+2026-05-18 15:05:52,011 INFO    MainThread:207109 [wandb_setup.py:_flush():81] Configure stats pid to 207109
+2026-05-18 15:05:52,011 INFO    MainThread:207109 [wandb_setup.py:_flush():81] Loading settings from environment variables
+2026-05-18 15:05:52,011 INFO    MainThread:207109 [wandb_init.py:setup_run_log_directory():723] Logging user logs to /workspace/ClashAI/wandb/run-20260518_150552-502uooam/logs/debug.log
+2026-05-18 15:05:52,011 INFO    MainThread:207109 [wandb_init.py:setup_run_log_directory():724] Logging internal logs to /workspace/ClashAI/wandb/run-20260518_150552-502uooam/logs/debug-internal.log
+2026-05-18 15:05:52,011 INFO    MainThread:207109 [wandb_init.py:init():851] calling init triggers
+2026-05-18 15:05:52,011 INFO    MainThread:207109 [wandb_init.py:init():856] wandb.init called with sweep_config: {}
+config: {'checkpoint': 'checkpoints/maskable_ppo/spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724/final_model.zip', 'profiles': ['hard'], 'episodes': 500, 'seed_start': 220000, 'army_composition': {'barbarian': 40, 'wall_breaker': 10}, 'spell_composition': {'rage': 2, 'freeze': 2}, 'max_ticks': 900, 'max_buildings': 257, 'deterministic': True, 'device': 'cpu', 'workers': 24, 'wandb': {'enabled': True, 'project': 'ClashAI', 'entity': 'jmc314-lumenary-com', 'group': 'spell_semantic_reward_v2_final_eval', 'tags': ['eval', 'final', 'holdout', 'spell_semantic_reward_v2', 'seed72', 'hard'], 'mode': 'online', 'run_id': None}, '_wandb': {}}
+2026-05-18 15:05:52,011 INFO    MainThread:207109 [wandb_init.py:init():899] starting backend
+2026-05-18 15:05:52,225 INFO    MainThread:207109 [wandb_init.py:init():914] sending inform_init request
+2026-05-18 15:05:52,503 INFO    MainThread:207109 [wandb_init.py:init():919] backend started and connected
+2026-05-18 15:05:52,526 INFO    MainThread:207109 [wandb_init.py:init():989] updated telemetry
+2026-05-18 15:05:52,535 INFO    MainThread:207109 [wandb_init.py:init():1012] communicating run to backend with 90.0 second timeout
+2026-05-18 15:05:53,714 INFO    MainThread:207109 [wandb_init.py:init():1057] starting run threads in backend
+2026-05-18 15:05:53,785 INFO    MainThread:207109 [wandb_run.py:_console_start():2509] atexit reg
+2026-05-18 15:05:53,785 INFO    MainThread:207109 [wandb_run.py:_redirect():2359] redirect: wrap_raw
+2026-05-18 15:05:53,785 INFO    MainThread:207109 [wandb_run.py:_redirect():2428] Wrapping output streams.
+2026-05-18 15:05:53,786 INFO    MainThread:207109 [wandb_run.py:_redirect():2451] Redirects installed.
+2026-05-18 15:05:53,788 INFO    MainThread:207109 [wandb_init.py:init():1095] run started, returning control to user process

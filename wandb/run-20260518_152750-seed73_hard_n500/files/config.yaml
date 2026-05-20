@@ -1,0 +1,171 @@
+_wandb:
+    value:
+        cli_version: 0.27.0
+        e:
+            dwfeunwknn0krtvvehu9wp8jy4x2zpma:
+                args:
+                    - --wandb
+                    - --wandb-project
+                    - ClashAI
+                    - --wandb-entity
+                    - jmc314-lumenary-com
+                    - --wandb-group
+                    - spell_semantic_reward_v2_final_eval
+                    - --wandb-run-id
+                    - seed73_hard_n500
+                    - --wandb-tags
+                    - eval,final,holdout,spell_semantic_reward_v2,seed73,hard
+                    - --checkpoint
+                    - checkpoints/maskable_ppo/spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724/final_model.zip
+                    - --profile
+                    - hard
+                    - --episodes
+                    - "500"
+                    - --seed-start
+                    - "220000"
+                    - --army-composition
+                    - barbarian=40,wall_breaker=10
+                    - --spell-composition
+                    - rage=2,freeze=2
+                    - --max-ticks
+                    - "900"
+                    - --workers
+                    - "24"
+                    - --device
+                    - cpu
+                    - --output-dir
+                    - runs/eval/spell_semantic_reward_v2_final
+                    - --name
+                    - seed73_hard_n500
+                codePath: scripts/evaluate_maskable_ppo.py
+                codePathLocal: scripts/evaluate_maskable_ppo.py
+                cpu_count: 192
+                cpu_count_logical: 384
+                cudaVersion: "13.0"
+                disk:
+                    /:
+                        total: "68719476736"
+                        used: "15646339072"
+                email: john@lumenary.com
+                executable: /workspace/ClashAI/.venv/bin/python
+                git:
+                    commit: fef668854a4937dc7e29faca670d904a88a60fb9
+                    remote: https://github.com/johnmccambridge7/ClashAI
+                gpu: NVIDIA RTX PRO 5000 Blackwell
+                gpu_count: 2
+                gpu_nvidia:
+                    - architecture: Blackwell
+                      cudaCores: 14080
+                      memoryTotal: "51312066560"
+                      name: NVIDIA RTX PRO 5000 Blackwell
+                      uuid: GPU-071138fc-ce7b-5544-2219-f0476262ad3e
+                    - architecture: Blackwell
+                      cudaCores: 14080
+                      memoryTotal: "51312066560"
+                      name: NVIDIA RTX PRO 5000 Blackwell
+                      uuid: GPU-dbde3035-a6b5-3a2b-3b64-c7a6af6d02f8
+                host: 800f0fbd3e15
+                memory:
+                    total: "540499230720"
+                os: Linux-6.8.0-111-lowlatency-x86_64-with-glibc2.39
+                program: /workspace/ClashAI/scripts/evaluate_maskable_ppo.py
+                python: CPython 3.12.13
+                root: /workspace/ClashAI
+                startedAt: "2026-05-18T15:27:50.519272Z"
+                writerId: dwfeunwknn0krtvvehu9wp8jy4x2zpma
+        m:
+            - "1": eval/episodes
+              "6":
+                - 3
+              "7": []
+            - "2": eval_profile/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": rollout/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": train/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": throughput/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": gpu/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": profile/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": eval/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+        python_version: 3.12.13
+        t:
+            "3":
+                - 2
+                - 7
+                - 13
+                - 14
+                - 15
+                - 16
+                - 62
+            "4": 3.12.13
+            "5": 0.27.0
+            "12": 0.27.0
+            "13": linux-x86_64
+army_composition:
+    value:
+        barbarian: 40
+        wall_breaker: 10
+checkpoint:
+    value: checkpoints/maskable_ppo/spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724/final_model.zip
+deterministic:
+    value: true
+device:
+    value: cpu
+episodes:
+    value: 500
+max_buildings:
+    value: 257
+max_ticks:
+    value: 900
+profiles:
+    value:
+        - hard
+seed_start:
+    value: 220000
+spell_composition:
+    value:
+        freeze: 2
+        rage: 2
+wandb:
+    value:
+        enabled: true
+        entity: jmc314-lumenary-com
+        group: spell_semantic_reward_v2_final_eval
+        mode: online
+        project: ClashAI
+        run_id: seed73_hard_n500
+        tags:
+            - eval
+            - final
+            - holdout
+            - spell_semantic_reward_v2
+            - seed73
+            - hard
+workers:
+    value: 24

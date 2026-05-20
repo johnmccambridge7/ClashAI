@@ -1,0 +1,6 @@
+seed72_easy_n100 209629 runs/eval/spell_semantic_reward_v2_final/launch_logs/seed72_easy_n100.log
+seed72_medium_n500 209630 runs/eval/spell_semantic_reward_v2_final/launch_logs/seed72_medium_n500.log
+seed72_hard_n500 209631 runs/eval/spell_semantic_reward_v2_final/launch_logs/seed72_hard_n500.log
+seed73_easy_n100 209632 runs/eval/spell_semantic_reward_v2_final/launch_logs/seed73_easy_n100.log
+seed73_medium_n500 209633 runs/eval/spell_semantic_reward_v2_final/launch_logs/seed73_medium_n500.log
+seed73_hard_n500 209634 runs/eval/spell_semantic_reward_v2_final/launch_logs/seed73_hard_n500.log

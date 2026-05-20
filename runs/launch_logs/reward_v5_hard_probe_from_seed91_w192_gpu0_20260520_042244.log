@@ -1,0 +1,23 @@
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from WANDB_API_KEY.
+wandb: Currently logged in as: jmc314 (jmc314-lumenary-com) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run reward_v5_hard_probe_from_seed91_w192_gpu0_20260520_042244
+wandb: Tracking run with wandb version 0.27.0
+wandb: Run data is saved locally in /workspace/ClashAI/wandb/run-20260520_042246-reward_v5_hard_probe_from_seed91_w192_gpu0_20260520_042244
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run reward_v5_hard_probe_from_seed91_w192_gpu0_20260520_042244
+wandb: ⭐️ View project at https://wandb.ai/jmc314-lumenary-com/ClashAI
+wandb: 🚀 View run at https://wandb.ai/jmc314-lumenary-com/ClashAI/runs/reward_v5_hard_probe_from_seed91_w192_gpu0_20260520_042244
+Traceback (most recent call last):
+  File "/workspace/ClashAI/scripts/train_maskable_ppo.py", line 1157, in <module>
+    main()
+  File "/workspace/ClashAI/scripts/train_maskable_ppo.py", line 1019, in main
+    model = deps.MaskablePPO.load(
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/ClashAI/.venv/lib/python3.12/site-packages/stable_baselines3/common/base_class.py", line 717, in load
+    check_for_correct_spaces(env, data["observation_space"], data["action_space"])
+  File "/workspace/ClashAI/.venv/lib/python3.12/site-packages/stable_baselines3/common/utils.py", line 315, in check_for_correct_spaces
+    raise ValueError(f"Observation spaces do not match: {observation_space} != {env.observation_space}")
+ValueError: Observation spaces do not match: Dict('active_spells_kind': Box(0, 1, (8,), int8), 'active_spells_pos': Box(0.0, 1.0, (8, 2), float32), 'active_spells_present': MultiBinary(8), 'active_spells_radius': Box(0.0, 1.0, (8,), float32), 'active_spells_time_remaining': Box(0.0, 1.0, (8,), float32), 'army_remaining': Box(0.0, 1.0, (1,), float32), 'buildings_alive': MultiBinary(257), 'buildings_attack_range': Box(0.0, 1.0, (257,), float32), 'buildings_blocks_move': MultiBinary(257), 'buildings_cooldown': Box(0.0, 1.0, (257,), float32), 'buildings_dps': Box(0.0, 1.0, (257,), float32), 'buildings_hp': Box(0.0, 1.0, (257,), float32), 'buildings_is_defense': MultiBinary(257), 'buildings_is_trap': MultiBinary(257), 'buildings_kind': Box(0, 6, (257,), int8), 'buildings_min_attack_range': Box(0.0, 1.0, (257,), float32), 'buildings_pos': Box(0.0, 1.0, (257, 2), float32), 'buildings_present': MultiBinary(257), 'buildings_size': Box(0.0, 1.0, (257,), float32), 'buildings_splash_radius': Box(0.0, 1.0, (257,), float32), 'spells_remaining': Box(0.0, 1.0, (2,), float32), 'time_remaining': Box(0.0, 1.0, (1,), float32), 'troops_alive': MultiBinary(65), 'troops_hp': Box(0.0, 1.0, (65,), float32), 'troops_kind': Box(0, 1, (65,), int8), 'troops_pos': Box(0.0, 1.0, (65, 2), float32), 'troops_target': Box(-1.0, 1.0, (65,), float32)) != Dict('active_spells_kind': Box(0, 1, (4,), int8), 'active_spells_pos': Box(0.0, 1.0, (4, 2), float32), 'active_spells_present': MultiBinary(4), 'active_spells_radius': Box(0.0, 1.0, (4,), float32), 'active_spells_time_remaining': Box(0.0, 1.0, (4,), float32), 'army_remaining': Box(0.0, 1.0, (1,), float32), 'buildings_alive': MultiBinary(257), 'buildings_attack_range': Box(0.0, 1.0, (257,), float32), 'buildings_blocks_move': MultiBinary(257), 'buildings_cooldown': Box(0.0, 1.0, (257,), float32), 'buildings_dps': Box(0.0, 1.0, (257,), float32), 'buildings_hp': Box(0.0, 1.0, (257,), float32), 'buildings_is_defense': MultiBinary(257), 'buildings_is_trap': MultiBinary(257), 'buildings_kind': Box(0, 6, (257,), int8), 'buildings_min_attack_range': Box(0.0, 1.0, (257,), float32), 'buildings_pos': Box(0.0, 1.0, (257, 2), float32), 'buildings_present': MultiBinary(257), 'buildings_size': Box(0.0, 1.0, (257,), float32), 'buildings_splash_radius': Box(0.0, 1.0, (257,), float32), 'spells_remaining': Box(0.0, 1.0, (2,), float32), 'time_remaining': Box(0.0, 1.0, (1,), float32), 'troops_alive': MultiBinary(50), 'troops_hp': Box(0.0, 1.0, (50,), float32), 'troops_kind': Box(0, 1, (50,), int8), 'troops_pos': Box(0.0, 1.0, (50, 2), float32), 'troops_target': Box(-1.0, 1.0, (50,), float32))
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mreward_v5_hard_probe_from_seed91_w192_gpu0_20260520_042244[0m at: [34mhttps://wandb.ai/jmc314-lumenary-com/ClashAI/runs/reward_v5_hard_probe_from_seed91_w192_gpu0_20260520_042244[0m
+[1;34mwandb[0m: Find logs at: [1;35mwandb/run-20260520_042246-reward_v5_hard_probe_from_seed91_w192_gpu0_20260520_042244/logs[0m

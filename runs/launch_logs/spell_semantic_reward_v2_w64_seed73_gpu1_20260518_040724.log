@@ -26859,3 +26859,146 @@ timesteps=7994368 | env_steps/sec=223.5 | episodes/sec=3.88 | gpu_util_mean=0% g
 ------------------------------------------------------
 timesteps=7995456 | env_steps/sec=115.6 | episodes/sec=1.38 | gpu_util_mean=18% gpu_util_max=37% | gpu_mem_mean=2.3/47.8GB
 timesteps=7996544 | env_steps/sec=215.9 | episodes/sec=2.78 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=7997632 | env_steps/sec=217.3 | episodes/sec=4.39 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=7998784 | env_steps/sec=220.8 | episodes/sec=3.83 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=7999872 | env_steps/sec=215.6 | episodes/sec=2.38 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=8000960 | env_steps/sec=214.9 | episodes/sec=2.76 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=8002112 | env_steps/sec=226.4 | episodes/sec=3.34 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=8003200 | env_steps/sec=216.0 | episodes/sec=4.96 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=8004352 | env_steps/sec=222.5 | episodes/sec=1.93 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=8005504 | env_steps/sec=220.5 | episodes/sec=2.87 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=8006720 | env_steps/sec=231.7 | episodes/sec=4.76 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=8007872 | env_steps/sec=224.3 | episodes/sec=3.11 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=8009024 | env_steps/sec=220.9 | episodes/sec=2.30 | gpu_util_mean=19% gpu_util_max=37% | gpu_mem_mean=2.3/47.8GB
+timesteps=8010176 | env_steps/sec=225.0 | episodes/sec=3.12 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=8011328 | env_steps/sec=220.6 | episodes/sec=4.60 | gpu_util_mean=1% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=8012480 | env_steps/sec=219.5 | episodes/sec=3.43 | gpu_util_mean=1% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=8013568 | env_steps/sec=209.6 | episodes/sec=2.50 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=8014720 | env_steps/sec=223.8 | episodes/sec=3.89 | gpu_util_mean=1% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=8015872 | env_steps/sec=223.1 | episodes/sec=3.10 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=8017024 | env_steps/sec=219.8 | episodes/sec=3.82 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=8018240 | env_steps/sec=231.8 | episodes/sec=3.24 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=8019392 | env_steps/sec=230.1 | episodes/sec=3.00 | gpu_util_mean=1% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=8020544 | env_steps/sec=221.3 | episodes/sec=2.69 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=8021696 | env_steps/sec=219.2 | episodes/sec=4.57 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=8022848 | env_steps/sec=227.3 | episodes/sec=2.37 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=8024064 | env_steps/sec=234.4 | episodes/sec=2.89 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=8025216 | env_steps/sec=228.6 | episodes/sec=4.56 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.3/47.8GB
+timesteps=8026368 | env_steps/sec=230.3 | episodes/sec=2.60 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+timesteps=8027584 | env_steps/sec=231.6 | episodes/sec=3.43 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.3/47.8GB
+------------------------------------------------------
+| gpu/                                 |             |
+|    gpu_count                         | 2           |
+|    gpu_mem_total_gb_mean             | 47.8        |
+|    gpu_mem_used_gb_mean              | 2.33        |
+|    gpu_util_pct_max                  | 1           |
+|    gpu_util_pct_mean                 | 0.5         |
+| profile/                             |             |
+|    hard/damage_mean                  | 0.339       |
+|    hard/ep_len_mean                  | 62.3        |
+|    hard/ep_rew_mean                  | 0.58        |
+|    hard/episodes_window              | 200         |
+|    hard/freeze_casts_mean            | 2           |
+|    hard/freeze_effect_reward_mean    | 0.0905      |
+|    hard/frozen_threat_ticks_mean     | 62.3        |
+|    hard/p_all_spells_used            | 1           |
+|    hard/p_damage_ge_90               | 0           |
+|    hard/p_stars_ge_2                 | 0.065       |
+|    hard/rage_bonus_damage_pct_mean   | 0.0104      |
+|    hard/rage_casts_mean              | 2           |
+|    hard/rage_effect_reward_mean      | 0.00156     |
+|    hard/score_mean                   | 0.549       |
+|    hard/spell_casts_mean             | 4           |
+|    hard/spell_shaping_reward_mean    | 0.0921      |
+|    hard/spells_remaining_mean        | 0           |
+|    hard/stars_mean                   | 0.21        |
+|    hard/ticks_mean                   | 619         |
+|    hard/truncated_rate               | 0.01        |
+|    hard/unused_spell_penalty_mean    | 0           |
+|    hard/useful_freeze_casts_mean     | 2           |
+|    hard/useful_rage_casts_mean       | 2           |
+|    hard/wasted_spell_casts_mean      | 0           |
+|    hard/wasted_spell_penalty_mean    | 0           |
+|    medium/damage_mean                | 0.81        |
+|    medium/ep_len_mean                | 72.1        |
+|    medium/ep_rew_mean                | 2.85        |
+|    medium/episodes_window            | 200         |
+|    medium/freeze_casts_mean          | 1.96        |
+|    medium/freeze_effect_reward_mean  | 0.072       |
+|    medium/frozen_threat_ticks_mean   | 41.2        |
+|    medium/p_all_spells_used          | 0.975       |
+|    medium/p_damage_ge_90             | 0.375       |
+|    medium/p_stars_ge_2               | 0.82        |
+|    medium/rage_bonus_damage_pct_mean | 0.0268      |
+|    medium/rage_casts_mean            | 2           |
+|    medium/rage_effect_reward_mean    | 0.00402     |
+|    medium/score_mean                 | 2.85        |
+|    medium/spell_casts_mean           | 3.96        |
+|    medium/spell_shaping_reward_mean  | 0.0748      |
+|    medium/spells_remaining_mean      | 0.04        |
+|    medium/stars_mean                 | 2.04        |
+|    medium/ticks_mean                 | 717         |
+|    medium/truncated_rate             | 0.135       |
+|    medium/unused_spell_penalty_mean  | 0.0012      |
+|    medium/useful_freeze_casts_mean   | 1.96        |
+|    medium/useful_rage_casts_mean     | 2           |
+|    medium/wasted_spell_casts_mean    | 0           |
+|    medium/wasted_spell_penalty_mean  | 0           |
+| rollout/                             |             |
+|    ep_len_mean                       | 68.3        |
+|    ep_rew_mean                       | 1.54        |
+| throughput/                          |             |
+|    env_steps_per_sec                 | 232         |
+|    episodes_per_sec                  | 3.43        |
+| time/                                |             |
+|    fps                               | 213         |
+|    iterations                        | 245         |
+|    time_elapsed                      | 37638       |
+|    total_timesteps                   | 8028160     |
+| train/                               |             |
+|    approx_kl                         | 0.012385398 |
+|    clip_fraction                     | 0.143       |
+|    clip_range                        | 0.2         |
+|    entropy_loss                      | -4.05       |
+|    explained_variance                | 0.917       |
+|    learning_rate                     | 0.0003      |
+|    loss                              | -0.0317     |
+|    n_updates                         | 2440        |
+|    policy_gradient_loss              | -0.0211     |
+|    value_loss                        | 0.0739      |
+------------------------------------------------------
+saved final model: checkpoints/maskable_ppo/spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724/final_model
+wandb: uploading artifact spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724-final-model; uploading artifact spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724-run-status; updating run metadata
+wandb: uploading artifact spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724-final-model; uploading artifact spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724-run-status
+wandb: uploading artifact spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724-final-model
+wandb: 
+wandb: Run history:
+wandb:                  global_step ▁▁▂▂▂▂▂▃▃▃▄▄▄▄▄▄▄▄▄▄▅▅▅▅▆▆▆▆▇▇▇▇▇▇▇▇▇███
+wandb:                gpu/gpu_count ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:    gpu/gpu_mem_total_gb_mean ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:     gpu/gpu_mem_used_gb_mean ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:         gpu/gpu_util_pct_max █▁███▁████▁████▁▁▁██▁▁▁████▁██▁█▁██▁▁▁█▁
+wandb:        gpu/gpu_util_pct_mean ▅█▅▁▁▁▅▁▅██▅▅▁▅▁▅▁▅▁▅▁▅▁▅▅▅▅▅▅▅▅▅▅▁▁▅▅▁▁
+wandb:     profile/hard/damage_mean ▁▂▂▃▂▂▂▂▂▃▃▃▃▁▃▃▃▃▅▄▅▆▆▆▆▇▇▆▇▇▆▇▆▇█▇▇█▇▇
+wandb:     profile/hard/ep_len_mean ▆▄▆▅▆▅▄▇▄▄▄▄█▄▅▅▄▄▅▄▄▃▃▄▄▅▃▃▂▂▃▁▃▂▄▁▂▂▃▄
+wandb:     profile/hard/ep_rew_mean ▂▁▁▂▁▁▂▂▂▂▂▂▂▂▂▂▂▂▃▄▄▅▅▅▇█▆▆▅▇▆▇▆▇▆▆▇▇▆▆
+wandb: profile/hard/episodes_window ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:                          +61 ...
+wandb: 
+wandb: Run summary:
+wandb:                  global_step 8028160
+wandb:                gpu/gpu_count 2
+wandb:    gpu/gpu_mem_total_gb_mean 47.78809
+wandb:     gpu/gpu_mem_used_gb_mean 2.33105
+wandb:         gpu/gpu_util_pct_max 1
+wandb:        gpu/gpu_util_pct_mean 0.5
+wandb:     profile/hard/damage_mean 0.33934
+wandb:     profile/hard/ep_len_mean 62.305
+wandb:     profile/hard/ep_rew_mean 0.57958
+wandb: profile/hard/episodes_window 200
+wandb:                          +62 ...
+wandb: 
+wandb: 🚀 View run spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724 at: https://wandb.ai/jmc314-lumenary-com/ClashAI/runs/spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724
+wandb: ⭐️ View project at: https://wandb.ai/jmc314-lumenary-com/ClashAI
+wandb: Synced 5 W&B file(s), 0 media file(s), 6 artifact file(s) and 1 other file(s)
+wandb: Find logs at: ./wandb/run-20260518_040726-spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724/logs

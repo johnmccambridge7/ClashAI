@@ -1,0 +1,299 @@
+_wandb:
+    value:
+        cli_version: 0.27.0
+        e:
+            yz6mr31pmy15mlk45tgrpwhtkfcu97qv:
+                args:
+                    - --wandb
+                    - --wandb-project
+                    - ClashAI
+                    - --wandb-entity
+                    - jmc314-lumenary-com
+                    - --wandb-group
+                    - spell_semantic_reward_v2
+                    - --wandb-log-model
+                    - --profile
+                    - medium,hard
+                    - --eval-profile
+                    - medium,hard
+                    - --army-composition
+                    - barbarian=40,wall_breaker=10
+                    - --spell-composition
+                    - rage=2,freeze=2
+                    - --max-ticks
+                    - "900"
+                    - --workers
+                    - "64"
+                    - --total-timesteps
+                    - "8000000"
+                    - --n-steps
+                    - "512"
+                    - --batch-size
+                    - "2048"
+                    - --checkpoint-freq
+                    - "500000"
+                    - --status-interval
+                    - "5"
+                    - --device
+                    - cuda
+                    - --torch-threads
+                    - "1"
+                    - --start-method
+                    - forkserver
+                    - --monitor-dir
+                    - runs/monitor
+                    - --seed
+                    - "72"
+                    - --run-name
+                    - spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724
+                    - --wandb-tags
+                    - train,spell,semantic_mask,reward_v2,medium_hard,seed72,gpu0,overnight,w64
+                codePath: scripts/train_maskable_ppo.py
+                codePathLocal: scripts/train_maskable_ppo.py
+                cpu_count: 192
+                cpu_count_logical: 384
+                cudaVersion: "13.0"
+                disk:
+                    /:
+                        total: "68719476736"
+                        used: "15607934976"
+                email: john@lumenary.com
+                executable: /workspace/ClashAI/.venv/bin/python
+                git:
+                    commit: 72be3d47aa34e6119c58fd4202279326f6c074ed
+                    remote: https://github.com/johnmccambridge7/ClashAI
+                gpu: NVIDIA RTX PRO 5000 Blackwell
+                gpu_count: 2
+                gpu_nvidia:
+                    - architecture: Blackwell
+                      cudaCores: 14080
+                      memoryTotal: "51312066560"
+                      name: NVIDIA RTX PRO 5000 Blackwell
+                      uuid: GPU-071138fc-ce7b-5544-2219-f0476262ad3e
+                    - architecture: Blackwell
+                      cudaCores: 14080
+                      memoryTotal: "51312066560"
+                      name: NVIDIA RTX PRO 5000 Blackwell
+                      uuid: GPU-dbde3035-a6b5-3a2b-3b64-c7a6af6d02f8
+                host: 800f0fbd3e15
+                memory:
+                    total: "540499230720"
+                os: Linux-6.8.0-111-lowlatency-x86_64-with-glibc2.39
+                program: /workspace/ClashAI/scripts/train_maskable_ppo.py
+                python: CPython 3.12.13
+                root: /workspace/ClashAI
+                startedAt: "2026-05-18T04:07:26.596649Z"
+                writerId: yz6mr31pmy15mlk45tgrpwhtkfcu97qv
+        m:
+            - "1": train/total_timesteps
+              "6":
+                - 3
+              "7": []
+            - "2": gpu/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": profile/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": eval/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": eval_profile/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": rollout/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": train/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+            - "2": throughput/*
+              "5": 1
+              "6":
+                - 1
+              "7": []
+        python_version: 3.12.13
+        t:
+            "1":
+                - 1
+            "2":
+                - 1
+            "3":
+                - 2
+                - 7
+                - 13
+                - 14
+                - 15
+                - 16
+                - 35
+                - 41
+                - 62
+            "4": 3.12.13
+            "5": 0.27.0
+            "12": 0.27.0
+            "13": linux-x86_64
+army_composition:
+    value:
+        barbarian: 40
+        wall_breaker: 10
+batch_size:
+    value: 2048
+checkpoint_freq:
+    value: 500000
+clip_range:
+    value: 0.2
+device:
+    value: cuda
+ent_coef:
+    value: 0.01
+eval_episodes:
+    value: 20
+eval_freq:
+    value: 0
+eval_profiles:
+    value:
+        - medium
+        - hard
+eval_seed_start:
+    value: 100000
+gae_lambda:
+    value: 0.95
+gamma:
+    value: 0.995
+keep_loaded_hparams:
+    value: false
+learning_rate:
+    value: 0.0003
+linear_lr:
+    value: false
+load_path:
+    value: null
+max_buildings:
+    value: 257
+max_grad_norm:
+    value: 0.5
+max_ticks:
+    value: 900
+metadata:
+    value:
+        argv:
+            - scripts/train_maskable_ppo.py
+            - --wandb
+            - --wandb-project
+            - ClashAI
+            - --wandb-entity
+            - jmc314-lumenary-com
+            - --wandb-group
+            - spell_semantic_reward_v2
+            - --wandb-log-model
+            - --profile
+            - medium,hard
+            - --eval-profile
+            - medium,hard
+            - --army-composition
+            - barbarian=40,wall_breaker=10
+            - --spell-composition
+            - rage=2,freeze=2
+            - --max-ticks
+            - "900"
+            - --workers
+            - "64"
+            - --total-timesteps
+            - "8000000"
+            - --n-steps
+            - "512"
+            - --batch-size
+            - "2048"
+            - --checkpoint-freq
+            - "500000"
+            - --status-interval
+            - "5"
+            - --device
+            - cuda
+            - --torch-threads
+            - "1"
+            - --start-method
+            - forkserver
+            - --monitor-dir
+            - runs/monitor
+            - --seed
+            - "72"
+            - --run-name
+            - spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724
+            - --wandb-tags
+            - train,spell,semantic_mask,reward_v2,medium_hard,seed72,gpu0,overnight,w64
+        cpu_count: 384
+        cwd: /workspace/ClashAI
+        host: 800f0fbd3e15
+        platform: Linux-6.8.0-111-lowlatency-x86_64-with-glibc2.39
+        python: 3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]
+n_epochs:
+    value: 10
+n_steps:
+    value: 512
+paths:
+    value:
+        monitor_dir: runs/monitor/spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724
+        save_dir: checkpoints/maskable_ppo/spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724
+        tensorboard_log: runs/maskable_ppo/spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724
+run_name:
+    value: spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724
+seed:
+    value: 72
+spell_composition:
+    value:
+        freeze: 2
+        rage: 2
+start_method:
+    value: forkserver
+stochastic_eval:
+    value: false
+target_kl:
+    value: null
+torch_threads:
+    value: 1
+total_timesteps:
+    value: 8000000
+train_profiles:
+    value:
+        - medium
+        - hard
+vec_env:
+    value: auto
+vf_coef:
+    value: 0.5
+wandb:
+    value:
+        enabled: true
+        entity: jmc314-lumenary-com
+        group: spell_semantic_reward_v2
+        log_code: false
+        log_model: true
+        mode: online
+        project: ClashAI
+        run_id: spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724
+        sync_tensorboard: true
+        tags:
+            - train
+            - spell
+            - semantic_mask
+            - reward_v2
+            - medium_hard
+            - seed72
+            - gpu0
+            - overnight
+            - w64
+workers:
+    value: 64

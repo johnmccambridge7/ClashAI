@@ -1,0 +1,110 @@
+{
+  "summary": {
+    "episodes": 2,
+    "score_mean": 4.0,
+    "damage_mean": 1.0,
+    "stars_mean": 3.0,
+    "wall_breakers_deployed_mean": 10.0,
+    "wall_breaker_explosions_mean": 6.0,
+    "wall_breakers_dead_without_explosion_mean": 4.0,
+    "wb_unique_walls_damaged_mean": 20.5,
+    "wb_unique_walls_destroyed_mean": 8.0,
+    "final_walls_destroyed_mean": 19.0,
+    "episodes_with_wb_deployed_rate": 1.0,
+    "episodes_with_wb_explosion_rate": 1.0,
+    "episodes_with_wb_wall_destroy_rate": 1.0,
+    "explosions_per_deployed_wb": 0.6,
+    "destroyed_walls_per_deployed_wb": 0.8,
+    "destroyed_walls_per_wb_explosion": 1.3333333333333333,
+    "wb_wall_damage_fraction_of_total_wall_damage": 0.5690137095700786,
+    "wb_fresh_walls_destroyed_total": 0,
+    "wb_predamaged_walls_destroyed_total": 16,
+    "elapsed_seconds": 6.805608324939385,
+    "episodes_per_min": 17.632516341008913,
+    "checkpoint": null,
+    "profiles": [
+      "easy"
+    ],
+    "seed_start": 1,
+    "army_composition": {
+      "barbarian": 40,
+      "wall_breaker": 10
+    },
+    "spell_composition": {
+      "rage": 2,
+      "freeze": 2
+    },
+    "max_ticks": 900
+  },
+  "by_profile": {
+    "easy": {
+      "episodes": 2,
+      "score_mean": 4.0,
+      "damage_mean": 1.0,
+      "stars_mean": 3.0,
+      "wall_breakers_deployed_mean": 10.0,
+      "wall_breaker_explosions_mean": 6.0,
+      "wall_breakers_dead_without_explosion_mean": 4.0,
+      "wb_unique_walls_damaged_mean": 20.5,
+      "wb_unique_walls_destroyed_mean": 8.0,
+      "final_walls_destroyed_mean": 19.0,
+      "episodes_with_wb_deployed_rate": 1.0,
+      "episodes_with_wb_explosion_rate": 1.0,
+      "episodes_with_wb_wall_destroy_rate": 1.0,
+      "explosions_per_deployed_wb": 0.6,
+      "destroyed_walls_per_deployed_wb": 0.8,
+      "destroyed_walls_per_wb_explosion": 1.3333333333333333,
+      "wb_wall_damage_fraction_of_total_wall_damage": 0.5690137095700786,
+      "wb_fresh_walls_destroyed_total": 0,
+      "wb_predamaged_walls_destroyed_total": 16
+    }
+  },
+  "episodes": [
+    {
+      "profile": "easy",
+      "seed": 1,
+      "steps": 63,
+      "ticks": 629,
+      "score": 4.0,
+      "damage_pct": 1.0,
+      "stars": 3,
+      "terminated": true,
+      "truncated": false,
+      "wall_breakers_deployed": 10,
+      "wall_breakers_alive_final": 0,
+      "wall_breaker_explosions": 6,
+      "wall_breakers_dead_without_explosion": 4,
+      "wb_wall_damage": 4500.0,
+      "wb_unique_walls_damaged": 21,
+      "wb_unique_walls_destroyed": 9,
+      "wb_fresh_walls_destroyed": 0,
+      "wb_predamaged_walls_destroyed": 9,
+      "final_walls_damaged": 29,
+      "final_walls_destroyed": 18,
+      "total_wall_damage": 6865.5
+    },
+    {
+      "profile": "easy",
+      "seed": 2,
+      "steps": 66,
+      "ticks": 659,
+      "score": 4.0,
+      "damage_pct": 1.0,
+      "stars": 3,
+      "terminated": true,
+      "truncated": false,
+      "wall_breakers_deployed": 10,
+      "wall_breakers_alive_final": 0,
+      "wall_breaker_explosions": 6,
+      "wall_breakers_dead_without_explosion": 4,
+      "wb_wall_damage": 4050.0,
+      "wb_unique_walls_damaged": 20,
+      "wb_unique_walls_destroyed": 7,
+      "wb_fresh_walls_destroyed": 0,
+      "wb_predamaged_walls_destroyed": 7,
+      "final_walls_damaged": 34,
+      "final_walls_destroyed": 20,
+      "total_wall_damage": 8160.5
+    }
+  ]
+}

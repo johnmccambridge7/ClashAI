@@ -1,6 +1,8 @@
 from __future__ import annotations
 import math
 
+import pytest
+
 from coc_env.entities import BUILDING_SPECS, GRID_SIZE, MAX_TICKS, TICK_SECONDS, TROOP_SPECS, Building
 from coc_env.layouts import default_layout
 from coc_env.simulator import Simulator
@@ -204,6 +206,30 @@ def test_destroying_only_walls_does_not_reward_score() -> None:
     assert sim.score == 0.0
 
 
+def test_damage_counters_ignore_walls_and_track_objectives() -> None:
+    layout = [
+        Building(0, BUILDING_SPECS["townhall"], 20, 20),
+        Building(1, BUILDING_SPECS["cannon"], 10, 10),
+        Building(2, BUILDING_SPECS["wall"], 18, 22),
+    ]
+    sim = Simulator(layout=layout, army_size=0)
+    townhall, cannon, wall = sim.buildings
+
+    sim._damage_building(wall, wall.spec.hp)
+    assert sim.defense_damage == 0.0
+    assert sim.townhall_damage == 0.0
+    assert sim.defenses_destroyed == 0
+    assert sim.townhall_destroyed == 0
+
+    sim._damage_building(cannon, cannon.spec.hp)
+    sim._damage_building(townhall, townhall.spec.hp)
+
+    assert sim.defense_damage == cannon.spec.hp
+    assert sim.townhall_damage == townhall.spec.hp
+    assert sim.defenses_destroyed == 1
+    assert sim.townhall_destroyed == 1
+
+
 def test_wall_blocks_troop_and_becomes_target() -> None:
     sim = Simulator(layout=default_layout(), army_size=1)
     assert sim.deploy(17.5, 22.5)
@@ -228,6 +254,11 @@ def test_wizard_tower_splash_damages_grouped_troops() -> None:
 
     assert len(sim.troops) == 2
     assert all(t.hp < t.spec.hp for t in sim.troops)
+    assert sim.troop_damage_taken > 0.0
+    assert sim.splash_damage_taken > 0.0
+    assert sim.multi_hit_splash_damage_taken > 0.0
+    assert sim.splash_cluster_risk > 0.0
+    assert sim.multi_hit_splash_events == 1
 
 
 def test_defense_fire_and_impact_are_explicit_visual_events() -> None:
@@ -450,7 +481,26 @@ def test_wall_breaker_explodes_on_nearest_connected_walls() -> None:
     assert len(damaged_walls) == TROOP_SPECS["wall_breaker"].wall_damage_count
     assert len(explosion_events) == 1
     assert explosion_events[0]["source_kind"] == "wall_breaker"
+    assert sim.wall_breaker_explosions == 1
+    assert sim.wall_breaker_damaged_wall_segments == TROOP_SPECS["wall_breaker"].wall_damage_count
+    assert sim.wall_breaker_destroyed_wall_segments == 0
+    assert sim.wall_breakers_dead_without_explosion == 0
     assert not sim.active_troops
+
+
+def test_scored_damage_is_attributed_to_deployment_origin_quadrants() -> None:
+    sim = Simulator(
+        layout=[Building(0, BUILDING_SPECS["storage"], 10, 10)],
+        army_size=2,
+    )
+    assert sim.deploy(0.5, 0.5)
+    assert sim.deploy(35.5, 35.5)
+
+    sim._damage_building(sim.buildings[0], 10.0, attacker=sim.troops[0])
+    sim._damage_building(sim.buildings[0], 20.0, attacker=sim.troops[1])
+
+    assert sim.scored_damage_by_origin_quadrant[0] == pytest.approx(10.0)
+    assert sim.scored_damage_by_origin_quadrant[3] == pytest.approx(20.0)
 
 
 def test_rage_spell_multiplies_troop_damage_for_18_seconds() -> None:
@@ -474,6 +524,48 @@ def test_rage_spell_multiplies_troop_damage_for_18_seconds() -> None:
     for _ in range(math.ceil(18.0 / TICK_SECONDS)):
         raged.tick()
     assert not raged.active_spells
+
+
+def test_spell_usefulness_requires_immediate_tactical_value() -> None:
+    rage_runner = Simulator(
+        layout=[Building(0, BUILDING_SPECS["storage"], 10, 10)],
+        army_size=1,
+        spell_composition={"rage": 1},
+    )
+    assert rage_runner.deploy(5.5, 5.5)
+    assert rage_runner.cast_spell(5.5, 5.5, "rage")
+    assert rage_runner.useful_spell_casts_by_kind["rage"] == 0
+    assert rage_runner.wasted_spell_casts_by_kind["rage"] == 1
+
+    rage_attacker = Simulator(
+        layout=[Building(0, BUILDING_SPECS["storage"], 10, 10)],
+        army_size=1,
+        spell_composition={"rage": 1},
+    )
+    assert rage_attacker.deploy(9.5, 11.5)
+    assert rage_attacker.cast_spell(9.5, 11.5, "rage")
+    assert rage_attacker.useful_spell_casts_by_kind["rage"] == 1
+    assert rage_attacker.wasted_spell_casts_by_kind["rage"] == 0
+
+    freeze_quiet = Simulator(
+        layout=[Building(0, BUILDING_SPECS["cannon"], 10, 10)],
+        army_size=1,
+        spell_composition={"freeze": 1},
+    )
+    assert freeze_quiet.deploy(35.5, 35.5)
+    assert freeze_quiet.cast_spell(*freeze_quiet.buildings[0].center, "freeze")
+    assert freeze_quiet.useful_spell_casts_by_kind["freeze"] == 0
+    assert freeze_quiet.wasted_spell_casts_by_kind["freeze"] == 1
+
+    freeze_threat = Simulator(
+        layout=[Building(0, BUILDING_SPECS["cannon"], 10, 10)],
+        army_size=1,
+        spell_composition={"freeze": 1},
+    )
+    assert freeze_threat.deploy(15.5, 11.5)
+    assert freeze_threat.cast_spell(*freeze_threat.buildings[0].center, "freeze")
+    assert freeze_threat.useful_spell_casts_by_kind["freeze"] == 1
+    assert freeze_threat.wasted_spell_casts_by_kind["freeze"] == 0
 
 
 def test_freeze_spell_only_stops_defenses_for_6_seconds() -> None:

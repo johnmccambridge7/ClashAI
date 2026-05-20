@@ -1,0 +1,91 @@
+{
+  "checkpoint": "checkpoints/maskable_ppo/spell_semantic_reward_v2_w64_seed73_gpu1_20260518_040724/final_model.zip",
+  "profiles": [
+    "easy"
+  ],
+  "episodes": 100,
+  "seed_start": 200000,
+  "army_composition": {
+    "barbarian": 40,
+    "wall_breaker": 10
+  },
+  "spell_composition": {
+    "rage": 2,
+    "freeze": 2
+  },
+  "max_ticks": 900,
+  "max_buildings": 257,
+  "deterministic": true,
+  "device": "cpu",
+  "workers": 24,
+  "wandb": {
+    "enabled": true,
+    "project": "ClashAI",
+    "entity": "jmc314-lumenary-com",
+    "group": "spell_semantic_reward_v2_final_eval",
+    "tags": [
+      "eval",
+      "final",
+      "holdout",
+      "spell_semantic_reward_v2",
+      "seed73",
+      "easy"
+    ],
+    "mode": "online",
+    "run_id": "seed73_easy_n100"
+  }
+}
+N=100 elapsed=65.91s maps/min=91.0 decisions/sec=89.9 sim_ticks/sec=893.1
+damage mean=0.802 median=0.974 min=0.149 max=1.000 std=0.272
+score  mean=2.902 median=2.974 min=0.149 max=4.000
+stars  mean=2.100 dist=0:16 1:7 2:28 3:49
+steps  mean=59.3 median=56.5 ticks_mean=588.7
+ends   terminated=97 truncated=3
+damage thresholds >=25%:92.0% >=50%:83.0% >=75%:68.0% >=90%:58.0% >=100%:49.0%
+wrote: runs/eval/spell_semantic_reward_v2_final/seed73_easy_n100.json
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from WANDB_API_KEY.
+wandb: Currently logged in as: jmc314 (jmc314-lumenary-com) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run seed73_easy_n100
+wandb: Tracking run with wandb version 0.27.0
+wandb: Run data is saved locally in /workspace/ClashAI/wandb/run-20260518_152535-seed73_easy_n100
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run eval-seed73_easy_n100
+wandb: ⭐️ View project at https://wandb.ai/jmc314-lumenary-com/ClashAI
+wandb: 🚀 View run at https://wandb.ai/jmc314-lumenary-com/ClashAI/runs/seed73_easy_n100
+wandb: updating run metadata; uploading artifact run-seed73_easy_n100-evalepisodes_table-wJ5DeQ; uploading artifact seed73_easy_n100-eval-json; uploading artifact seed73_easy_n100-eval-csv
+wandb: uploading artifact run-seed73_easy_n100-evalepisodes_table-wJ5DeQ; uploading artifact seed73_easy_n100-eval-json; uploading artifact seed73_easy_n100-eval-csv
+wandb: uploading artifact seed73_easy_n100-eval-json; uploading artifact seed73_easy_n100-eval-csv
+wandb: uploading artifact seed73_easy_n100-eval-json
+wandb: uploading config.yaml; uploading wandb-metadata.json; uploading requirements.txt; uploading media/table/eval/episodes_table_1_676967ae83a0a4f8a86f.table.json; uploading wandb-summary.json
+wandb: uploading history steps 0-1, summary
+wandb: 
+wandb: Run history:
+wandb:        eval/damage_max ▁
+wandb:       eval/damage_mean ▁
+wandb:     eval/damage_median ▁
+wandb:        eval/damage_min ▁
+wandb:        eval/damage_std ▁
+wandb: eval/decisions_per_sec ▁
+wandb:   eval/elapsed_seconds ▁
+wandb:          eval/episodes ▁▁
+wandb:      eval/maps_per_min ▁
+wandb:   eval/p_damage_eq_100 ▁
+wandb:                    +48 ...
+wandb: 
+wandb: Run summary:
+wandb:        eval/damage_max 1
+wandb:       eval/damage_mean 0.80212
+wandb:     eval/damage_median 0.974
+wandb:        eval/damage_min 0.14942
+wandb:        eval/damage_std 0.27177
+wandb: eval/decisions_per_sec 89.92277
+wandb:   eval/elapsed_seconds 65.91212
+wandb:          eval/episodes 100
+wandb:      eval/maps_per_min 91.0303
+wandb:   eval/p_damage_eq_100 0.49
+wandb:                    +49 ...
+wandb: 
+wandb: 🚀 View run eval-seed73_easy_n100 at: https://wandb.ai/jmc314-lumenary-com/ClashAI/runs/seed73_easy_n100
+wandb: ⭐️ View project at: https://wandb.ai/jmc314-lumenary-com/ClashAI
+wandb: Synced 4 W&B file(s), 1 media file(s), 6 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20260518_152535-seed73_easy_n100/logs

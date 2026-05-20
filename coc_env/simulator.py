@@ -95,6 +95,8 @@ class Simulator:
         self.max_ticks: int = int(max_ticks)
         self.troops: list[Troop] = []
         self.active_spells: list[ActiveSpell] = []
+        self.deployment_cells: list[tuple[int, int, str]] = []
+        self.troop_deploy_origins: dict[int, tuple[int, int, int]] = {}
         self.tick_count: int = 0
         self.next_troop_id: int = 0
         self.pending_impacts: list[PendingImpact] = []
@@ -106,9 +108,34 @@ class Simulator:
         self.original_total_hp: float = float(sum(
             b.spec.hp for b in self.buildings if b.spec.counts_for_score
         ))
+        self.original_defense_hp: float = float(sum(
+            b.spec.hp for b in self.buildings if b.spec.is_defense
+        ))
+        self.original_townhall_hp: float = float(sum(
+            b.spec.hp for b in self.buildings if b.spec.kind == "townhall"
+        ))
+        self.original_army_hp: float = float(sum(
+            TROOP_SPECS[kind].hp * count for kind, count in composition.items()
+        ))
+        self.defense_damage: float = 0.0
+        self.townhall_damage: float = 0.0
+        self.defenses_destroyed: int = 0
         self.rage_bonus_scored_damage: float = 0.0
+        self.rage_bonus_defense_damage: float = 0.0
+        self.rage_bonus_townhall_damage: float = 0.0
         self.frozen_defense_ticks: int = 0
         self.frozen_threat_ticks: int = 0
+        self.frozen_threat_damage_prevented: float = 0.0
+        self.troop_damage_taken: float = 0.0
+        self.splash_damage_taken: float = 0.0
+        self.multi_hit_splash_damage_taken: float = 0.0
+        self.splash_cluster_risk: float = 0.0
+        self.multi_hit_splash_events: int = 0
+        self.scored_damage_by_origin_quadrant: list[float] = [0.0, 0.0, 0.0, 0.0]
+        self.wall_breaker_explosions: int = 0
+        self.wall_breaker_damaged_wall_segments: int = 0
+        self.wall_breaker_destroyed_wall_segments: int = 0
+        self.wall_breaker_exploded_ids: set[int] = set()
         self.spell_casts_by_kind: dict[str, int] = {kind: 0 for kind in SPELL_SPECS}
         self.useful_spell_casts_by_kind: dict[str, int] = {kind: 0 for kind in SPELL_SPECS}
         self.wasted_spell_casts_by_kind: dict[str, int] = {kind: 0 for kind in SPELL_SPECS}
@@ -132,6 +159,16 @@ class Simulator:
     @property
     def wasted_spell_casts(self) -> int:
         return sum(self.wasted_spell_casts_by_kind.values())
+
+    @property
+    def wall_breakers_dead_without_explosion(self) -> int:
+        return sum(
+            1
+            for troop in self.troops
+            if troop.spec.kind == "wall_breaker"
+            and not troop.alive
+            and troop.id not in self.wall_breaker_exploded_ids
+        )
 
     # ── view helpers ─────────────────────────────────────────────────────
     @property
@@ -161,8 +198,13 @@ class Simulator:
         if self._blocking_building(x, y) is not None:
             return False
         self.army_remaining_by_kind[troop_kind] -= 1
+        troop_id = self.next_troop_id
+        cell_x, cell_y = int(x), int(y)
+        quadrant = int(cell_x >= GRID_SIZE / 2) + 2 * int(cell_y >= GRID_SIZE / 2)
+        self.deployment_cells.append((cell_x, cell_y, troop_kind))
+        self.troop_deploy_origins[troop_id] = (cell_x, cell_y, quadrant)
         self.troops.append(
-            Troop(id=self.next_troop_id, spec=TROOP_SPECS[troop_kind],
+            Troop(id=troop_id, spec=TROOP_SPECS[troop_kind],
                   x=float(x), y=float(y))
         )
         self.next_troop_id += 1
@@ -241,10 +283,12 @@ class Simulator:
                     target,
                     base_damage * multiplier,
                     rage_bonus=max(0.0, base_damage * (multiplier - 1.0)),
+                    attacker=t,
                 )
             else:
                 self._move_toward(t, target)
 
+        self.splash_cluster_risk += self._current_splash_cluster_risk()
         self._update_defenses()
         self._advance_spell_durations()
 
@@ -338,6 +382,17 @@ class Simulator:
 
         return path
 
+    def troop_has_attack_opportunity(self, troop: Troop) -> bool:
+        if not troop.alive:
+            return False
+        target = self.predicted_target_for(troop)
+        if target is None:
+            return False
+        distance = target.distance_to(troop.x, troop.y)
+        if troop.spec.explodes_on_wall and target.spec.kind == "wall":
+            return distance <= troop.spec.explosion_trigger_range
+        return distance <= troop.spec.attack_range + 0.7
+
     def _move_toward(self, troop: Troop, target: Building) -> None:
         target_cell = self._next_path_cell(troop, target)
         if target_cell is None:
@@ -355,6 +410,7 @@ class Simulator:
                     cell_blocker,
                     base_damage * multiplier,
                     rage_bonus=max(0.0, base_damage * (multiplier - 1.0)),
+                    attacker=troop,
                 )
                 return
             if cell_blocker is not None:
@@ -375,7 +431,14 @@ class Simulator:
                 self._explode_wall_breaker(troop, blocker)
                 return
             troop.target_id = blocker.id
-            self._damage_building(blocker, troop.spec.dps * TICK_SECONDS * self._troop_damage_multiplier(troop))
+            base_damage = troop.spec.dps * TICK_SECONDS
+            multiplier = self._troop_damage_multiplier(troop)
+            self._damage_building(
+                blocker,
+                base_damage * multiplier,
+                rage_bonus=max(0.0, base_damage * (multiplier - 1.0)),
+                attacker=troop,
+            )
             return
         if blocker is not None:
             return
@@ -469,7 +532,14 @@ class Simulator:
             and building.y + eps < py < building.y + building.spec.size - eps
         )
 
-    def _damage_building(self, building: Building, amount: float, *, rage_bonus: float = 0.0) -> None:
+    def _damage_building(
+        self,
+        building: Building,
+        amount: float,
+        *,
+        rage_bonus: float = 0.0,
+        attacker: Troop | None = None,
+    ) -> None:
         was_alive = building.alive
         hp_before = max(0.0, building.hp)
         base_amount = max(0.0, amount - max(0.0, rage_bonus))
@@ -477,8 +547,24 @@ class Simulator:
         actual_damage = hp_before - max(0.0, building.hp)
         if building.spec.counts_for_score and rage_bonus > 0.0 and actual_damage > 0.0:
             base_actual = min(hp_before, base_amount)
-            self.rage_bonus_scored_damage += max(0.0, actual_damage - base_actual)
+            actual_bonus = max(0.0, actual_damage - base_actual)
+            self.rage_bonus_scored_damage += actual_bonus
+            if building.spec.is_defense:
+                self.rage_bonus_defense_damage += actual_bonus
+            if building.spec.kind == "townhall":
+                self.rage_bonus_townhall_damage += actual_bonus
+        if actual_damage > 0.0:
+            if building.spec.is_defense:
+                self.defense_damage += actual_damage
+            if building.spec.kind == "townhall":
+                self.townhall_damage += actual_damage
+            if building.spec.counts_for_score and attacker is not None:
+                origin = self.troop_deploy_origins.get(attacker.id)
+                if origin is not None:
+                    self.scored_damage_by_origin_quadrant[origin[2]] += actual_damage
         if was_alive and not building.alive:
+            if building.spec.is_defense:
+                self.defenses_destroyed += 1
             self.terrain_version += 1
             self._flow_cache.clear()
 
@@ -496,11 +582,23 @@ class Simulator:
     def _explode_wall_breaker(self, troop: Troop, target: Building) -> None:
         if not troop.alive or target.spec.kind != "wall":
             return
+        self.wall_breaker_explosions += 1
+        self.wall_breaker_exploded_ids.add(troop.id)
         wall_count = max(0, troop.spec.wall_damage_count)
         if wall_count > 0 and troop.spec.wall_damage_fraction > 0.0:
             multiplier = self._troop_damage_multiplier(troop)
             for wall in self._connected_walls(target, wall_count):
-                self._damage_building(wall, wall.spec.hp * troop.spec.wall_damage_fraction * multiplier)
+                was_alive = wall.alive
+                hp_before = max(0.0, wall.hp)
+                self._damage_building(
+                    wall,
+                    wall.spec.hp * troop.spec.wall_damage_fraction * multiplier,
+                    attacker=troop,
+                )
+                if hp_before > max(0.0, wall.hp):
+                    self.wall_breaker_damaged_wall_segments += 1
+                if was_alive and not wall.alive:
+                    self.wall_breaker_destroyed_wall_segments += 1
         self._emit_visual_event({
             "kind": "wall_breaker_explosion",
             "source_kind": troop.spec.kind,
@@ -678,10 +776,15 @@ class Simulator:
     def _spell_cast_has_target(self, x: float, y: float, spell_kind: str) -> bool:
         spec = SPELL_SPECS[spell_kind]
         if spell_kind == "rage":
-            return any(math.hypot(t.x - x, t.y - y) <= spec.radius for t in self.active_troops)
+            return any(
+                math.hypot(t.x - x, t.y - y) <= spec.radius
+                and self.troop_has_attack_opportunity(t)
+                for t in self.active_troops
+            )
         if spell_kind == "freeze":
             return any(
                 b.alive and b.spec.is_defense and math.hypot(b.center[0] - x, b.center[1] - y) <= spec.radius
+                and self._nearest_troop_in_range(b) is not None
                 for b in self.buildings
             )
         return True
@@ -710,6 +813,7 @@ class Simulator:
                 self.frozen_defense_ticks += 1
                 if self._nearest_troop_in_range(b) is not None:
                     self.frozen_threat_ticks += 1
+                    self.frozen_threat_damage_prevented += self._frozen_threat_damage_per_tick(b)
                 continue
             b.cooldown_remaining -= TICK_SECONDS
             if b.cooldown_remaining > 1e-9:
@@ -720,6 +824,12 @@ class Simulator:
                 continue
             self._fire_defense(b, victim)
             b.cooldown_remaining += max(TICK_SECONDS, b.spec.attack_cooldown)
+
+    def _frozen_threat_damage_per_tick(self, defense: Building) -> float:
+        cooldown = max(TICK_SECONDS, defense.spec.attack_cooldown)
+        damage_per_attack = defense.spec.damage if defense.spec.damage > 0.0 else defense.spec.dps * cooldown
+        splash_multiplier = 1.0 + min(1.0, max(0.0, defense.spec.splash_radius) / 2.0)
+        return damage_per_attack / cooldown * TICK_SECONDS * splash_multiplier
 
     def _fire_defense(self, defense: Building, victim: Troop) -> None:
         damage = self._attack_damage(defense)
@@ -758,7 +868,14 @@ class Simulator:
                 impact_tick=impact_tick,
             ))
             return
-        self._damage_troops_at(victim.x, victim.y, radius, damage, fallback=victim)
+        self._damage_troops_at(
+            victim.x,
+            victim.y,
+            radius,
+            damage,
+            fallback=victim,
+            source_kind=defense.spec.kind,
+        )
         self._emit_visual_event({
             "kind": "impact",
             "source_kind": defense.spec.kind,
@@ -779,7 +896,12 @@ class Simulator:
                 b.cooldown_remaining -= TICK_SECONDS
                 if b.cooldown_remaining > 1e-9:
                     continue
-                self._damage_troops_at(*b.center, b.spec.splash_radius, self._attack_damage(b))
+                self._damage_troops_at(
+                    *b.center,
+                    b.spec.splash_radius,
+                    self._attack_damage(b),
+                    source_kind=b.spec.kind,
+                )
                 if b.spec.one_shot:
                     self._damage_building(b, b.hp)
                 self._emit_visual_event({
@@ -810,7 +932,13 @@ class Simulator:
             if impact.delay > 1e-9:
                 remaining.append(impact)
                 continue
-            self._damage_troops_at(impact.x, impact.y, impact.radius, impact.damage)
+            self._damage_troops_at(
+                impact.x,
+                impact.y,
+                impact.radius,
+                impact.damage,
+                source_kind=impact.source_kind,
+            )
             self._emit_visual_event({
                 "kind": "impact",
                 "source_kind": impact.source_kind,
@@ -833,14 +961,61 @@ class Simulator:
         damage: float,
         *,
         fallback: Troop | None = None,
+        source_kind: str | None = None,
     ) -> None:
         if radius <= 0.0:
             if fallback is not None and fallback.alive:
+                before = max(0.0, fallback.hp)
                 fallback.hp = max(0.0, fallback.hp - damage)
+                self.troop_damage_taken += before - max(0.0, fallback.hp)
             return
+        hits = 0
+        damage_done = 0.0
         for t in self.troops:
             if t.alive and math.hypot(t.x - x, t.y - y) <= radius:
+                before = max(0.0, t.hp)
                 t.hp = max(0.0, t.hp - damage)
+                actual = before - max(0.0, t.hp)
+                if actual > 0.0:
+                    hits += 1
+                    damage_done += actual
+        self.troop_damage_taken += damage_done
+        if damage_done > 0.0 and source_kind is not None:
+            self.splash_damage_taken += damage_done
+            if hits >= 2:
+                self.multi_hit_splash_events += 1
+                self.multi_hit_splash_damage_taken += damage_done
+
+    def _current_splash_cluster_risk(self) -> float:
+        troops = self.active_troops
+        if len(troops) < 2:
+            return 0.0
+        risk = 0.0
+        for defense in self.buildings:
+            if (
+                not defense.alive
+                or not defense.spec.is_defense
+                or defense.spec.splash_radius <= 0.0
+                or self._defense_frozen(defense)
+            ):
+                continue
+            cx, cy = defense.center
+            threatened = [
+                troop
+                for troop in troops
+                if defense.spec.min_attack_range <= math.hypot(troop.x - cx, troop.y - cy) <= defense.spec.attack_range
+            ]
+            if len(threatened) < 2:
+                continue
+            damage_per_tick = self._frozen_threat_damage_per_tick(defense)
+            for victim in threatened:
+                extra_hits = sum(
+                    1
+                    for other in troops
+                    if other.id != victim.id and math.hypot(other.x - victim.x, other.y - victim.y) <= defense.spec.splash_radius
+                )
+                risk += damage_per_tick * extra_hits
+        return risk
 
     # ── visualisation helper ─────────────────────────────────────────────
     def current_engagements(self) -> list[Engagement]:

@@ -1,0 +1,863 @@
+training profiles=hard eval_profiles=hard workers=192 device=cuda timesteps=500000 run=reward_v5_hard_probe_plus_from_seed91_w192_gpu0_20260520_042657
+Logging to runs/maskable_ppo/reward_v5_hard_probe_plus_from_seed91_w192_gpu0_20260520_042657_0
+timesteps=10027200 | env_steps/sec=36.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=1.4/47.8GB
+timesteps=10029312 | env_steps/sec=390.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=1.4/47.8GB
+timesteps=10031232 | env_steps/sec=348.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10033152 | env_steps/sec=356.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10035072 | env_steps/sec=358.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10036800 | env_steps/sec=341.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10038528 | env_steps/sec=323.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=1.4/47.8GB
+timesteps=10040064 | env_steps/sec=301.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=1.4/47.8GB
+timesteps=10041984 | env_steps/sec=354.5 | episodes/sec=35.45 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10043904 | env_steps/sec=363.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10045632 | env_steps/sec=340.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10047360 | env_steps/sec=340.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10049088 | env_steps/sec=332.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10050816 | env_steps/sec=345.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10052736 | env_steps/sec=349.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10054848 | env_steps/sec=382.5 | episodes/sec=34.77 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10056768 | env_steps/sec=366.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=1.4/47.8GB
+timesteps=10058496 | env_steps/sec=332.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10060224 | env_steps/sec=338.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10062144 | env_steps/sec=350.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10064064 | env_steps/sec=351.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10065984 | env_steps/sec=362.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=1.4/47.8GB
+timesteps=10067904 | env_steps/sec=355.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10070016 | env_steps/sec=392.2 | episodes/sec=35.65 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10071936 | env_steps/sec=363.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10073856 | env_steps/sec=359.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10075776 | env_steps/sec=369.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10077696 | env_steps/sec=366.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10079616 | env_steps/sec=358.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10081536 | env_steps/sec=363.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=1.4/47.8GB
+timesteps=10083648 | env_steps/sec=418.9 | episodes/sec=38.08 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10085568 | env_steps/sec=376.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10087488 | env_steps/sec=373.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10089408 | env_steps/sec=361.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10091328 | env_steps/sec=364.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10093248 | env_steps/sec=347.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10094976 | env_steps/sec=343.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10097088 | env_steps/sec=397.2 | episodes/sec=36.11 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10099200 | env_steps/sec=387.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10101120 | env_steps/sec=364.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=1.4/47.8GB
+timesteps=10103040 | env_steps/sec=375.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10104960 | env_steps/sec=371.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10106880 | env_steps/sec=366.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=1.4/47.8GB
+timesteps=10108800 | env_steps/sec=362.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10110912 | env_steps/sec=417.9 | episodes/sec=37.99 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10112832 | env_steps/sec=382.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10114752 | env_steps/sec=364.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10116672 | env_steps/sec=366.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10118592 | env_steps/sec=368.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10120512 | env_steps/sec=382.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10122432 | env_steps/sec=371.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+timesteps=10124544 | env_steps/sec=416.0 | episodes/sec=37.82 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=1.4/47.8GB
+---------------------------------------------------
+| gpu/                                 |          |
+|    gpu_count                         | 2        |
+|    gpu_mem_total_gb_mean             | 47.8     |
+|    gpu_mem_used_gb_mean              | 1.37     |
+|    gpu_util_pct_max                  | 0        |
+|    gpu_util_pct_mean                 | 0        |
+| profile/                             |          |
+|    hard/damage_mean                  | 0.42     |
+|    hard/defense_damage_pct_mean      | 0.402    |
+|    hard/defense_damage_reward_mean   | 0.0483   |
+|    hard/defense_destroy_reward_mean  | 0.0142   |
+|    hard/defenses_destroyed_mean      | 2.83     |
+|    hard/deploy_crowding_penalty_mean | 0.1      |
+|    hard/deployment_quadrant_entro... | 0.121    |
+|    hard/deployment_top3_cell_frac... | 0.194    |
+|    hard/deployment_top_cell_fract... | 0.0836   |
+|    hard/deployment_unique_cells_mean | 43.3     |
+|    hard/deployments_mean             | 64.8     |
+|    hard/ep_len_mean                  | 72       |
+|    hard/ep_rew_mean                  | 0.896    |
+|    hard/episodes_window              | 200      |
+|    hard/freeze_casts_mean            | 3.92     |
+|    hard/freeze_effect_reward_mean    | 0.0956   |
+|    hard/front_damage_quadrant_ent... | 0.0664   |
+|    hard/front_damage_reward_mean     | 0.0012   |
+|    hard/front_damage_second_pct_mean | 0.00996  |
+|    hard/front_damage_total_pct_mean  | 0.42     |
+|    hard/frozen_threat_damage_pct_... | 0.0968   |
+|    hard/frozen_threat_ticks_mean     | 120      |
+|    hard/multi_hit_splash_damage_p... | 0.416    |
+|    hard/multi_hit_splash_events_mean | 29       |
+|    hard/multi_hit_splash_penalty_... | 0.046    |
+|    hard/objective_shaping_reward_... | 0.109    |
+|    hard/p_all_spells_used            | 0.19     |
+|    hard/p_damage_ge_90               | 0        |
+|    hard/p_stars_ge_2                 | 0.165    |
+|    hard/rage_bonus_damage_pct_mean   | 0.0144   |
+|    hard/rage_bonus_defense_damage... | 0.00985  |
+|    hard/rage_bonus_townhall_damag... | 0.0242   |
+|    hard/rage_casts_mean              | 3        |
+|    hard/rage_effect_reward_mean      | 0.00503  |
+|    hard/score_mean                   | 0.9      |
+|    hard/spell_casts_mean             | 6.92     |
+|    hard/spell_shaping_reward_mean    | 0.0684   |
+|    hard/spells_remaining_mean        | 1.07     |
+|    hard/splash_cluster_risk_pct_mean | 1.72     |
+|    hard/splash_damage_taken_pct_mean | 0.644    |
+|    hard/splash_risk_penalty_mean     | 0.0298   |
+|    hard/stars_mean                   | 0.48     |
+|    hard/survival_reward_mean         | 0.00187  |
+|    hard/tactical_shaping_reward_mean | -0.11    |
+|    hard/ticks_mean                   | 720      |
+|    hard/townhall_damage_pct_mean     | 0.351    |
+|    hard/townhall_damage_reward_mean  | 0.0351   |
+|    hard/townhall_destroy_reward_mean | 0.0118   |
+|    hard/townhall_destroyed_rate      | 0.235    |
+|    hard/troop_damage_taken_pct_mean  | 0.857    |
+|    hard/truncated_rate               | 0.98     |
+|    hard/unused_spell_penalty_mean    | 0.0323   |
+|    hard/useful_freeze_casts_mean     | 3.92     |
+|    hard/useful_rage_casts_mean       | 3        |
+|    hard/wall_breaker_damaged_wall... | 52.3     |
+|    hard/wall_breaker_death_penalt... | 0.0202   |
+|    hard/wall_breaker_destroyed_wa... | 21.7     |
+|    hard/wall_breaker_explosions_mean | 11.6     |
+|    hard/wall_breaker_reward_mean     | 0.0827   |
+|    hard/wall_breakers_dead_withou... | 3.36     |
+|    hard/wasted_spell_casts_mean      | 0        |
+|    hard/wasted_spell_penalty_mean    | 0        |
+| rollout/                             |          |
+|    ep_len_mean                       | 72       |
+|    ep_rew_mean                       | 0.96     |
+| throughput/                          |          |
+|    env_steps_per_sec                 | 416      |
+|    episodes_per_sec                  | 37.8     |
+| time/                                |          |
+|    fps                               | 357      |
+|    iterations                        | 1        |
+|    time_elapsed                      | 275      |
+|    total_timesteps                   | 10125312 |
+---------------------------------------------------
+timesteps=10125504 | env_steps/sec=120.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10127424 | env_steps/sec=380.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10129344 | env_steps/sec=376.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10131264 | env_steps/sec=372.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10133184 | env_steps/sec=372.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10135104 | env_steps/sec=362.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10137024 | env_steps/sec=377.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10139136 | env_steps/sec=410.8 | episodes/sec=37.35 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10141056 | env_steps/sec=366.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10142784 | env_steps/sec=342.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10144704 | env_steps/sec=354.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10146624 | env_steps/sec=364.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10148544 | env_steps/sec=357.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10150464 | env_steps/sec=352.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10152768 | env_steps/sec=418.9 | episodes/sec=34.91 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10154688 | env_steps/sec=369.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10156608 | env_steps/sec=362.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10158528 | env_steps/sec=353.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10160256 | env_steps/sec=343.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10162176 | env_steps/sec=352.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10164096 | env_steps/sec=348.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10166208 | env_steps/sec=412.5 | episodes/sec=37.50 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10168128 | env_steps/sec=363.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10170048 | env_steps/sec=366.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10171968 | env_steps/sec=355.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10173888 | env_steps/sec=374.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10175808 | env_steps/sec=348.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10177728 | env_steps/sec=355.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10179648 | env_steps/sec=361.4 | episodes/sec=36.14 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10181568 | env_steps/sec=373.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10183488 | env_steps/sec=365.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10185408 | env_steps/sec=373.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10187328 | env_steps/sec=350.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10189248 | env_steps/sec=351.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10191168 | env_steps/sec=356.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10193088 | env_steps/sec=356.0 | episodes/sec=35.60 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10195008 | env_steps/sec=377.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10196928 | env_steps/sec=364.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10198848 | env_steps/sec=363.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10200768 | env_steps/sec=361.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10202688 | env_steps/sec=365.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10204416 | env_steps/sec=339.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10206336 | env_steps/sec=373.3 | episodes/sec=0.39 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10208448 | env_steps/sec=410.0 | episodes/sec=36.88 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10210368 | env_steps/sec=362.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10212288 | env_steps/sec=370.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10214208 | env_steps/sec=351.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10215936 | env_steps/sec=325.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10217664 | env_steps/sec=341.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+timesteps=10219200 | env_steps/sec=304.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10221120 | env_steps/sec=379.4 | episodes/sec=37.94 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.8/47.8GB
+timesteps=10223040 | env_steps/sec=357.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.8/47.8GB
+-------------------------------------------------------
+| gpu/                                 |              |
+|    gpu_count                         | 2            |
+|    gpu_mem_total_gb_mean             | 47.8         |
+|    gpu_mem_used_gb_mean              | 2.85         |
+|    gpu_util_pct_max                  | 1            |
+|    gpu_util_pct_mean                 | 0.5          |
+| profile/                             |              |
+|    hard/damage_mean                  | 0.408        |
+|    hard/defense_damage_pct_mean      | 0.389        |
+|    hard/defense_damage_reward_mean   | 0.0467       |
+|    hard/defense_destroy_reward_mean  | 0.0135       |
+|    hard/defenses_destroyed_mean      | 2.71         |
+|    hard/deploy_crowding_penalty_mean | 0.1          |
+|    hard/deployment_quadrant_entro... | 0.142        |
+|    hard/deployment_top3_cell_frac... | 0.184        |
+|    hard/deployment_top_cell_fract... | 0.0775       |
+|    hard/deployment_unique_cells_mean | 44.3         |
+|    hard/deployments_mean             | 64.8         |
+|    hard/ep_len_mean                  | 72           |
+|    hard/ep_rew_mean                  | 0.881        |
+|    hard/episodes_window              | 200          |
+|    hard/freeze_casts_mean            | 3.88         |
+|    hard/freeze_effect_reward_mean    | 0.0927       |
+|    hard/front_damage_quadrant_ent... | 0.0842       |
+|    hard/front_damage_reward_mean     | 0.0014       |
+|    hard/front_damage_second_pct_mean | 0.0116       |
+|    hard/front_damage_total_pct_mean  | 0.408        |
+|    hard/frozen_threat_damage_pct_... | 0.0926       |
+|    hard/frozen_threat_ticks_mean     | 117          |
+|    hard/multi_hit_splash_damage_p... | 0.416        |
+|    hard/multi_hit_splash_events_mean | 29.4         |
+|    hard/multi_hit_splash_penalty_... | 0.0454       |
+|    hard/objective_shaping_reward_... | 0.108        |
+|    hard/p_all_spells_used            | 0.22         |
+|    hard/p_damage_ge_90               | 0            |
+|    hard/p_stars_ge_2                 | 0.175        |
+|    hard/rage_bonus_damage_pct_mean   | 0.0148       |
+|    hard/rage_bonus_defense_damage... | 0.0118       |
+|    hard/rage_bonus_townhall_damag... | 0.0308       |
+|    hard/rage_casts_mean              | 3.04         |
+|    hard/rage_effect_reward_mean      | 0.00518      |
+|    hard/score_mean                   | 0.883        |
+|    hard/spell_casts_mean             | 6.92         |
+|    hard/spell_shaping_reward_mean    | 0.0655       |
+|    hard/spells_remaining_mean        | 1.08         |
+|    hard/splash_cluster_risk_pct_mean | 1.65         |
+|    hard/splash_damage_taken_pct_mean | 0.644        |
+|    hard/splash_risk_penalty_mean     | 0.0294       |
+|    hard/stars_mean                   | 0.475        |
+|    hard/survival_reward_mean         | 0.0018       |
+|    hard/tactical_shaping_reward_mean | -0.104       |
+|    hard/ticks_mean                   | 720          |
+|    hard/townhall_damage_pct_mean     | 0.357        |
+|    hard/townhall_damage_reward_mean  | 0.0357       |
+|    hard/townhall_destroy_reward_mean | 0.0125       |
+|    hard/townhall_destroyed_rate      | 0.25         |
+|    hard/troop_damage_taken_pct_mean  | 0.855        |
+|    hard/truncated_rate               | 0.985        |
+|    hard/unused_spell_penalty_mean    | 0.0324       |
+|    hard/useful_freeze_casts_mean     | 3.88         |
+|    hard/useful_rage_casts_mean       | 3.04         |
+|    hard/wall_breaker_damaged_wall... | 54.2         |
+|    hard/wall_breaker_death_penalt... | 0.0172       |
+|    hard/wall_breaker_destroyed_wa... | 22.3         |
+|    hard/wall_breaker_explosions_mean | 12.1         |
+|    hard/wall_breaker_reward_mean     | 0.0847       |
+|    hard/wall_breakers_dead_withou... | 2.87         |
+|    hard/wasted_spell_casts_mean      | 0            |
+|    hard/wasted_spell_penalty_mean    | 0            |
+| rollout/                             |              |
+|    ep_len_mean                       | 72           |
+|    ep_rew_mean                       | 0.917        |
+| throughput/                          |              |
+|    env_steps_per_sec                 | 357          |
+|    episodes_per_sec                  | 0            |
+| time/                                |              |
+|    fps                               | 356          |
+|    iterations                        | 2            |
+|    time_elapsed                      | 550          |
+|    total_timesteps                   | 10223616     |
+| train/                               |              |
+|    approx_kl                         | 0.0024248634 |
+|    clip_fraction                     | 0.00913      |
+|    clip_range                        | 0.15         |
+|    entropy_loss                      | -4.34        |
+|    explained_variance                | 0.741        |
+|    learning_rate                     | 0.0001       |
+|    loss                              | -0.0452      |
+|    n_updates                         | 3064         |
+|    policy_gradient_loss              | -0.00104     |
+|    value_loss                        | 0.089        |
+-------------------------------------------------------
+timesteps=10223808 | env_steps/sec=99.6 | episodes/sec=0.00 | gpu_util_mean=17% gpu_util_max=34% | gpu_mem_mean=2.9/47.8GB
+timesteps=10225728 | env_steps/sec=364.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10227456 | env_steps/sec=342.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10229376 | env_steps/sec=355.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10231296 | env_steps/sec=340.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10233216 | env_steps/sec=353.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10235328 | env_steps/sec=391.8 | episodes/sec=35.62 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10237248 | env_steps/sec=373.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10239168 | env_steps/sec=354.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10241088 | env_steps/sec=359.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10243008 | env_steps/sec=365.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10244928 | env_steps/sec=362.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10246848 | env_steps/sec=351.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10248768 | env_steps/sec=361.0 | episodes/sec=36.10 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10250880 | env_steps/sec=387.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10252800 | env_steps/sec=367.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10254720 | env_steps/sec=366.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10256640 | env_steps/sec=371.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10258560 | env_steps/sec=372.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10260480 | env_steps/sec=357.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10262592 | env_steps/sec=395.1 | episodes/sec=35.91 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10264320 | env_steps/sec=341.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10266240 | env_steps/sec=365.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10267968 | env_steps/sec=343.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10269888 | env_steps/sec=378.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10271808 | env_steps/sec=362.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10273536 | env_steps/sec=325.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10275264 | env_steps/sec=324.9 | episodes/sec=0.38 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10277376 | env_steps/sec=392.0 | episodes/sec=35.27 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10279104 | env_steps/sec=333.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10280832 | env_steps/sec=323.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10282560 | env_steps/sec=336.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10284288 | env_steps/sec=334.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10286016 | env_steps/sec=327.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10287744 | env_steps/sec=327.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10289664 | env_steps/sec=365.9 | episodes/sec=36.59 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10291584 | env_steps/sec=370.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10293504 | env_steps/sec=355.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10295424 | env_steps/sec=360.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10297344 | env_steps/sec=367.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10299264 | env_steps/sec=351.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10301184 | env_steps/sec=345.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10302912 | env_steps/sec=332.9 | episodes/sec=0.39 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10305024 | env_steps/sec=397.9 | episodes/sec=35.79 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10306944 | env_steps/sec=347.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10308672 | env_steps/sec=327.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10310592 | env_steps/sec=348.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10312512 | env_steps/sec=361.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10314432 | env_steps/sec=346.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10316352 | env_steps/sec=352.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10318464 | env_steps/sec=387.9 | episodes/sec=35.26 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10320384 | env_steps/sec=379.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+-------------------------------------------------------
+| gpu/                                 |              |
+|    gpu_count                         | 2            |
+|    gpu_mem_total_gb_mean             | 47.8         |
+|    gpu_mem_used_gb_mean              | 2.85         |
+|    gpu_util_pct_max                  | 0            |
+|    gpu_util_pct_mean                 | 0            |
+| profile/                             |              |
+|    hard/damage_mean                  | 0.412        |
+|    hard/defense_damage_pct_mean      | 0.405        |
+|    hard/defense_damage_reward_mean   | 0.0486       |
+|    hard/defense_destroy_reward_mean  | 0.014        |
+|    hard/defenses_destroyed_mean      | 2.8          |
+|    hard/deploy_crowding_penalty_mean | 0.1          |
+|    hard/deployment_quadrant_entro... | 0.17         |
+|    hard/deployment_top3_cell_frac... | 0.182        |
+|    hard/deployment_top_cell_fract... | 0.0777       |
+|    hard/deployment_unique_cells_mean | 44.8         |
+|    hard/deployments_mean             | 64.7         |
+|    hard/ep_len_mean                  | 72           |
+|    hard/ep_rew_mean                  | 0.877        |
+|    hard/episodes_window              | 200          |
+|    hard/freeze_casts_mean            | 3.89         |
+|    hard/freeze_effect_reward_mean    | 0.0941       |
+|    hard/front_damage_quadrant_ent... | 0.102        |
+|    hard/front_damage_reward_mean     | 0.00169      |
+|    hard/front_damage_second_pct_mean | 0.0141       |
+|    hard/front_damage_total_pct_mean  | 0.412        |
+|    hard/frozen_threat_damage_pct_... | 0.0957       |
+|    hard/frozen_threat_ticks_mean     | 120          |
+|    hard/multi_hit_splash_damage_p... | 0.412        |
+|    hard/multi_hit_splash_events_mean | 28.7         |
+|    hard/multi_hit_splash_penalty_... | 0.0449       |
+|    hard/objective_shaping_reward_... | 0.108        |
+|    hard/p_all_spells_used            | 0.26         |
+|    hard/p_damage_ge_90               | 0            |
+|    hard/p_stars_ge_2                 | 0.155        |
+|    hard/rage_bonus_damage_pct_mean   | 0.0165       |
+|    hard/rage_bonus_defense_damage... | 0.0123       |
+|    hard/rage_bonus_townhall_damag... | 0.0316       |
+|    hard/rage_casts_mean              | 3.1          |
+|    hard/rage_effect_reward_mean      | 0.00577      |
+|    hard/score_mean                   | 0.877        |
+|    hard/spell_casts_mean             | 7            |
+|    hard/spell_shaping_reward_mean    | 0.0698       |
+|    hard/spells_remaining_mean        | 1            |
+|    hard/splash_cluster_risk_pct_mean | 1.67         |
+|    hard/splash_damage_taken_pct_mean | 0.637        |
+|    hard/splash_risk_penalty_mean     | 0.0292       |
+|    hard/stars_mean                   | 0.465        |
+|    hard/survival_reward_mean         | 0.00183      |
+|    hard/tactical_shaping_reward_mean | -0.106       |
+|    hard/ticks_mean                   | 720          |
+|    hard/townhall_damage_pct_mean     | 0.34         |
+|    hard/townhall_damage_reward_mean  | 0.034        |
+|    hard/townhall_destroy_reward_mean | 0.0115       |
+|    hard/townhall_destroyed_rate      | 0.23         |
+|    hard/troop_damage_taken_pct_mean  | 0.856        |
+|    hard/truncated_rate               | 0.98         |
+|    hard/unused_spell_penalty_mean    | 0.0301       |
+|    hard/useful_freeze_casts_mean     | 3.89         |
+|    hard/useful_rage_casts_mean       | 3.1          |
+|    hard/wall_breaker_damaged_wall... | 53.4         |
+|    hard/wall_breaker_death_penalt... | 0.0192       |
+|    hard/wall_breaker_destroyed_wa... | 22.2         |
+|    hard/wall_breaker_explosions_mean | 11.8         |
+|    hard/wall_breaker_reward_mean     | 0.0842       |
+|    hard/wall_breakers_dead_withou... | 3.2          |
+|    hard/wasted_spell_casts_mean      | 0            |
+|    hard/wasted_spell_penalty_mean    | 0            |
+| rollout/                             |              |
+|    ep_len_mean                       | 72           |
+|    ep_rew_mean                       | 0.884        |
+| throughput/                          |              |
+|    env_steps_per_sec                 | 380          |
+|    episodes_per_sec                  | 0            |
+| time/                                |              |
+|    fps                               | 354          |
+|    iterations                        | 3            |
+|    time_elapsed                      | 831          |
+|    total_timesteps                   | 10321920     |
+| train/                               |              |
+|    approx_kl                         | 0.0011505584 |
+|    clip_fraction                     | 0.00255      |
+|    clip_range                        | 0.15         |
+|    entropy_loss                      | -4.4         |
+|    explained_variance                | 0.767        |
+|    learning_rate                     | 0.0001       |
+|    loss                              | -0.0416      |
+|    n_updates                         | 3068         |
+|    policy_gradient_loss              | -0.000548    |
+|    value_loss                        | 0.0935       |
+-------------------------------------------------------
+timesteps=10322112 | env_steps/sec=168.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10324032 | env_steps/sec=359.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10325952 | env_steps/sec=364.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10327872 | env_steps/sec=364.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10329792 | env_steps/sec=363.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10331904 | env_steps/sec=410.1 | episodes/sec=37.28 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10333824 | env_steps/sec=364.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10335744 | env_steps/sec=370.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10337664 | env_steps/sec=351.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10339584 | env_steps/sec=362.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10341504 | env_steps/sec=350.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10343424 | env_steps/sec=361.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10345344 | env_steps/sec=379.7 | episodes/sec=37.97 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10347264 | env_steps/sec=380.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10349184 | env_steps/sec=366.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10351104 | env_steps/sec=362.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10353024 | env_steps/sec=369.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10354944 | env_steps/sec=358.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10356672 | env_steps/sec=345.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10358592 | env_steps/sec=353.6 | episodes/sec=2.95 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10360704 | env_steps/sec=387.9 | episodes/sec=32.33 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10362624 | env_steps/sec=369.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10364544 | env_steps/sec=370.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10366272 | env_steps/sec=319.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10368000 | env_steps/sec=341.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10369920 | env_steps/sec=366.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10371840 | env_steps/sec=352.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10373952 | env_steps/sec=391.6 | episodes/sec=35.60 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10375872 | env_steps/sec=373.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10377792 | env_steps/sec=349.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10379712 | env_steps/sec=360.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10381632 | env_steps/sec=370.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10383360 | env_steps/sec=340.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10385088 | env_steps/sec=344.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10387200 | env_steps/sec=418.5 | episodes/sec=38.05 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10389120 | env_steps/sec=375.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10390848 | env_steps/sec=340.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10392576 | env_steps/sec=342.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10394304 | env_steps/sec=334.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10396032 | env_steps/sec=330.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10397760 | env_steps/sec=328.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10399488 | env_steps/sec=345.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10401600 | env_steps/sec=404.6 | episodes/sec=36.79 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10403520 | env_steps/sec=349.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10405440 | env_steps/sec=350.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10407360 | env_steps/sec=359.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10409088 | env_steps/sec=334.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10411008 | env_steps/sec=344.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10412928 | env_steps/sec=349.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10415040 | env_steps/sec=391.3 | episodes/sec=35.57 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10416960 | env_steps/sec=347.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10418688 | env_steps/sec=340.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+-------------------------------------------------------
+| gpu/                                 |              |
+|    gpu_count                         | 2            |
+|    gpu_mem_total_gb_mean             | 47.8         |
+|    gpu_mem_used_gb_mean              | 2.85         |
+|    gpu_util_pct_max                  | 0            |
+|    gpu_util_pct_mean                 | 0            |
+| profile/                             |              |
+|    hard/damage_mean                  | 0.418        |
+|    hard/defense_damage_pct_mean      | 0.398        |
+|    hard/defense_damage_reward_mean   | 0.0478       |
+|    hard/defense_destroy_reward_mean  | 0.014        |
+|    hard/defenses_destroyed_mean      | 2.81         |
+|    hard/deploy_crowding_penalty_mean | 0.0999       |
+|    hard/deployment_quadrant_entro... | 0.151        |
+|    hard/deployment_top3_cell_frac... | 0.177        |
+|    hard/deployment_top_cell_fract... | 0.0735       |
+|    hard/deployment_unique_cells_mean | 45.2         |
+|    hard/deployments_mean             | 64.8         |
+|    hard/ep_len_mean                  | 72           |
+|    hard/ep_rew_mean                  | 0.93         |
+|    hard/episodes_window              | 200          |
+|    hard/freeze_casts_mean            | 3.79         |
+|    hard/freeze_effect_reward_mean    | 0.0925       |
+|    hard/front_damage_quadrant_ent... | 0.0907       |
+|    hard/front_damage_reward_mean     | 0.00158      |
+|    hard/front_damage_second_pct_mean | 0.0132       |
+|    hard/front_damage_total_pct_mean  | 0.418        |
+|    hard/frozen_threat_damage_pct_... | 0.0915       |
+|    hard/frozen_threat_ticks_mean     | 116          |
+|    hard/multi_hit_splash_damage_p... | 0.417        |
+|    hard/multi_hit_splash_events_mean | 29.1         |
+|    hard/multi_hit_splash_penalty_... | 0.0461       |
+|    hard/objective_shaping_reward_... | 0.112        |
+|    hard/p_all_spells_used            | 0.18         |
+|    hard/p_damage_ge_90               | 0            |
+|    hard/p_stars_ge_2                 | 0.2          |
+|    hard/rage_bonus_damage_pct_mean   | 0.0173       |
+|    hard/rage_bonus_defense_damage... | 0.0129       |
+|    hard/rage_bonus_townhall_damag... | 0.0309       |
+|    hard/rage_casts_mean              | 3.15         |
+|    hard/rage_effect_reward_mean      | 0.00606      |
+|    hard/score_mean                   | 0.933        |
+|    hard/spell_casts_mean             | 6.93         |
+|    hard/spell_shaping_reward_mean    | 0.0666       |
+|    hard/spells_remaining_mean        | 1.06         |
+|    hard/splash_cluster_risk_pct_mean | 1.71         |
+|    hard/splash_damage_taken_pct_mean | 0.641        |
+|    hard/splash_risk_penalty_mean     | 0.0296       |
+|    hard/stars_mean                   | 0.515        |
+|    hard/survival_reward_mean         | 0.00178      |
+|    hard/tactical_shaping_reward_mean | -0.109       |
+|    hard/ticks_mean                   | 720          |
+|    hard/townhall_damage_pct_mean     | 0.359        |
+|    hard/townhall_damage_reward_mean  | 0.0359       |
+|    hard/townhall_destroy_reward_mean | 0.0145       |
+|    hard/townhall_destroyed_rate      | 0.29         |
+|    hard/troop_damage_taken_pct_mean  | 0.858        |
+|    hard/truncated_rate               | 0.99         |
+|    hard/unused_spell_penalty_mean    | 0.032        |
+|    hard/useful_freeze_casts_mean     | 3.79         |
+|    hard/useful_rage_casts_mean       | 3.15         |
+|    hard/wall_breaker_damaged_wall... | 52.5         |
+|    hard/wall_breaker_death_penalt... | 0.0197       |
+|    hard/wall_breaker_destroyed_wa... | 21.4         |
+|    hard/wall_breaker_explosions_mean | 11.7         |
+|    hard/wall_breaker_reward_mean     | 0.0826       |
+|    hard/wall_breakers_dead_withou... | 3.29         |
+|    hard/wasted_spell_casts_mean      | 0            |
+|    hard/wasted_spell_penalty_mean    | 0            |
+| rollout/                             |              |
+|    ep_len_mean                       | 72           |
+|    ep_rew_mean                       | 0.883        |
+| throughput/                          |              |
+|    env_steps_per_sec                 | 340          |
+|    episodes_per_sec                  | 0            |
+| time/                                |              |
+|    fps                               | 354          |
+|    iterations                        | 4            |
+|    time_elapsed                      | 1110         |
+|    total_timesteps                   | 10420224     |
+| train/                               |              |
+|    approx_kl                         | 0.0009177948 |
+|    clip_fraction                     | 0.000315     |
+|    clip_range                        | 0.15         |
+|    entropy_loss                      | -4.46        |
+|    explained_variance                | 0.752        |
+|    learning_rate                     | 0.0001       |
+|    loss                              | -0.0426      |
+|    n_updates                         | 3072         |
+|    policy_gradient_loss              | -0.000695    |
+|    value_loss                        | 0.101        |
+-------------------------------------------------------
+timesteps=10420416 | env_steps/sec=168.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10422336 | env_steps/sec=357.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10424064 | env_steps/sec=340.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10425984 | env_steps/sec=351.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10427904 | env_steps/sec=379.3 | episodes/sec=37.93 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10429824 | env_steps/sec=365.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10431552 | env_steps/sec=343.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10433280 | env_steps/sec=339.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10435008 | env_steps/sec=345.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10436928 | env_steps/sec=375.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10438848 | env_steps/sec=360.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10440768 | env_steps/sec=353.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10442880 | env_steps/sec=388.9 | episodes/sec=35.35 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10444800 | env_steps/sec=374.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10446720 | env_steps/sec=359.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10448640 | env_steps/sec=371.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10450560 | env_steps/sec=366.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10452480 | env_steps/sec=362.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10454400 | env_steps/sec=352.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10456512 | env_steps/sec=407.6 | episodes/sec=37.06 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10458624 | env_steps/sec=387.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10460544 | env_steps/sec=361.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10462464 | env_steps/sec=363.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10464384 | env_steps/sec=367.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10466304 | env_steps/sec=360.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10468032 | env_steps/sec=325.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10470144 | env_steps/sec=413.3 | episodes/sec=37.57 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10472256 | env_steps/sec=369.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10473984 | env_steps/sec=332.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10475904 | env_steps/sec=370.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10477824 | env_steps/sec=377.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10479744 | env_steps/sec=368.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10481664 | env_steps/sec=372.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10483584 | env_steps/sec=355.4 | episodes/sec=35.54 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10485696 | env_steps/sec=379.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10487424 | env_steps/sec=336.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10489344 | env_steps/sec=355.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10491264 | env_steps/sec=352.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10492992 | env_steps/sec=333.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10494720 | env_steps/sec=339.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10496832 | env_steps/sec=395.1 | episodes/sec=4.49 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10498944 | env_steps/sec=407.5 | episodes/sec=32.42 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10500864 | env_steps/sec=371.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10502784 | env_steps/sec=360.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10504512 | env_steps/sec=335.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10506432 | env_steps/sec=361.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10508352 | env_steps/sec=354.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10510080 | env_steps/sec=344.8 | episodes/sec=0.20 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10512192 | env_steps/sec=403.6 | episodes/sec=36.50 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10514112 | env_steps/sec=382.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10515840 | env_steps/sec=343.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10517760 | env_steps/sec=359.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+-------------------------------------------------------
+| gpu/                                 |              |
+|    gpu_count                         | 2            |
+|    gpu_mem_total_gb_mean             | 47.8         |
+|    gpu_mem_used_gb_mean              | 2.85         |
+|    gpu_util_pct_max                  | 0            |
+|    gpu_util_pct_mean                 | 0            |
+| profile/                             |              |
+|    hard/damage_mean                  | 0.4          |
+|    hard/defense_damage_pct_mean      | 0.389        |
+|    hard/defense_damage_reward_mean   | 0.0467       |
+|    hard/defense_destroy_reward_mean  | 0.0137       |
+|    hard/defenses_destroyed_mean      | 2.73         |
+|    hard/deploy_crowding_penalty_mean | 0.1          |
+|    hard/deployment_quadrant_entro... | 0.168        |
+|    hard/deployment_top3_cell_frac... | 0.171        |
+|    hard/deployment_top_cell_fract... | 0.0704       |
+|    hard/deployment_unique_cells_mean | 46           |
+|    hard/deployments_mean             | 64.8         |
+|    hard/ep_len_mean                  | 72           |
+|    hard/ep_rew_mean                  | 0.773        |
+|    hard/episodes_window              | 200          |
+|    hard/freeze_casts_mean            | 3.92         |
+|    hard/freeze_effect_reward_mean    | 0.0955       |
+|    hard/front_damage_quadrant_ent... | 0.101        |
+|    hard/front_damage_reward_mean     | 0.00161      |
+|    hard/front_damage_second_pct_mean | 0.0134       |
+|    hard/front_damage_total_pct_mean  | 0.4          |
+|    hard/frozen_threat_damage_pct_... | 0.0992       |
+|    hard/frozen_threat_ticks_mean     | 125          |
+|    hard/multi_hit_splash_damage_p... | 0.402        |
+|    hard/multi_hit_splash_events_mean | 28.7         |
+|    hard/multi_hit_splash_penalty_... | 0.0449       |
+|    hard/objective_shaping_reward_... | 0.1          |
+|    hard/p_all_spells_used            | 0.23         |
+|    hard/p_damage_ge_90               | 0            |
+|    hard/p_stars_ge_2                 | 0.125        |
+|    hard/rage_bonus_damage_pct_mean   | 0.0157       |
+|    hard/rage_bonus_defense_damage... | 0.0105       |
+|    hard/rage_bonus_townhall_damag... | 0.0298       |
+|    hard/rage_casts_mean              | 2.98         |
+|    hard/rage_effect_reward_mean      | 0.00549      |
+|    hard/score_mean                   | 0.785        |
+|    hard/spell_casts_mean             | 6.9          |
+|    hard/spell_shaping_reward_mean    | 0.068        |
+|    hard/spells_remaining_mean        | 1.1          |
+|    hard/splash_cluster_risk_pct_mean | 1.64         |
+|    hard/splash_damage_taken_pct_mean | 0.63         |
+|    hard/splash_risk_penalty_mean     | 0.0293       |
+|    hard/stars_mean                   | 0.385        |
+|    hard/survival_reward_mean         | 0.00147      |
+|    hard/tactical_shaping_reward_mean | -0.108       |
+|    hard/ticks_mean                   | 720          |
+|    hard/townhall_damage_pct_mean     | 0.292        |
+|    hard/townhall_damage_reward_mean  | 0.0292       |
+|    hard/townhall_destroy_reward_mean | 0.0108       |
+|    hard/townhall_destroyed_rate      | 0.215        |
+|    hard/troop_damage_taken_pct_mean  | 0.854        |
+|    hard/truncated_rate               | 0.99         |
+|    hard/unused_spell_penalty_mean    | 0.033        |
+|    hard/useful_freeze_casts_mean     | 3.92         |
+|    hard/useful_rage_casts_mean       | 2.98         |
+|    hard/wall_breaker_damaged_wall... | 53.4         |
+|    hard/wall_breaker_death_penalt... | 0.019        |
+|    hard/wall_breaker_destroyed_wa... | 21.8         |
+|    hard/wall_breaker_explosions_mean | 11.8         |
+|    hard/wall_breaker_reward_mean     | 0.0826       |
+|    hard/wall_breakers_dead_withou... | 3.17         |
+|    hard/wasted_spell_casts_mean      | 0            |
+|    hard/wasted_spell_penalty_mean    | 0            |
+| rollout/                             |              |
+|    ep_len_mean                       | 72           |
+|    ep_rew_mean                       | 0.701        |
+| throughput/                          |              |
+|    env_steps_per_sec                 | 359          |
+|    episodes_per_sec                  | 0            |
+| time/                                |              |
+|    fps                               | 354          |
+|    iterations                        | 5            |
+|    time_elapsed                      | 1386         |
+|    total_timesteps                   | 10518528     |
+| train/                               |              |
+|    approx_kl                         | 0.0024203712 |
+|    clip_fraction                     | 0.00864      |
+|    clip_range                        | 0.15         |
+|    entropy_loss                      | -4.51        |
+|    explained_variance                | 0.759        |
+|    learning_rate                     | 0.0001       |
+|    loss                              | -0.0434      |
+|    n_updates                         | 3076         |
+|    policy_gradient_loss              | -0.000892    |
+|    value_loss                        | 0.0993       |
+-------------------------------------------------------
+timesteps=10518720 | env_steps/sec=119.2 | episodes/sec=0.00 | gpu_util_mean=18% gpu_util_max=36% | gpu_mem_mean=2.9/47.8GB
+timesteps=10520640 | env_steps/sec=356.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10522560 | env_steps/sec=360.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10524672 | env_steps/sec=397.1 | episodes/sec=36.10 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10526592 | env_steps/sec=364.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10528320 | env_steps/sec=343.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10530048 | env_steps/sec=327.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10531776 | env_steps/sec=335.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10533696 | env_steps/sec=354.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10535424 | env_steps/sec=343.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10537344 | env_steps/sec=350.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10539456 | env_steps/sec=409.7 | episodes/sec=37.25 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10541376 | env_steps/sec=357.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10543296 | env_steps/sec=346.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10545216 | env_steps/sec=356.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10547136 | env_steps/sec=376.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10549056 | env_steps/sec=363.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10550976 | env_steps/sec=355.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10553088 | env_steps/sec=396.9 | episodes/sec=36.08 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10555008 | env_steps/sec=382.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10556928 | env_steps/sec=364.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10558848 | env_steps/sec=353.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10560768 | env_steps/sec=365.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10562496 | env_steps/sec=334.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10564416 | env_steps/sec=345.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10566336 | env_steps/sec=349.0 | episodes/sec=34.90 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10568256 | env_steps/sec=361.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10569984 | env_steps/sec=325.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10571712 | env_steps/sec=336.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10573632 | env_steps/sec=364.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10575360 | env_steps/sec=344.4 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10577088 | env_steps/sec=331.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10578816 | env_steps/sec=342.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10580736 | env_steps/sec=353.5 | episodes/sec=35.35 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10582656 | env_steps/sec=366.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10584576 | env_steps/sec=349.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10586496 | env_steps/sec=353.0 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10588224 | env_steps/sec=342.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10590144 | env_steps/sec=352.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10591872 | env_steps/sec=344.6 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10593792 | env_steps/sec=383.7 | episodes/sec=38.37 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10595712 | env_steps/sec=372.5 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10597632 | env_steps/sec=347.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10599552 | env_steps/sec=351.7 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10601472 | env_steps/sec=358.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10603392 | env_steps/sec=357.1 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10605312 | env_steps/sec=352.9 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10607040 | env_steps/sec=328.5 | episodes/sec=1.52 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10609152 | env_steps/sec=408.7 | episodes/sec=35.61 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10611072 | env_steps/sec=356.2 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10612800 | env_steps/sec=321.3 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+timesteps=10614528 | env_steps/sec=325.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=1% | gpu_mem_mean=2.9/47.8GB
+timesteps=10616448 | env_steps/sec=351.8 | episodes/sec=0.00 | gpu_util_mean=0% gpu_util_max=0% | gpu_mem_mean=2.9/47.8GB
+-------------------------------------------------------
+| gpu/                                 |              |
+|    gpu_count                         | 2            |
+|    gpu_mem_total_gb_mean             | 47.8         |
+|    gpu_mem_used_gb_mean              | 2.85         |
+|    gpu_util_pct_max                  | 0            |
+|    gpu_util_pct_mean                 | 0            |
+| profile/                             |              |
+|    hard/damage_mean                  | 0.389        |
+|    hard/defense_damage_pct_mean      | 0.385        |
+|    hard/defense_damage_reward_mean   | 0.0462       |
+|    hard/defense_destroy_reward_mean  | 0.0132       |
+|    hard/defenses_destroyed_mean      | 2.65         |
+|    hard/deploy_crowding_penalty_mean | 0.0996       |
+|    hard/deployment_quadrant_entro... | 0.193        |
+|    hard/deployment_top3_cell_frac... | 0.168        |
+|    hard/deployment_top_cell_fract... | 0.0694       |
+|    hard/deployment_unique_cells_mean | 46.8         |
+|    hard/deployments_mean             | 64.8         |
+|    hard/ep_len_mean                  | 72           |
+|    hard/ep_rew_mean                  | 0.706        |
+|    hard/episodes_window              | 200          |
+|    hard/freeze_casts_mean            | 3.89         |
+|    hard/freeze_effect_reward_mean    | 0.0943       |
+|    hard/front_damage_quadrant_ent... | 0.125        |
+|    hard/front_damage_reward_mean     | 0.00207      |
+|    hard/front_damage_second_pct_mean | 0.0172       |
+|    hard/front_damage_total_pct_mean  | 0.389        |
+|    hard/frozen_threat_damage_pct_... | 0.0947       |
+|    hard/frozen_threat_ticks_mean     | 116          |
+|    hard/multi_hit_splash_damage_p... | 0.396        |
+|    hard/multi_hit_splash_events_mean | 28.1         |
+|    hard/multi_hit_splash_penalty_... | 0.0444       |
+|    hard/objective_shaping_reward_... | 0.0943       |
+|    hard/p_all_spells_used            | 0.245        |
+|    hard/p_damage_ge_90               | 0            |
+|    hard/p_stars_ge_2                 | 0.105        |
+|    hard/rage_bonus_damage_pct_mean   | 0.0131       |
+|    hard/rage_bonus_defense_damage... | 0.0109       |
+|    hard/rage_bonus_townhall_damag... | 0.0196       |
+|    hard/rage_casts_mean              | 3.07         |
+|    hard/rage_effect_reward_mean      | 0.00458      |
+|    hard/score_mean                   | 0.719        |
+|    hard/spell_casts_mean             | 6.96         |
+|    hard/spell_shaping_reward_mean    | 0.0677       |
+|    hard/spells_remaining_mean        | 1.04         |
+|    hard/splash_cluster_risk_pct_mean | 1.61         |
+|    hard/splash_damage_taken_pct_mean | 0.622        |
+|    hard/splash_risk_penalty_mean     | 0.029        |
+|    hard/stars_mean                   | 0.33         |
+|    hard/survival_reward_mean         | 0.00123      |
+|    hard/tactical_shaping_reward_mean | -0.103       |
+|    hard/ticks_mean                   | 720          |
+|    hard/townhall_damage_pct_mean     | 0.262        |
+|    hard/townhall_damage_reward_mean  | 0.0262       |
+|    hard/townhall_destroy_reward_mean | 0.00875      |
+|    hard/townhall_destroyed_rate      | 0.175        |
+|    hard/troop_damage_taken_pct_mean  | 0.858        |
+|    hard/truncated_rate               | 0.995        |
+|    hard/unused_spell_penalty_mean    | 0.0312       |
+|    hard/useful_freeze_casts_mean     | 3.89         |
+|    hard/useful_rage_casts_mean       | 3.07         |
+|    hard/wall_breaker_damaged_wall... | 54           |
+|    hard/wall_breaker_death_penalt... | 0.0177       |
+|    hard/wall_breaker_destroyed_wa... | 22.3         |
+|    hard/wall_breaker_explosions_mean | 12.1         |
+|    hard/wall_breaker_reward_mean     | 0.0849       |
+|    hard/wall_breakers_dead_withou... | 2.94         |
+|    hard/wasted_spell_casts_mean      | 0            |
+|    hard/wasted_spell_penalty_mean    | 0            |
+| rollout/                             |              |
+|    ep_len_mean                       | 72           |
+|    ep_rew_mean                       | 0.618        |
+| throughput/                          |              |
+|    env_steps_per_sec                 | 352          |
+|    episodes_per_sec                  | 0            |
+| time/                                |              |
+|    fps                               | 353          |
+|    iterations                        | 6            |
+|    time_elapsed                      | 1668         |
+|    total_timesteps                   | 10616832     |
+| train/                               |              |
+|    approx_kl                         | 0.0023859406 |
+|    clip_fraction                     | 0.0102       |
+|    clip_range                        | 0.15         |
+|    entropy_loss                      | -4.56        |
+|    explained_variance                | 0.769        |
+|    learning_rate                     | 0.0001       |
+|    loss                              | -0.0477      |
+|    n_updates                         | 3080         |
+|    policy_gradient_loss              | -0.00147     |
+|    value_loss                        | 0.0989       |
+-------------------------------------------------------
+saved final model: checkpoints/maskable_ppo/reward_v5_hard_probe_plus_from_seed91_w192_gpu0_20260520_042657/final_model

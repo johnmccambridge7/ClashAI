@@ -18,3 +18,8 @@ config: {'run_name': 'spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724',
 2026-05-18 04:07:27,624 INFO    MainThread:159613 [wandb_run.py:_redirect():2451] Redirects installed.
 2026-05-18 04:07:27,627 INFO    MainThread:159613 [wandb_init.py:init():1095] run started, returning control to user process
 2026-05-18 04:07:31,955 INFO    MainThread:159613 [wandb_run.py:_tensorboard_callback():1560] tensorboard callback: runs/maskable_ppo/spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724_1, True
+2026-05-18 14:40:50,633 INFO    MainThread:159613 [wandb_run.py:_finish():2271] finishing run jmc314-lumenary-com/ClashAI/spell_semantic_reward_v2_w64_seed72_gpu0_20260518_040724
+2026-05-18 14:40:50,634 INFO    MainThread:159613 [wandb_run.py:_atexit_cleanup():2476] got exitcode: 0
+2026-05-18 14:40:50,635 INFO    MainThread:159613 [wandb_run.py:_restore():2458] restore
+2026-05-18 14:40:50,635 INFO    MainThread:159613 [wandb_run.py:_restore():2464] restore done
+2026-05-18 14:40:53,513 INFO    MainThread:159613 [wandb_run.py:_footer_sync_info():3877] logging synced files

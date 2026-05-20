@@ -1,0 +1,9 @@
+{
+  "elapsed_seconds": 111.77859935094602,
+  "final_model": "checkpoints/maskable_ppo/smoke_strict_spell_spread_load/final_model.zip",
+  "finished_at_unix": 1779208084.123712,
+  "num_timesteps": 10031104,
+  "run_name": "smoke_strict_spell_spread_load",
+  "started_at_unix": 1779207972.345115,
+  "status": "completed"
+}

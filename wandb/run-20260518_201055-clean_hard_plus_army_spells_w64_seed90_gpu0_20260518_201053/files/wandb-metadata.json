@@ -1,0 +1,93 @@
+{
+  "os": "Linux-6.8.0-111-lowlatency-x86_64-with-glibc2.39",
+  "python": "CPython 3.12.13",
+  "startedAt": "2026-05-18T20:10:55.822293Z",
+  "args": [
+    "--wandb",
+    "--wandb-project",
+    "ClashAI",
+    "--wandb-entity",
+    "jmc314-lumenary-com",
+    "--wandb-group",
+    "clean_hard_plus_army_spells",
+    "--wandb-tags",
+    "clean,hard,plus-army,plus-wallbreakers,plus-spells,reward-v3",
+    "--wandb-log-model",
+    "--profile",
+    "hard,hard,hard,medium",
+    "--eval-profile",
+    "hard,medium",
+    "--army-composition",
+    "barbarian=50,wall_breaker=15",
+    "--spell-composition",
+    "rage=4,freeze=4",
+    "--max-ticks",
+    "900",
+    "--workers",
+    "64",
+    "--total-timesteps",
+    "10000000",
+    "--n-steps",
+    "512",
+    "--batch-size",
+    "2048",
+    "--learning-rate",
+    "0.0003",
+    "--checkpoint-freq",
+    "500000",
+    "--status-interval",
+    "5",
+    "--device",
+    "cuda",
+    "--torch-threads",
+    "1",
+    "--start-method",
+    "forkserver",
+    "--monitor-dir",
+    "runs/monitor",
+    "--run-name",
+    "clean_hard_plus_army_spells_w64_seed90_gpu0_20260518_201053"
+  ],
+  "program": "/workspace/ClashAI/scripts/train_maskable_ppo.py",
+  "codePath": "scripts/train_maskable_ppo.py",
+  "codePathLocal": "scripts/train_maskable_ppo.py",
+  "git": {
+    "remote": "https://github.com/johnmccambridge7/ClashAI",
+    "commit": "fef668854a4937dc7e29faca670d904a88a60fb9"
+  },
+  "email": "john@lumenary.com",
+  "root": "/workspace/ClashAI",
+  "host": "800f0fbd3e15",
+  "executable": "/workspace/ClashAI/.venv/bin/python",
+  "cpu_count": 192,
+  "cpu_count_logical": 384,
+  "gpu": "NVIDIA RTX PRO 5000 Blackwell",
+  "gpu_count": 2,
+  "disk": {
+    "/": {
+      "total": "68719476736",
+      "used": "15647051776"
+    }
+  },
+  "memory": {
+    "total": "540499230720"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA RTX PRO 5000 Blackwell",
+      "memoryTotal": "51312066560",
+      "cudaCores": 14080,
+      "architecture": "Blackwell",
+      "uuid": "GPU-071138fc-ce7b-5544-2219-f0476262ad3e"
+    },
+    {
+      "name": "NVIDIA RTX PRO 5000 Blackwell",
+      "memoryTotal": "51312066560",
+      "cudaCores": 14080,
+      "architecture": "Blackwell",
+      "uuid": "GPU-dbde3035-a6b5-3a2b-3b64-c7a6af6d02f8"
+    }
+  ],
+  "cudaVersion": "13.0",
+  "writerId": "dklyd337n6n3ookl5birhr7u6hskbnzh"
+}
